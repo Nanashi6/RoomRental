@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using WebApplication1.Models;
+using RoomRental.Models;
 
 namespace WebApplication1.Controllers
 {
