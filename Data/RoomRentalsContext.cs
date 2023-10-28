@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using RoomRental.Models;
 
-namespace RoomRental;
+namespace RoomRental.Data;
 
 public partial class RoomRentalsContext : DbContext
 {

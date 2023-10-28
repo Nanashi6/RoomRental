@@ -1,0 +1,90 @@
+﻿@model RoomRental.ViewModels.PeopleViewModel
+@*подключаем все tag-хелперы*@
+@addTagHelper *, RoomRental
+@{
+    ViewData["Title"] = "People";
+    string surnameFind = Model.FilterViewModel.SurnameFind;
+    string nameFind = Model.FilterViewModel.NameFind;
+    string lastnameFind = Model.FilterViewModel.LastnameFind;
+}
+
+<h1>People</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<form method="get">
+    <label>Фамилия: </label>
+    <input name="surnameFind" value="@surnameFind" />
+
+    <label>Имя: </label>
+    <input name="nameFind" value="@nameFind" />
+
+    <label>Отчество: </label>
+    <input name="lastnameFind" value="@lastnameFind" />
+
+    <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
+    <input type="submit" value="Фильтр" />
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.SurnameSort)"
+                   asp-route-surnameFind="@surnameFind"
+                   asp-route-nameFind="@nameFind"
+                   asp-route-lastnameFind="@lastnameFind">
+                    @Html.DisplayNameFor(model => model.People.SingleOrDefault().Surname)
+                </a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.NameSort)"
+                   asp-route-surnameFind="@surnameFind"
+                   asp-route-nameFind="@nameFind"
+                   asp-route-lastnameFind="@lastnameFind">
+                    @Html.DisplayNameFor(model => model.People.SingleOrDefault().Name)
+                </a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.LastnameSort)"
+                   asp-route-surnameFind="@surnameFind"
+                   asp-route-nameFind="@nameFind"
+                   asp-route-lastnameFind="@lastnameFind">
+                    @Html.DisplayNameFor(model => model.People.SingleOrDefault().Lastname)
+                </a>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.People) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Surname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Lastname)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.PersonId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.PersonId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.PersonId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<page-link page-model="Model.PageViewModel" page-action="Index"
+           page-url-sortOrder="@(Model.SortViewModel.Current)"
+           page-url-surnameFind="@surnameFind"
+           page-url-nameFind="@nameFind"
+           page-url-lastnameFind="@lastnameFind"></page-link>

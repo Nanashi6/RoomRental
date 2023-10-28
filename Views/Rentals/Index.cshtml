@@ -1,0 +1,97 @@
+﻿@model RoomRental.ViewModels.RentalsViewModel
+@*подключаем все tag-хелперы*@
+@addTagHelper *, RoomRental
+@{
+    ViewData["Title"] = "Rentals";
+    string organizationNameFind = Model.FilterViewModel.OrganizationNameFind;
+    DateTime? checkInDateFind = Model.FilterViewModel.CheckInDateFind;
+    DateTime? checkOutDateFind = Model.FilterViewModel.CheckOutDateFind;
+}
+
+<h1>Rentals</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+
+<form method="get">
+    <label>Название организации: </label>
+    <input name="organizationNameFind" value="@organizationNameFind" />
+
+    <label>Дата заезда: </label>
+    <input type="date" name="checkInDateFind" value="@checkInDateFind" />
+
+    <label>Дата выезда: </label>
+    <input type="date" name="checkOutDateFind" value="@checkOutDateFind" />
+
+    <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
+    <input type="submit" value="Фильтр" />
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RoomId)
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.OrganizationNameSort)"
+                   asp-route-organizationNameFind="@organizationNameFind"
+                   asp-route-checkInDateFind="@checkInDateFind"
+                   asp-route-checkOutDateFind="@checkOutDateFind">
+                    @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RentalOrganization)
+                </a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.CheckInDateSort)"
+                   asp-route-organizationNameFind="@organizationNameFind"
+                   asp-route-checkInDateFind="@checkInDateFind"
+                   asp-route-checkOutDateFind="@checkOutDateFind">
+                    @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().CheckInDate)
+                </a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.CheckOutDateSort)"
+                   asp-route-organizationNameFind="@organizationNameFind"
+                   asp-route-checkInDateFind="@checkInDateFind"
+                   asp-route-checkOutDateFind="@checkOutDateFind">
+                    @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().CheckOutDate)
+                </a>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Rentals) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoomId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RentalOrganization)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CheckInDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CheckOutDate)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.RentalId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.RentalId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.RentalId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<page-link page-model="Model.PageViewModel" page-action="Index"
+           page-url-sortOrder="@(Model.SortViewModel.Current)"
+           page-url-organizationNameFind="@organizationNameFind"
+           page-url-checkInDateFind="@checkInDateFind"
+           page-url-checkOutDateFind="@checkOutDateFind"></page-link>
