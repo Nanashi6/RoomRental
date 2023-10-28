@@ -1,4 +1,5 @@
 ﻿using RoomRental.ViewModels.FilterViewModels;
+using RoomRental.ViewModels.SortViewModels;
 
 namespace RoomRental.ViewModels
 {

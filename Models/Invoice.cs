@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace RoomRental.Models;
 
 public partial class Invoice
 {
+    [Display(Name = "Идентификатор")]
     public int InvoiceId { get; set; }
-
+    [Display(Name = "Организация-арендатор")]
     public int? RentalOrganizationId { get; set; }
-
+    [Display(Name = "Помещение")]
     public int RoomId { get; set; }
-
+    [Display(Name = "Сумма оплаты")]
     public decimal Amount { get; set; }
-
+    [Display(Name = "Дата оплаты")]
     public DateTime PaymentDate { get; set; }
-
+    [Display(Name = "Оформляющий")]
     public int ResponsiblePerson { get; set; }
 
     public virtual Organization? RentalOrganization { get; set; }

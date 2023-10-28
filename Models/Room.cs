@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace RoomRental.Models;
 
 public partial class Room
 {
+    [Display(Name = "Идентификатор")]
     public int RoomId { get; set; }
-
+    [Display(Name = "Здание")]
     public int BuildingId { get; set; }
-
+    [Display(Name = "Площадь")]
     public decimal Area { get; set; }
-
-    public string Description { get; set; } = null!;
-
-    public byte[] Photo { get; set; } = null!;
-
-    public virtual Building Building { get; set; } = null!;
+    [Display(Name = "Описание")]
+    public string Description { get; set; }
+    [Display(Name = "Фотография")]
+    public byte[] Photo { get; set; }
+    public virtual Building Building { get; set; }
 
     public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
 
