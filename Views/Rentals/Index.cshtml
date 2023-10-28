@@ -1,7 +1,10 @@
-﻿@model IEnumerable<RoomRental.Models.Rental>
+﻿@model RoomRental.ViewModels.RentalsViewModel
 
 @{
     ViewData["Title"] = "Index";
+    string organizationNameFind = Model.FilterViewModel.OrganizationNameFind;
+    DateTime? checkInDateFind = Model.FilterViewModel.CheckInDateFind;
+    DateTime? checkOutDateFind = Model.FilterViewModel.CheckOutDateFind;
 }
 
 <h1>Index</h1>
@@ -13,34 +16,34 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.CheckInDate)
+                @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RoomId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CheckOutDate)
+                @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RentalOrganization)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RentalOrganization)
+                @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().CheckInDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Room)
+                @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().CheckOutDate)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Rentals) {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoomId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RentalOrganization)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.CheckInDate)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.CheckOutDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RentalOrganization.OrganizationId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Room.RoomId)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.RentalId">Edit</a> |

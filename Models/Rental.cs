@@ -16,9 +16,11 @@ public partial class Rental
     public int RentalOrganizationId { get; set; }
 
     [Display(Name = "Дата начала аренды")]
+    [DataType(DataType.Date)]
     public DateTime CheckInDate { get; set; }
 
     [Display(Name = "Дата окончания аренды")]
+    [DataType(DataType.Date)]
     public DateTime CheckOutDate { get; set; }
 
     public virtual Organization RentalOrganization { get; set; } = null!;

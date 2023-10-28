@@ -13,6 +13,7 @@ namespace RoomRental.ViewModels
         [Display(Name = "Сумма оплаты")]
         public decimal Amount { get; set; }
         [Display(Name = "Дата оплаты")]
+        [DataType(DataType.Date)]
         public DateTime PaymentDate { get; set; }
         [Display(Name = "Оформляющий")]
         public string ResponsiblePerson { get; set; }

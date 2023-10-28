@@ -1,7 +1,8 @@
-﻿@model IEnumerable<RoomRental.Models.Organization>
+﻿@model RoomRental.ViewModels.OrganizationsViewModel
 
 @{
     ViewData["Title"] = "Index";
+    string organizationNameFind = Model.OrganizationNameFind;
 }
 
 <h1>Index</h1>
@@ -13,16 +14,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Organizations.SingleOrDefault().Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PostalAddress)
+                @Html.DisplayNameFor(model => model.Organizations.SingleOrDefault().PostalAddress)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Organizations) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)

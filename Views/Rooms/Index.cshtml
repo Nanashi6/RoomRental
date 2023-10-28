@@ -1,7 +1,9 @@
-﻿@model IEnumerable<RoomRental.Models.Room>
+﻿@model RoomRental.ViewModels.RoomsViewModel
 
 @{
     ViewData["Title"] = "Index";
+    string buildingNameFind = Model.FilterViewModel.BuildingNameFind;
+    decimal? areaFind = Model.FilterViewModel.AreaFind;
 }
 
 <h1>Index</h1>
@@ -13,23 +15,26 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Area)
+                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Building)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Area)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Photo)
+                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Building)
+                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Photo)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Rooms) {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Building)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Area)
             </td>
@@ -38,9 +43,6 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Photo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Building.BuildingId)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.RoomId">Edit</a> |

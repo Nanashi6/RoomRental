@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,12 +8,16 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RoomRental.Data;
 using RoomRental.Models;
+using RoomRental.ViewModels;
+using RoomRental.ViewModels.SortStates;
+using RoomRental.ViewModels.SortViewModels;
 
 namespace RoomRental.Controllers
 {
     public class OrganizationsController : Controller
     {
         private readonly RoomRentalsContext _context;
+        private readonly int _pageSize = 10;
 
         public OrganizationsController(RoomRentalsContext context)
         {
@@ -20,11 +25,45 @@ namespace RoomRental.Controllers
         }
 
         // GET: Organizations
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string organizationNameFind = "", OrganizationSortState sortOrder = OrganizationSortState.NameAsc)
         {
-              return _context.Organizations != null ? 
-                          View(await _context.Organizations.ToListAsync()) :
-                          Problem("Entity set 'RoomRentalsContext.Organizations'  is null.");
+            var organizationsQuery = await _context.Organizations.ToListAsync();
+
+            //Фильтрация
+            if(!String.IsNullOrEmpty(organizationNameFind))
+                organizationsQuery = organizationsQuery.Where(e => e.Name.Contains(organizationNameFind)).ToList();
+
+            //Сортировка
+            switch(sortOrder)
+            {
+                case OrganizationSortState.NameAsc:
+                    organizationsQuery = organizationsQuery.OrderBy(e => e.Name).ToList();
+                    break;
+                case OrganizationSortState.NameDesc:
+                    organizationsQuery = organizationsQuery.OrderByDescending(e => e.Name).ToList();
+                    break;
+                case OrganizationSortState.AddressAsc:
+                    organizationsQuery = organizationsQuery.OrderBy(e => e.PostalAddress).ToList();
+                    break;
+                default:
+                    organizationsQuery = organizationsQuery.OrderByDescending(e => e.PostalAddress).ToList();
+                    break;
+            }
+
+            //Разбиение на страницы
+            int count = organizationsQuery.Count;
+            organizationsQuery = organizationsQuery.Skip((page - 1) * _pageSize).Take(_pageSize).ToList();
+
+            //Модель отображения
+            OrganizationsViewModel organizationsViewModel = new OrganizationsViewModel()
+            {
+                Organizations = organizationsQuery,
+                PageViewModel = new PageViewModel(page, count, _pageSize),
+                OrganizationNameFind = organizationNameFind,
+                SortViewModel = new OrganizationSortViewModel(sortOrder)
+            };
+
+            return View(organizationsViewModel);
         }
 
         // GET: Organizations/Details/5
@@ -52,8 +91,6 @@ namespace RoomRental.Controllers
         }
 
         // POST: Organizations/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("OrganizationId,Name,PostalAddress")] Organization organization)
@@ -84,8 +121,6 @@ namespace RoomRental.Controllers
         }
 
         // POST: Organizations/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("OrganizationId,Name,PostalAddress")] Organization organization)
@@ -146,6 +181,31 @@ namespace RoomRental.Controllers
                 return Problem("Entity set 'RoomRentalsContext.Organizations'  is null.");
             }
             var organization = await _context.Organizations.FindAsync(id);
+
+            var rentals = await _context.Rentals.Where(e => e.RentalOrganizationId == organization.OrganizationId).ToListAsync();
+            var invoices = await _context.Invoices.Where(e => e.RentalOrganizationId == organization.OrganizationId).ToListAsync();
+
+            var rooms = await _context.Rooms
+                        .Where(r => _context.Buildings
+                            .Where(b => organization.OrganizationId == b.OwnerOrganizationId)
+                            .Select(b => b.BuildingId)
+                            .Contains(r.BuildingId))
+                        .Select(r => r.RoomId)
+                        .ToListAsync();
+
+            rentals.AddRange(await _context.Rentals.Where(r => rooms.Contains(r.RoomId)).ToListAsync());
+            invoices.AddRange(await _context.Invoices.Where(i => rooms.Contains(i.RoomId)).ToListAsync());
+
+            if (rentals != null)
+            {
+                _context.Rentals.RemoveRange(rentals);
+            }
+            if (invoices != null)
+            {
+                _context.Invoices.RemoveRange(invoices);
+            }
+            await _context.SaveChangesAsync();
+
             if (organization != null)
             {
                 _context.Organizations.Remove(organization);

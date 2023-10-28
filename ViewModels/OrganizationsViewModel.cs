@@ -1,4 +1,5 @@
 ﻿using RoomRental.Models;
+using RoomRental.ViewModels.SortViewModels;
 
 namespace RoomRental.ViewModels
 {

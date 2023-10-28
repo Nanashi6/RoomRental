@@ -7,24 +7,74 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RoomRental.Data;
 using RoomRental.Models;
+using RoomRental.ViewModels;
+using RoomRental.ViewModels.FilterViewModels;
+using RoomRental.ViewModels.SortStates;
+using RoomRental.ViewModels.SortViewModels;
 
 namespace RoomRental.Controllers
 {
-    public class ResponsiblePersonsController : Controller
+    public class ResponsiblePeopleController : Controller
     {
         private readonly RoomRentalsContext _context;
+        private readonly int _pageSize = 10;
 
-        public ResponsiblePersonsController(RoomRentalsContext context)
+        public ResponsiblePeopleController(RoomRentalsContext context)
         {
             _context = context;
         }
 
         // GET: ResponsiblePersons
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string surnameFind = "", string nameFind = "", string lastnameFind = "",
+                                                PersonSortState sortOrder = PersonSortState.SurnameAsc)
         {
-              return _context.ResponsiblePeople != null ? 
-                          View(await _context.ResponsiblePeople.ToListAsync()) :
-                          Problem("Entity set 'RoomRentalsContext.ResponsiblePeople'  is null.");
+            var peopleQuery = await _context.ResponsiblePeople.ToListAsync();
+
+            //Фильтрация
+            if (!String.IsNullOrEmpty(surnameFind))
+                peopleQuery = peopleQuery.Where(e => e.Surname.Contains(surnameFind)).ToList();
+            if (!String.IsNullOrEmpty(nameFind))
+                peopleQuery = peopleQuery.Where(e => e.Name.Contains(nameFind)).ToList();
+            if (!String.IsNullOrEmpty(lastnameFind))
+                peopleQuery = peopleQuery.Where(e => e.Lastname.Contains(lastnameFind)).ToList();
+
+            //Сортировка
+            switch (sortOrder)
+            {
+                case PersonSortState.SurnameAsc:
+                    peopleQuery = peopleQuery.OrderBy(e => e.Surname).ToList();
+                    break;
+                case PersonSortState.SurnameDesc:
+                    peopleQuery = peopleQuery.OrderByDescending(e => e.Surname).ToList();
+                    break;
+                case PersonSortState.NameAsc:
+                    peopleQuery = peopleQuery.OrderBy(e => e.Name).ToList();
+                    break;
+                case PersonSortState.NameDesc:
+                    peopleQuery = peopleQuery.OrderByDescending(e => e.Name).ToList();
+                    break;
+                case PersonSortState.LastnameAsc:
+                    peopleQuery = peopleQuery.OrderBy(e => e.Lastname).ToList();
+                    break;
+                default:
+                    peopleQuery = peopleQuery.OrderByDescending(e => e.Lastname).ToList();
+                    break;
+            }
+
+            //Разбиение на страницы
+            int count = peopleQuery.Count;
+            peopleQuery = peopleQuery.Skip((page - 1) * _pageSize).Take(_pageSize).ToList();
+
+            //Модель отображения
+            PeopleViewModel peopleViewModel = new PeopleViewModel()
+            {
+                People = peopleQuery,
+                PageViewModel = new PageViewModel(page, count, _pageSize),
+                FilterViewModel = new PersonFilterViewModel(surnameFind, nameFind, lastnameFind),
+                SortViewModel = new PersonSortViewModel(sortOrder)
+            };
+
+            return View(peopleViewModel);
         }
 
         // GET: ResponsiblePersons/Details/5
@@ -52,8 +102,6 @@ namespace RoomRental.Controllers
         }
 
         // POST: ResponsiblePersons/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("PersonId,Surname,Name,Lastname")] ResponsiblePerson responsiblePerson)
@@ -84,8 +132,6 @@ namespace RoomRental.Controllers
         }
 
         // POST: ResponsiblePersons/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("PersonId,Surname,Name,Lastname")] ResponsiblePerson responsiblePerson)

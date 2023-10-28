@@ -2,7 +2,7 @@
 
 namespace RoomRental.ViewModels.SortViewModels
 {
-    public class BuildingSortViewModel
+    public class RoomSortrViewModel
     {
         public BuildingSortState NameSort { get; set; }
         public BuildingSortState OrganizationNameSort { get; set; }
@@ -10,7 +10,7 @@ namespace RoomRental.ViewModels.SortViewModels
         public BuildingSortState FloorsSort { get; set; }
         public BuildingSortState Current { get; set; }
 
-        public BuildingSortViewModel(BuildingSortState sortOrder)
+        public RoomSortrViewModel(BuildingSortState sortOrder)
         {
             NameSort = sortOrder == BuildingSortState.NameAsc ? BuildingSortState.NameDesc : BuildingSortState.NameAsc;
             OrganizationNameSort = sortOrder == BuildingSortState.OrganizationNameAsc ? BuildingSortState.OrganizationNameDesc : BuildingSortState.OrganizationNameAsc;

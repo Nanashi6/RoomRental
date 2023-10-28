@@ -1,7 +1,10 @@
-﻿@model IEnumerable<RoomRental.Models.ResponsiblePerson>
+﻿@model RoomRental.ViewModels.PeopleViewModel
 
 @{
     ViewData["Title"] = "Index";
+    string surnameFind = Model.FilterViewModel.SurnameFind;
+    string nameFind = Model.FilterViewModel.NameFind;
+    string lastnameFind = Model.FilterViewModel.LastnameFind;
 }
 
 <h1>Index</h1>
@@ -13,19 +16,19 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Surname)
+                @Html.DisplayNameFor(model => model.People.SingleOrDefault().Surname)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.People.SingleOrDefault().Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Lastname)
+                @Html.DisplayNameFor(model => model.People.SingleOrDefault().Lastname)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.People) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Surname)

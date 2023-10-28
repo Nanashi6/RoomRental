@@ -1,7 +1,11 @@
-﻿@model IEnumerable<RoomRental.Models.Invoice>
+﻿@model RoomRental.ViewModels.InvoicesViewModel
 
 @{
     ViewData["Title"] = "Index";
+    string organizationNameFind = Model.FilterViewModel.OrganizationNameFind;
+    decimal? amountFind = Model.FilterViewModel.AmountFind;
+    string personFind = Model.FilterViewModel.ResponsiblePersonFind;
+    DateTime? paymentDateFind = Model.FilterViewModel.PaymentDateFind;
 }
 
 <h1>Index</h1>
@@ -13,26 +17,32 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Amount)
+                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().RoomId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PaymentDate)
+                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().RentalOrganization)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RentalOrganization)
+                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().Amount)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ResponsiblePersonNavigation)
+                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().PaymentDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Room)
+                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().ResponsiblePerson)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Invoices) {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoomId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RentalOrganization)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Amount)
             </td>
@@ -40,13 +50,7 @@
                 @Html.DisplayFor(modelItem => item.PaymentDate)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.RentalOrganization.OrganizationId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ResponsiblePersonNavigation.PersonId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Room.RoomId)
+                @Html.DisplayFor(modelItem => item.ResponsiblePerson)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.InvoiceId">Edit</a> |

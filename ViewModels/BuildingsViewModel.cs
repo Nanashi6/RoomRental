@@ -1,4 +1,5 @@
 ﻿using RoomRental.ViewModels.FilterViewModels;
+using RoomRental.ViewModels.SortViewModels;
 
 namespace RoomRental.ViewModels
 {
@@ -6,8 +7,7 @@ namespace RoomRental.ViewModels
     {
         public IEnumerable<BuildingViewModel>? Buildings { get; set; }
         public PageViewModel? PageViewModel { get; set; }
-        public string? BuildingNameFind { get; set; }
-        public BuildingSortViewModel? SortViewModel { get; set; }
+        public RoomSortrViewModel? SortViewModel { get; set; }
         public BuildingFilterViewModel FilterViewModel { get; set; }
     }
 }
