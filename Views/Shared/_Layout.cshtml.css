@@ -38,9 +38,6 @@ button.accept-policy {
   font-size: 1rem;
   line-height: inherit;
 }
-main {
-    padding-bottom: 40px;
-}
 .footer {
   position: absolute;
   bottom: 0;

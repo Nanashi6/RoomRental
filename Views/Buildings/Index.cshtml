@@ -1,32 +1,79 @@
 ﻿@model RoomRental.ViewModels.BuildingsViewModel
-
+@*подключаем все tag-хелперы*@
+@addTagHelper *, RoomRental
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Buildings";
     string buildingNameFind = Model.FilterViewModel.BuildingNameFind;
     string organizationNameFind = Model.FilterViewModel.OrganizationNameFind;
     int? floorsFind = Model.FilterViewModel.FloorsFind;
     string addressFind = Model.FilterViewModel.AddressFind;
 }
 
-<h1>Index</h1>
+<h1>Buildings</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<form method="get">
+    <label>Название здания: </label>
+    <input name="buildingNameFind" value="@buildingNameFind" />
+
+    <label>Название организации: </label>
+    <input name="organizationNameFind" value="@organizationNameFind" />
+
+    <label>Этажность: </label>
+    <input type="number" name="floorsFind" value="@floorsFind" />
+
+    <label>Адрес: </label>
+    <input name="addressFind" value="@addressFind" />
+
+    <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
+    <input type="submit" value="Фильтр" />
+</form>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().Name)
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.NameSort)"
+                   asp-route-buildingNameFind="@buildingNameFind"
+                   asp-route-organizationNameFind="@organizationNameFind"
+                   asp-route-floorsFind="@floorsFind"
+                   asp-route-addressFind="@addressFind">
+                    @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().Name)
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().OwnerOrganization)
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.OrganizationNameSort)"
+                   asp-route-buildingNameFind="@buildingNameFind"
+                   asp-route-organizationNameFind="@organizationNameFind"
+                   asp-route-floorsFind="@floorsFind"
+                   asp-route-addressFind="@addressFind">
+                    @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().OwnerOrganization)
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().PostalAddress)
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.AddressSort)"
+                   asp-route-buildingNameFind="@buildingNameFind"
+                   asp-route-organizationNameFind="@organizationNameFind"
+                   asp-route-floorsFind="@floorsFind"
+                   asp-route-addressFind="@addressFind">
+                    @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().PostalAddress)
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().Floors)
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.FloorsSort)"
+                   asp-route-buildingNameFind="@buildingNameFind"
+                   asp-route-organizationNameFind="@organizationNameFind"
+                   asp-route-floorsFind="@floorsFind"
+                   asp-route-addressFind="@addressFind">
+                    @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().Floors)
+                </a>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().Description)
@@ -69,3 +116,10 @@
 }
     </tbody>
 </table>
+
+<page-link page-model="Model.PageViewModel" page-action="Index"
+           page-url-sortOrder="@(Model.SortViewModel.Current)"
+           page-url-buildingNameFind="@buildingNameFind"
+           page-url-organizationNameFind="@organizationNameFind"
+           page-url-floorsFind="@floorsFind"
+           page-url-addressFind="@addressFind"></page-link>

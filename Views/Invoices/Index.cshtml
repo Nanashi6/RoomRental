@@ -1,18 +1,37 @@
 ﻿@model RoomRental.ViewModels.InvoicesViewModel
-
+@*подключаем все tag-хелперы*@
+@addTagHelper *, RoomRental
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Invoices";
     string organizationNameFind = Model.FilterViewModel.OrganizationNameFind;
     decimal? amountFind = Model.FilterViewModel.AmountFind;
     string personFind = Model.FilterViewModel.ResponsiblePersonFind;
     DateTime? paymentDateFind = Model.FilterViewModel.PaymentDateFind;
 }
 
-<h1>Index</h1>
+<h1>Invoices</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<form method="get">
+    <label>Название организации: </label>
+    <input name="organizationNameFind" value="@organizationNameFind" />
+
+    <label>Сумма: </label>
+    <input type="number" step="any" name="amountFind" value="@amountFind" />
+
+    <label>Ответственное лицо: </label>
+    <input name="personFind" value="@personFind" />
+
+    <label>Дата платежа: </label>
+    <input type="date" name="paymentDateFind" value="@paymentDateFind" />
+
+    <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
+    <input type="submit" value="Фильтр" />
+</form>
+
 <table class="table">
     <thead>
         <tr>
@@ -20,16 +39,44 @@
                 @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().RoomId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().RentalOrganization)
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.OrganizationNameSort)"
+                   asp-route-amountFind="@amountFind"
+                   asp-route-organizationNameFind="@organizationNameFind"
+                   asp-route-personFind="@personFind"
+                   asp-route-paymentDateFind="@paymentDateFind">
+                    @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().RentalOrganization)
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().Amount)
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.AmountSort)"
+                   asp-route-amountFind="@amountFind"
+                   asp-route-organizationNameFind="@organizationNameFind"
+                   asp-route-personFind="@personFind"
+                   asp-route-paymentDateFind="@paymentDateFind">
+                    @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().Amount)
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().PaymentDate)
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.PaymentDateSort)"
+                   asp-route-amountFind="@amountFind"
+                   asp-route-organizationNameFind="@organizationNameFind"
+                   asp-route-personFind="@personFind"
+                   asp-route-paymentDateFind="@paymentDateFind">
+                    @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().PaymentDate)
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().ResponsiblePerson)
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.ResponsiblePersonSort)"
+                   asp-route-amountFind="@amountFind"
+                   asp-route-organizationNameFind="@organizationNameFind"
+                   asp-route-personFind="@personFind"
+                   asp-route-paymentDateFind="@paymentDateFind">
+                    @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().ResponsiblePerson)
+                </a>
             </th>
             <th></th>
         </tr>
@@ -61,3 +108,10 @@
 }
     </tbody>
 </table>
+
+<page-link page-model="Model.PageViewModel" page-action="Index"
+           page-url-sortOrder="@(Model.SortViewModel.Current)"
+           page-url-amountFind="@amountFind"
+           page-url-organizationNameFind="@organizationNameFind"
+           page-url-personFind="@personFind"
+           page-url-paymentDateFind="@paymentDateFind"></page-link>

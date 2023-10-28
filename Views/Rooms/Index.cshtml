@@ -1,24 +1,47 @@
 ﻿@model RoomRental.ViewModels.RoomsViewModel
-
+@*подключаем все tag-хелперы*@
+@addTagHelper *, RoomRental
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Rooms";
     string buildingNameFind = Model.FilterViewModel.BuildingNameFind;
     decimal? areaFind = Model.FilterViewModel.AreaFind;
 }
 
-<h1>Index</h1>
+<h1>Rooms</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<form method="get">
+    <label>Название здания: </label>
+    <input name="buildingNameFind" value="@buildingNameFind" />
+
+    <label>Площадь: </label>
+    <input type="number" step="any" name="areaFind" value="@areaFind" />
+
+    <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
+    <input type="submit" value="Фильтр" />
+</form>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Building)
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.BuildingNameSort)"
+                   asp-route-buildingNameFind="@buildingNameFind"
+                   asp-route-areaFind="@areaFind">
+                    @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Building)
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Area)
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.AreaSort)"
+                   asp-route-buildingNameFind="@buildingNameFind"
+                   asp-route-areaFind="@areaFind">
+                    @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Area)
+                </a>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Description)
@@ -55,3 +78,8 @@
 }
     </tbody>
 </table>
+
+<page-link page-model="Model.PageViewModel" page-action="Index"
+           page-url-sortOrder="@(Model.SortViewModel.Current)"
+           page-url-buildingNameFind="@buildingNameFind"
+           page-url-areaFind="@areaFind"></page-link>

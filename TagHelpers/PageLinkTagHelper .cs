@@ -31,7 +31,7 @@ namespace RoomRental.TagHelpers
 
             // набор ссылок будет представлять список ul
             TagBuilder tag = new TagBuilder("ul");
-            tag.AddCssClass("pagination");
+            tag.AddCssClass("pagination justify-content-center");
 
             // формируем три ссылки - на текущую, предыдущую и следующую
             TagBuilder currentItem = CreateTag(PageModel.PageNumber, urlHelper);

@@ -1,11 +1,19 @@
 ﻿@model RoomRental.ViewModels.OrganizationsViewModel
-
+@*подключаем все tag-хелперы*@
+@addTagHelper *, RoomRental
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Organizations";
     string organizationNameFind = Model.OrganizationNameFind;
 }
 
-<h1>Index</h1>
+<h1>Organizations</h1>
+
+<form method="get">
+    <label>Название организации: </label>
+    <input name="organizationNameFind" value="@organizationNameFind"  />
+    <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
+    <input type="submit" value="Фильтр" />
+</form>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -14,10 +22,18 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Organizations.SingleOrDefault().Name)
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.NameSort)"
+                   asp-route-organizationNameFind="@organizationNameFind">
+                    @Html.DisplayNameFor(model => model.Organizations.SingleOrDefault().Name)
+               </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Organizations.SingleOrDefault().PostalAddress)
+                <a asp-action="Index"
+                   asp-route-sortOrder="@(Model.SortViewModel.AddressSort)"
+                   asp-route-organizationNameFind="@organizationNameFind">
+                    @Html.DisplayNameFor(model => model.Organizations.SingleOrDefault().PostalAddress)
+                </a>
             </th>
             <th></th>
         </tr>
@@ -41,4 +57,6 @@
     </tbody>
 </table>
 
-<page-link page-model="Model.PageViewModel" page-action="Index"></page-link>
+<page-link page-model="Model.PageViewModel" page-action="Index"
+           page-url-sortOrder="@(Model.SortViewModel.Current)"
+           page-url-organizationNameFind="@organizationNameFind"></page-link>
