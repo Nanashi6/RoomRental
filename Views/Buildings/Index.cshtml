@@ -39,6 +39,8 @@
     </thead>
     <tbody>
 @foreach (var item in Model.Buildings) {
+            var base64Image = Convert.ToBase64String(item.FloorPlan.FileContents);
+            var imageSource = $"data:{item.FloorPlan.ContentType};base64,{base64Image}";
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
@@ -56,7 +58,7 @@
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.FloorPlan)
+                    <img src="@imageSource">
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.BuildingId">Edit</a> |

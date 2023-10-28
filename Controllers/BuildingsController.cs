@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using RoomRental.Data;
@@ -123,11 +124,28 @@ namespace RoomRental.Controllers
         // POST: Buildings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlan")] Building building)
+        public async Task<IActionResult> Create([Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlan")] BuildingBindModel building/*int BuildingId, string Name, int OwnerOrganizationId, string PostalAddress, int Floors, string Description, IFormFile FloorPlan*/)
         {
+/*            Building building = new Building();*/
             if (ModelState.IsValid)
             {
-                _context.Add(building);
+/*                building.BuildingId = BuildingId;
+                building.Name = Name;
+                building.OwnerOrganizationId = OwnerOrganizationId;
+                building.PostalAddress = PostalAddress;
+                building.Floors = Floors;
+                building.Description = Description;
+                building.FloorPlan = ConvertIFormFileToByteArray(FloorPlan);*/
+                _context.Add(new Building()
+                {
+                    BuildingId = building.BuildingId,
+                    Name = building.Name,
+                    OwnerOrganizationId = building.OwnerOrganizationId,
+                    PostalAddress = building.PostalAddress,
+                    Floors = building.Floors,
+                    Description = building.Description,
+                    FloorPlan = ConvertIFormFileToByteArray(building.FloorPlan)
+                });
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -155,8 +173,9 @@ namespace RoomRental.Controllers
         // POST: Buildings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlan")] Building building)
+        public async Task<IActionResult> Edit(int id, [Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlan")] BuildingBindModel building)
         {
+/*            Building building = new Building();*/
             if (id != building.BuildingId)
             {
                 return NotFound();
@@ -166,7 +185,23 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    _context.Update(building);
+/*                    building.BuildingId = BuildingId;
+                    building.Name = Name;
+                    building.OwnerOrganizationId = OwnerOrganizationId;
+                    building.PostalAddress = PostalAddress;
+                    building.Floors = Floors;
+                    building.Description = Description;
+                    building.FloorPlan = ConvertIFormFileToByteArray(FloorPlan);*/
+                    _context.Update(new Building()
+                    {
+                        BuildingId = building.BuildingId,
+                        Name = building.Name,
+                        OwnerOrganizationId = building.OwnerOrganizationId,
+                        PostalAddress = building.PostalAddress,
+                        Floors = building.Floors,
+                        Description = building.Description,
+                        FloorPlan = ConvertIFormFileToByteArray(building.FloorPlan)
+                    });
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

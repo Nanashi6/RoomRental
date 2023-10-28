@@ -35,7 +35,7 @@ namespace RoomRental.Controllers
             foreach (var item in roomsQuery)
             {
                 var building = _context.Buildings.FirstAsync(e => e.BuildingId == item.BuildingId);
-                rooms.Add(new RoomViewModel(item.RoomId, building.Result.Name, item.Area, item.Description,  new FileContentResult(item.Photo, "image/jpg")));
+                rooms.Add(new RoomViewModel(item.RoomId, building.Result.Name, item.Area, item.Description,  new FileContentResult(item.Photo, "image/*")));
             }
 
             //Фильтрация
@@ -106,11 +106,18 @@ namespace RoomRental.Controllers
         // POST: Rooms/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RoomId,BuildingId,Area,Description,Photo")] Room room)
+        public async Task<IActionResult> Create([Bind("RoomId,BuildingId,Area,Description,Photo")] RoomBindModel room)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(room);
+                _context.Add(new Room()
+                {
+                    RoomId = room.RoomId,
+                    BuildingId = room.BuildingId,
+                    Area = room.Area,
+                    Description = room.Description,
+                    Photo = ConvertIFormFileToByteArray(room.Photo)
+                });
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -138,7 +145,7 @@ namespace RoomRental.Controllers
         // POST: Rooms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RoomId,BuildingId,Area,Description,Photo")] Room room)
+        public async Task<IActionResult> Edit(int id, [Bind("RoomId,BuildingId,Area,Description,Photo")] RoomBindModel room)
         {
             if (id != room.RoomId)
             {
@@ -149,7 +156,14 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    _context.Update(room);
+                    _context.Update(new Room()
+                    {
+                        RoomId = room.RoomId,
+                        BuildingId = room.BuildingId,
+                        Area = room.Area,
+                        Description = room.Description,
+                        Photo = ConvertIFormFileToByteArray(room.Photo)
+                    });
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

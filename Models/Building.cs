@@ -19,7 +19,7 @@ public partial class Building
     [Display(Name = "Описание")]
     public string Description { get; set; }
     [Display(Name = "План этажа")]
-    public byte[] FloorPlan { get; set; }
+    public byte[] FloorPlan { get; set; } = new byte[0];
 
     public virtual Organization OwnerOrganization { get; set; }
 
