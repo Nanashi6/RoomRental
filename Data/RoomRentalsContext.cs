@@ -29,8 +29,8 @@ public partial class RoomRentalsContext : IdentityDbContext<User>
 
     public virtual DbSet<Room> Rooms { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=localhost;Database=RoomRentals;Trusted_Connection=True;TrustServerCertificate=True;");
+/*    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        => optionsBuilder.UseSqlServer("Server=localhost;Database=RoomRentals;Trusted_Connection=True;TrustServerCertificate=True;");*/
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
