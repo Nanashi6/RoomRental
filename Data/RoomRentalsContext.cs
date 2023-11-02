@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using RoomRental.Models;
 
 namespace RoomRental.Data;
 
-public partial class RoomRentalsContext : DbContext
+public partial class RoomRentalsContext : IdentityDbContext<User>
 {
     public RoomRentalsContext()
     {
@@ -23,17 +25,17 @@ public partial class RoomRentalsContext : DbContext
     public virtual DbSet<Organization> Organizations { get; set; }
 
     public virtual DbSet<Rental> Rentals { get; set; }
-
     public virtual DbSet<ResponsiblePerson> ResponsiblePeople { get; set; }
 
     public virtual DbSet<Room> Rooms { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=localhost;Database=RoomRentals;Trusted_Connection=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Building>(entity =>
         {
             entity.HasKey(e => e.BuildingId).HasName("PK__Building__979FD1CD67568AE3");

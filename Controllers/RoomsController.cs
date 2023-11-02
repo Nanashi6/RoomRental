@@ -12,9 +12,11 @@ using RoomRental.ViewModels.FilterViewModels;
 using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
 using RoomRental.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RoomRental.Controllers
 {
+    [Authorize(Roles = "User")]
     public class RoomsController : Controller
     {
         private readonly RoomRentalsContext _context;
@@ -35,7 +37,7 @@ namespace RoomRental.Controllers
             foreach (var item in roomsQuery)
             {
                 var building = _context.Buildings.FirstAsync(e => e.BuildingId == item.BuildingId);
-                rooms.Add(new RoomViewModel(item.RoomId, building.Result.Name, item.Area, item.Description,  new FileContentResult(item.Photo, "image/*")));
+                rooms.Add(new RoomViewModel(item.RoomId, building.Result.Name, item.Area, item.Description, item.Photo));
             }
 
             //Фильтрация

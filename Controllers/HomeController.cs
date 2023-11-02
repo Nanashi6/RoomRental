@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using RoomRental.Models;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace WebApplication1.Controllers
 {
@@ -12,7 +14,7 @@ namespace WebApplication1.Controllers
         {
             _logger = logger;
         }
-
+        //[Authorize(Roles = "admin, user")]
         public IActionResult Index()
         {
             return View();

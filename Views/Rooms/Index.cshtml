@@ -1,6 +1,4 @@
 ﻿@model RoomRental.ViewModels.RoomsViewModel
-@*подключаем все tag-хелперы*@
-@addTagHelper *, RoomRental
 @{
     ViewData["Title"] = "Rooms";
     string buildingNameFind = Model.FilterViewModel.BuildingNameFind;
@@ -54,8 +52,6 @@
     </thead>
     <tbody>
 @foreach (var item in Model.Rooms) {
-            var base64Image = Convert.ToBase64String(item.Photo.FileContents);
-            var imageSource = $"data:{item.Photo.ContentType};base64,{base64Image}";
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Building)
@@ -67,7 +63,7 @@
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                <img src="@imageSource">
+                    <img src=" data:image /jpeg;base64,@(Convert.ToBase64String(item.Photo))">
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.RoomId">Edit</a> |

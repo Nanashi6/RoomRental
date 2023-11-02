@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using RoomRental.Data;
 using RoomRental.Models;
 using RoomRental.ViewModels;
@@ -16,6 +11,7 @@ using RoomRental.ViewModels.SortViewModels;
 
 namespace RoomRental.Controllers
 {
+    [Authorize(Roles = "User")]
     public class BuildingsController : Controller
     {
         private readonly RoomRentalsContext _context;
@@ -37,7 +33,7 @@ namespace RoomRental.Controllers
             foreach (var item in buildingsQuery)
             {
                 var organization = _context.Organizations.FirstAsync(e => e.OrganizationId == item.OwnerOrganizationId);
-                buildings.Add(new BuildingViewModel(item.BuildingId, item.Name, organization.Result.Name, item.PostalAddress, item.Floors, item.Description, new FileContentResult(item.FloorPlan, "image/jpg")));
+                buildings.Add(new BuildingViewModel(item.BuildingId, item.Name, organization.Result.Name, item.PostalAddress, item.Floors, item.Description, item.FloorPlan));
             }
 
             //Фильтрация
@@ -126,16 +122,8 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlan")] BuildingBindModel building/*int BuildingId, string Name, int OwnerOrganizationId, string PostalAddress, int Floors, string Description, IFormFile FloorPlan*/)
         {
-/*            Building building = new Building();*/
             if (ModelState.IsValid)
             {
-/*                building.BuildingId = BuildingId;
-                building.Name = Name;
-                building.OwnerOrganizationId = OwnerOrganizationId;
-                building.PostalAddress = PostalAddress;
-                building.Floors = Floors;
-                building.Description = Description;
-                building.FloorPlan = ConvertIFormFileToByteArray(FloorPlan);*/
                 _context.Add(new Building()
                 {
                     BuildingId = building.BuildingId,
@@ -175,7 +163,6 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlan")] BuildingBindModel building)
         {
-/*            Building building = new Building();*/
             if (id != building.BuildingId)
             {
                 return NotFound();
@@ -185,13 +172,6 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-/*                    building.BuildingId = BuildingId;
-                    building.Name = Name;
-                    building.OwnerOrganizationId = OwnerOrganizationId;
-                    building.PostalAddress = PostalAddress;
-                    building.Floors = Floors;
-                    building.Description = Description;
-                    building.FloorPlan = ConvertIFormFileToByteArray(FloorPlan);*/
                     _context.Update(new Building()
                     {
                         BuildingId = building.BuildingId,
@@ -273,14 +253,14 @@ namespace RoomRental.Controllers
             {
                 _context.Buildings.Remove(building);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool BuildingExists(int id)
         {
-          return (_context.Buildings?.Any(e => e.BuildingId == id)).GetValueOrDefault();
+            return (_context.Buildings?.Any(e => e.BuildingId == id)).GetValueOrDefault();
         }
         public byte[] ConvertIFormFileToByteArray(IFormFile file)
         {
