@@ -18,9 +18,9 @@ namespace RoomRental.ViewModels
         public string? Description { get; set; }
 
         [Display(Name = "Фотография")]
-        public FileContentResult? Photo { get; set; }
+        public byte[]? Photo { get; set; }
 
-        public RoomViewModel(int id, string buildingName, decimal area, string description, FileContentResult photo)
+        public RoomViewModel(int id, string buildingName, decimal area, string description, byte[] photo)
         {
             RoomId = id;
             Building = buildingName;

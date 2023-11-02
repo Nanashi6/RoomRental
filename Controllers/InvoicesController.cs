@@ -12,9 +12,11 @@ using RoomRental.ViewModels.FilterViewModels;
 using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
 using RoomRental.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RoomRental.Controllers
 {
+    [Authorize(Roles = "User")]
     public class InvoicesController : Controller
     {
         private readonly RoomRentalsContext _context;
