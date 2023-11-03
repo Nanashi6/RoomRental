@@ -15,13 +15,13 @@ namespace RoomRental.ViewModels
 
         [Display(Name = "Дата начала аренды")]
         [DataType(DataType.Date)]
-        public DateTime CheckInDate { get; set; }
+        public DateTime? CheckInDate { get; set; }
 
         [Display(Name = "Дата окончания аренды")]
         [DataType(DataType.Date)]
-        public DateTime CheckOutDate { get; set; }
+        public DateTime? CheckOutDate { get; set; }
 
-        public RentalViewModel(int id, int room, string organization, DateTime checkInDate, DateTime checkOutDate)
+        public RentalViewModel(int id, int room, string organization, DateTime? checkInDate, DateTime? checkOutDate)
         {
             RentalId = id;
             RoomId = room;

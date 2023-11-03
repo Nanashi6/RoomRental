@@ -13,34 +13,42 @@ using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
 using RoomRental.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using RoomRental.Services;
 
 namespace RoomRental.Controllers
 {
     [Authorize(Roles = "User")]
     public class InvoicesController : Controller
     {
-        private readonly RoomRentalsContext _context;
+        private readonly InvoiceService _cache;
+        private readonly OrganizationService _organizationCache;
+        private readonly PeopleService _peopleCache;
+        private readonly RoomService _roomCache;
         private readonly int _pageSize = 10;
 
-        public InvoicesController(RoomRentalsContext context)
+        public InvoicesController(InvoiceService cache, PeopleService peopleCache, RoomService roomCache, OrganizationService organizationCache)
         {
-            _context = context;
+            _cache = cache;
+            _organizationCache = organizationCache;
+            _peopleCache = peopleCache;
+            _roomCache = roomCache;
         }
 
         // GET: Invoices
         public async Task<IActionResult> Index(int page = 1, string organizationNameFind = "", string personFind = "", decimal? amountFind = null, DateTime? paymentDateFind = null, InvoiceSortState sortOrder = InvoiceSortState.OrganizationNameAsc)
         {
-            var invoicesQuery = await _context.Invoices.ToListAsync();
-            var organizationsQuery = await _context.Organizations.ToListAsync();
-            var peopleQuery = await _context.ResponsiblePeople.ToListAsync();
+            var invoicesQuery = await _cache.GetInvoices();
+            var organizationsQuery = await _organizationCache.GetOrganizations();
+            var peopleQuery = await _peopleCache.GetPeople();
+            var roomsQuery = await _roomCache.GetRooms();
             //Формирование осмысленных связей
             List<InvoiceViewModel> invoices = new List<InvoiceViewModel>();
             foreach (var item in invoicesQuery)
             {
                 var organization = organizationsQuery.Single(e => e.OrganizationId == item.RentalOrganizationId);
-                var room = _context.Rooms.FirstAsync(e => e.RoomId == item.RoomId);
+                var room = roomsQuery.Single(e => e.RoomId == item.RoomId);
                 var person = peopleQuery.Single(e => e.PersonId == item.ResponsiblePerson);
-                invoices.Add(new InvoiceViewModel(item.InvoiceId, organization.Name, room.Result.RoomId, item.Amount, item.PaymentDate,
+                invoices.Add(new InvoiceViewModel(item.InvoiceId, organization.Name, room.RoomId, item.Amount, item.PaymentDate,
                                 person.Surname + " " + person.Name + " " + person.Lastname));
             }
 
@@ -102,16 +110,12 @@ namespace RoomRental.Controllers
         // GET: Invoices/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Invoices == null)
+            if (id == null || _cache.GetInvoices() == null)
             {
                 return NotFound();
             }
 
-            var invoice = await _context.Invoices
-                .Include(i => i.RentalOrganization)
-                .Include(i => i.ResponsiblePersonNavigation)
-                .Include(i => i.Room)
-                .FirstOrDefaultAsync(m => m.InvoiceId == id);
+            var invoice = await _cache.GetInvoice(id);
             if (invoice == null)
             {
                 return NotFound();
@@ -123,12 +127,12 @@ namespace RoomRental.Controllers
         // GET: Invoices/Create
         public IActionResult Create()
         {
-            ViewData["RentalOrganizationId"] = new SelectList(_context.Organizations, "OrganizationId", "Name");
+            ViewData["RentalOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name");
 
-            var people = _context.ResponsiblePeople.Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
+            var people = _peopleCache.GetPeople().Result.ToList().Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
 
             ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL");
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomId");
+            ViewData["RoomId"] = new SelectList(_roomCache.GetRooms().Result, "RoomId", "RoomId");
             return View();
         }
 
@@ -137,40 +141,39 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("InvoiceId,RentalOrganizationId,RoomId,Amount,PaymentDate,ResponsiblePerson")] Invoice invoice)
         {
-            if (ModelState.IsValid)
+            if (/*ModelState.IsValid*/true)
             {
-                _context.Add(invoice);
-                await _context.SaveChangesAsync();
+                _cache.AddInvoice(invoice);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentalOrganizationId"] = new SelectList(_context.Organizations, "OrganizationId", "Name", invoice.RentalOrganizationId);
+            ViewData["RentalOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name", invoice.RentalOrganizationId);
 
-            var people = _context.ResponsiblePeople.Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
+            var people = _peopleCache.GetPeople().Result.Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
 
-            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL");
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomId", invoice.RoomId);
+            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL", invoice.ResponsiblePerson);
+            ViewData["RoomId"] = new SelectList(_roomCache.GetRooms().Result, "RoomId", "RoomId", invoice.RoomId);
             return View(invoice);
         }
 
         // GET: Invoices/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Invoices == null)
+            if (id == null || _cache.GetInvoices() == null)
             {
                 return NotFound();
             }
 
-            var invoice = await _context.Invoices.FindAsync(id);
+            var invoice = await _cache.GetInvoice(id);
             if (invoice == null)
             {
                 return NotFound();
             }
-            ViewData["RentalOrganizationId"] = new SelectList(_context.Organizations, "OrganizationId", "Name", invoice.RentalOrganizationId);
+            ViewData["RentalOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name", invoice.RentalOrganizationId);
 
-            var people = _context.ResponsiblePeople.Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
+            var people = _peopleCache.GetPeople().Result.Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
 
-            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL");
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomId", invoice.RoomId);
+            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL", invoice.ResponsiblePerson);
+            ViewData["RoomId"] = new SelectList(_roomCache.GetRooms().Result, "RoomId", "RoomId", invoice.RoomId);
             return View(invoice);
         }
 
@@ -184,12 +187,11 @@ namespace RoomRental.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (/*ModelState.IsValid*/true)
             {
                 try
                 {
-                    _context.Update(invoice);
-                    await _context.SaveChangesAsync();
+                    _cache.UpdateInvoice(invoice);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -204,28 +206,24 @@ namespace RoomRental.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentalOrganizationId"] = new SelectList(_context.Organizations, "OrganizationId", "Name", invoice.RentalOrganizationId);
+            ViewData["RentalOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name", invoice.RentalOrganizationId);
 
-            var people = _context.ResponsiblePeople.Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
+            var people = _peopleCache.GetPeople().Result.Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
 
-            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL");
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "RoomId", "RoomId", invoice.RoomId);
+            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL", invoice.ResponsiblePerson);
+            ViewData["RoomId"] = new SelectList(_roomCache.GetRooms().Result, "RoomId", "RoomId", invoice.RoomId);
             return View(invoice);
         }
 
         // GET: Invoices/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Invoices == null)
+            if (id == null || _cache.GetInvoices() == null)
             {
                 return NotFound();
             }
 
-            var invoice = await _context.Invoices
-                .Include(i => i.RentalOrganization)
-                .Include(i => i.ResponsiblePersonNavigation)
-                .Include(i => i.Room)
-                .FirstOrDefaultAsync(m => m.InvoiceId == id);
+            var invoice = await _cache.GetInvoice(id);
             if (invoice == null)
             {
                 return NotFound();
@@ -239,23 +237,17 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Invoices == null)
+            if (_cache.GetInvoices() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.Invoices'  is null.");
             }
-            var invoice = await _context.Invoices.FindAsync(id);
-            if (invoice != null)
-            {
-                _context.Invoices.Remove(invoice);
-            }
-            
-            await _context.SaveChangesAsync();
+            _cache.DeleteInvoice(_cache.GetInvoice(id).Result);
             return RedirectToAction(nameof(Index));
         }
 
         private bool InvoiceExists(int id)
         {
-          return (_context.Invoices?.Any(e => e.InvoiceId == id)).GetValueOrDefault();
+          return (_cache.GetInvoices().Result?.Any(e => e.InvoiceId == id)).GetValueOrDefault();
         }
     }
 }

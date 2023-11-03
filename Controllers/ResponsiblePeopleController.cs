@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RoomRental.Data;
 using RoomRental.Models;
+using RoomRental.Services;
 using RoomRental.ViewModels;
 using RoomRental.ViewModels.FilterViewModels;
 using RoomRental.ViewModels.SortStates;
@@ -18,19 +19,19 @@ namespace RoomRental.Controllers
     [Authorize(Roles = "User")]
     public class ResponsiblePeopleController : Controller
     {
-        private readonly RoomRentalsContext _context;
+        private readonly PeopleService _cache;
         private readonly int _pageSize = 10;
 
-        public ResponsiblePeopleController(RoomRentalsContext context)
+        public ResponsiblePeopleController(PeopleService cache)
         {
-            _context = context;
+            _cache = cache;
         }
 
         // GET: ResponsiblePersons
         public async Task<IActionResult> Index(int page = 1, string surnameFind = "", string nameFind = "", string lastnameFind = "",
                                                 PersonSortState sortOrder = PersonSortState.SurnameAsc)
         {
-            var peopleQuery = await _context.ResponsiblePeople.ToListAsync();
+            var peopleQuery = await _cache.GetPeople();
 
             //Фильтрация
             if (!String.IsNullOrEmpty(surnameFind))
@@ -82,13 +83,12 @@ namespace RoomRental.Controllers
         // GET: ResponsiblePersons/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.ResponsiblePeople == null)
+            if (id == null || _cache.GetPeople() == null)
             {
                 return NotFound();
             }
 
-            var responsiblePerson = await _context.ResponsiblePeople
-                .FirstOrDefaultAsync(m => m.PersonId == id);
+            var responsiblePerson = await _cache.GetPerson(id);
             if (responsiblePerson == null)
             {
                 return NotFound();
@@ -110,8 +110,7 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(responsiblePerson);
-                await _context.SaveChangesAsync();
+                _cache.AddPerson(responsiblePerson);
                 return RedirectToAction(nameof(Index));
             }
             return View(responsiblePerson);
@@ -120,12 +119,12 @@ namespace RoomRental.Controllers
         // GET: ResponsiblePersons/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.ResponsiblePeople == null)
+            if (id == null || _cache.GetPeople() == null)
             {
                 return NotFound();
             }
 
-            var responsiblePerson = await _context.ResponsiblePeople.FindAsync(id);
+            var responsiblePerson = await _cache.GetPerson(id);
             if (responsiblePerson == null)
             {
                 return NotFound();
@@ -147,8 +146,7 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    _context.Update(responsiblePerson);
-                    await _context.SaveChangesAsync();
+                    _cache.UpdatePerson(responsiblePerson);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -169,13 +167,12 @@ namespace RoomRental.Controllers
         // GET: ResponsiblePersons/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.ResponsiblePeople == null)
+            if (id == null || _cache.GetPeople() == null)
             {
                 return NotFound();
             }
 
-            var responsiblePerson = await _context.ResponsiblePeople
-                .FirstOrDefaultAsync(m => m.PersonId == id);
+            var responsiblePerson = await _cache.GetPerson(id);
             if (responsiblePerson == null)
             {
                 return NotFound();
@@ -189,23 +186,17 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.ResponsiblePeople == null)
+            if (_cache.GetPeople() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.ResponsiblePeople'  is null.");
             }
-            var responsiblePerson = await _context.ResponsiblePeople.FindAsync(id);
-            if (responsiblePerson != null)
-            {
-                _context.ResponsiblePeople.Remove(responsiblePerson);
-            }
-            
-            await _context.SaveChangesAsync();
+            _cache.DeletePerson(_cache.GetPerson(id).Result);
             return RedirectToAction(nameof(Index));
         }
 
         private bool ResponsiblePersonExists(int id)
         {
-          return (_context.ResponsiblePeople?.Any(e => e.PersonId == id)).GetValueOrDefault();
+            return (_cache.GetPeople().Result?.Any(e => e.PersonId == id)).GetValueOrDefault();
         }
     }
 }

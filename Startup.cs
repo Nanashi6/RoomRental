@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.EntityFrameworkCore;
 using RoomRental.Data;
 using RoomRental.Models;
+using RoomRental.Services;
 using System.Security.Principal;
 
 namespace RoomRental
@@ -40,6 +41,16 @@ namespace RoomRental
                     options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
                     options.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
                 });
+
+            // добавление кэширования
+            services.AddMemoryCache();
+            // внедрение зависимости CachedService
+            services.AddScoped<OrganizationService>();
+            services.AddScoped<BuildingService>();
+            services.AddScoped<RoomService>();
+            services.AddScoped<RentalService>();
+            services.AddScoped<InvoiceService>();
+            services.AddScoped<PeopleService>();
 
             services.AddMvc();
             services.AddControllersWithViews(mvcOtions =>

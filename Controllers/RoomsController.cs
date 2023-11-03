@@ -13,31 +13,34 @@ using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
 using RoomRental.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using RoomRental.Services;
 
 namespace RoomRental.Controllers
 {
     [Authorize(Roles = "User")]
     public class RoomsController : Controller
     {
-        private readonly RoomRentalsContext _context;
+        private readonly RoomService _cache;
+        private readonly BuildingService _buildingCache;
         private readonly int _pageSize = 10;
 
-        public RoomsController(RoomRentalsContext context)
+        public RoomsController(RoomService cache, BuildingService buildingCache)
         {
-            _context = context;
+            _cache = cache;
+            _buildingCache = buildingCache;
         }
 
         // GET: Rooms
         public async Task<IActionResult> Index(int page = 1, string buildingNameFind = "", decimal? areaFind = null, RoomSortState sortOrder = RoomSortState.BuildingNameAsc)
         {
-            var roomsQuery = await _context.Rooms.ToListAsync();
-
+            var roomsQuery = await _cache.GetRooms();
+            var buildingsQuery = await _buildingCache.GetBuildings();
             //Формирование осмысленных связей
             List<RoomViewModel> rooms = new List<RoomViewModel>();
             foreach (var item in roomsQuery)
             {
-                var building = _context.Buildings.FirstAsync(e => e.BuildingId == item.BuildingId);
-                rooms.Add(new RoomViewModel(item.RoomId, building.Result.Name, item.Area, item.Description, item.Photo));
+                var building = buildingsQuery.Single(e => e.BuildingId == item.BuildingId);
+                rooms.Add(new RoomViewModel(item.RoomId, building.Name, item.Area, item.Description, item.Photo));
             }
 
             //Фильтрация
@@ -82,14 +85,12 @@ namespace RoomRental.Controllers
         // GET: Rooms/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Rooms == null)
+            if (id == null || _cache.GetRooms() == null)
             {
                 return NotFound();
             }
 
-            var room = await _context.Rooms
-                .Include(r => r.Building)
-                .FirstOrDefaultAsync(m => m.RoomId == id);
+            var room = await _cache.GetRoom(id);
             if (room == null)
             {
                 return NotFound();
@@ -101,7 +102,7 @@ namespace RoomRental.Controllers
         // GET: Rooms/Create
         public IActionResult Create()
         {
-            ViewData["BuildingId"] = new SelectList(_context.Buildings, "BuildingId", "Name");
+            ViewData["BuildingId"] = new SelectList(_buildingCache.GetBuildings().Result, "BuildingId", "Name");
             return View();
         }
 
@@ -112,7 +113,7 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(new Room()
+                _cache.AddRoom(new Room()
                 {
                     RoomId = room.RoomId,
                     BuildingId = room.BuildingId,
@@ -120,27 +121,26 @@ namespace RoomRental.Controllers
                     Description = room.Description,
                     Photo = ConvertIFormFileToByteArray(room.Photo)
                 });
-                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BuildingId"] = new SelectList(_context.Buildings, "BuildingId", "Name", room.BuildingId);
+            ViewData["BuildingId"] = new SelectList(_buildingCache.GetBuildings().Result, "BuildingId", "Name", room.BuildingId);
             return View(room);
         }
 
         // GET: Rooms/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Rooms == null)
+            if (id == null || _cache.GetRooms() == null)
             {
                 return NotFound();
             }
 
-            var room = await _context.Rooms.FindAsync(id);
+            var room = await _cache.GetRoom(id);
             if (room == null)
             {
                 return NotFound();
             }
-            ViewData["BuildingId"] = new SelectList(_context.Buildings, "BuildingId", "Name", room.BuildingId);
+            ViewData["BuildingId"] = new SelectList(_buildingCache.GetBuildings().Result, "BuildingId", "Name", room.BuildingId);
             return View(room);
         }
 
@@ -158,7 +158,7 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    _context.Update(new Room()
+                    _cache.UpdateRoom(new Room()
                     {
                         RoomId = room.RoomId,
                         BuildingId = room.BuildingId,
@@ -166,7 +166,6 @@ namespace RoomRental.Controllers
                         Description = room.Description,
                         Photo = ConvertIFormFileToByteArray(room.Photo)
                     });
-                    await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -181,21 +180,19 @@ namespace RoomRental.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BuildingId"] = new SelectList(_context.Buildings, "BuildingId", "Name", room.BuildingId);
+            ViewData["BuildingId"] = new SelectList(_buildingCache.GetBuildings().Result, "BuildingId", "Name", room.BuildingId);
             return View(room);
         }
 
         // GET: Rooms/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Rooms == null)
+            if (id == null || _cache.GetRooms() == null)
             {
                 return NotFound();
             }
 
-            var room = await _context.Rooms
-                .Include(r => r.Building)
-                .FirstOrDefaultAsync(m => m.RoomId == id);
+            var room = await _cache.GetRoom(id);
             if (room == null)
             {
                 return NotFound();
@@ -209,37 +206,17 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Rooms == null)
+            if (_cache.GetRooms() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.Rooms'  is null.");
             }
-            var room = await _context.Rooms.FindAsync(id);
-
-            var rentals = await _context.Rentals.Where(e => e.RoomId == room.RoomId).ToListAsync();
-            var invoices = await _context.Invoices.Where(e => e.RoomId == room.RoomId).ToListAsync();
-
-            if (rentals != null)
-            {
-                _context.Rentals.RemoveRange(rentals);
-            }
-            if (invoices != null)
-            {
-                _context.Invoices.RemoveRange(invoices);
-            }
-            await _context.SaveChangesAsync();
-
-            if (room != null)
-            {
-                _context.Rooms.Remove(room);
-            }
-            
-            await _context.SaveChangesAsync();
+            _cache.DeleteRoom(_cache.GetRoom(id).Result);
             return RedirectToAction(nameof(Index));
         }
 
         private bool RoomExists(int id)
         {
-          return (_context.Rooms?.Any(e => e.RoomId == id)).GetValueOrDefault();
+          return (_cache.GetRooms().Result?.Any(e => e.RoomId == id)).GetValueOrDefault();
         }
         public byte[] ConvertIFormFileToByteArray(IFormFile file)
         {
