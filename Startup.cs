@@ -25,7 +25,7 @@ namespace RoomRental
             services.AddDbContext<RoomRentalsContext>(options => options.UseSqlServer(connection));
 
             //Добавление классов авторизации
-            services.AddIdentity<User, IdentityRole>(opts => {
+            services.AddIdentity<IdentityUser, IdentityRole>(opts => {
                 opts.User.RequireUniqueEmail = true;    // уникальный email
                 opts.Password.RequiredLength = 6;   // минимальная длина
                 opts.Password.RequireNonAlphanumeric = false;   // требуются ли не алфавитно-цифровые символы
@@ -38,8 +38,8 @@ namespace RoomRental
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
-                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
-                    options.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
+                    options.LoginPath = new PathString("/Account/Login");
+                    options.AccessDeniedPath = new PathString("/Account/Login");
                 });
 
             // добавление кэширования

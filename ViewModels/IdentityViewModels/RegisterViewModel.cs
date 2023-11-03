@@ -5,12 +5,12 @@ namespace RoomRental.ViewModels.IdentityViewModels
     public class RegisterViewModel
     {
         [Required]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
+        [Display(Name = "Логин")]
+        public string Login { get; set; }
 
         [Required]
-        [Display(Name = "Год рождения")]
-        public int Year { get; set; }
+        [Display(Name = "Email")]
+        public string Email { get; set; }
 
         [Required]
         [DataType(DataType.Password)]

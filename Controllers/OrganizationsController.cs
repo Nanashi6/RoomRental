@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using RoomRental.Data;
 using RoomRental.Models;
 using RoomRental.Services;
 using RoomRental.ViewModels;
@@ -23,7 +15,7 @@ namespace RoomRental.Controllers
         private readonly OrganizationService _cache;
         private readonly int _pageSize = 10;
 
-        public OrganizationsController(RoomRentalsContext context, OrganizationService cache)
+        public OrganizationsController(OrganizationService cache)
         {
             _cache = cache;
         }
@@ -31,7 +23,7 @@ namespace RoomRental.Controllers
         // GET: Organizations
         public async Task<IActionResult> Index(int page = 1, string organizationNameFind = "", OrganizationSortState sortOrder = OrganizationSortState.NameAsc)
         {
-            var organizationsQuery = await _cache.GetOrganizations();
+             var organizationsQuery = await _cache.GetOrganizations();
             //Фильтрация
             if (!String.IsNullOrEmpty(organizationNameFind))
                 organizationsQuery = organizationsQuery.Where(e => e.Name.Contains(organizationNameFind)).ToList();

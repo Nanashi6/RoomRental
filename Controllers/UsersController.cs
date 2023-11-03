@@ -9,9 +9,9 @@ namespace RoomRental.Controllers
     [Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
-        UserManager<User> _userManager;
+        UserManager<IdentityUser> _userManager;
 
-        public UsersController(UserManager<User> userManager)
+        public UsersController(UserManager<IdentityUser> userManager)
         {
             _userManager = userManager;
         }
@@ -25,7 +25,7 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = new User { Email = model.Email, UserName = model.Email, Year = model.Year };
+                IdentityUser user = new IdentityUser { Email = model.Email, UserName = model.UserName};
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -44,12 +44,12 @@ namespace RoomRental.Controllers
 
         public async Task<IActionResult> Edit(string id)
         {
-            User user = await _userManager.FindByIdAsync(id);
+            IdentityUser user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
-            EditUserViewModel model = new EditUserViewModel { Id = user.Id, Email = user.Email, Year = user.Year };
+            EditUserViewModel model = new EditUserViewModel { Id = user.Id, Email = user.UserName };
             return View(model);
         }
 
@@ -58,12 +58,12 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await _userManager.FindByIdAsync(model.Id);
+                IdentityUser user = await _userManager.FindByIdAsync(model.Id);
                 if (user != null)
                 {
                     user.Email = model.Email;
                     user.UserName = model.Email;
-                    user.Year = model.Year;
+                    user.UserName = model.UserName;
 
                     var result = await _userManager.UpdateAsync(user);
                     if (result.Succeeded)
@@ -85,7 +85,7 @@ namespace RoomRental.Controllers
         [HttpPost]
         public async Task<ActionResult> Delete(string id)
         {
-            User user = await _userManager.FindByIdAsync(id);
+            IdentityUser user = await _userManager.FindByIdAsync(id);
             if (user != null)
             {
                 IdentityResult result = await _userManager.DeleteAsync(user);
@@ -94,7 +94,7 @@ namespace RoomRental.Controllers
         }
         public async Task<IActionResult> ChangePassword(string id)
         {
-            User user = await _userManager.FindByIdAsync(id);
+            IdentityUser user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
@@ -108,13 +108,13 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = await _userManager.FindByIdAsync(model.Id);
+                IdentityUser user = await _userManager.FindByIdAsync(model.Id);
                 if (user != null)
                 {
                     var _passwordValidator =
-                        HttpContext.RequestServices.GetService(typeof(IPasswordValidator<User>)) as IPasswordValidator<User>;
+                        HttpContext.RequestServices.GetService(typeof(IPasswordValidator<IdentityUser>)) as IPasswordValidator<IdentityUser>;
                     var _passwordHasher =
-                        HttpContext.RequestServices.GetService(typeof(IPasswordHasher<User>)) as IPasswordHasher<User>;
+                        HttpContext.RequestServices.GetService(typeof(IPasswordHasher<IdentityUser>)) as IPasswordHasher<IdentityUser>;
 
                     IdentityResult result =
                         await _passwordValidator.ValidateAsync(_userManager, user, model.NewPassword);

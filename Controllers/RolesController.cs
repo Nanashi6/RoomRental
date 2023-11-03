@@ -10,8 +10,8 @@ namespace RoomRental.Controllers
     public class RolesController : Controller
     {
         RoleManager<IdentityRole> _roleManager;
-        UserManager<User> _userManager;
-        public RolesController(RoleManager<IdentityRole> roleManager, UserManager<User> userManager)
+        UserManager<IdentityUser> _userManager;
+        public RolesController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -56,7 +56,7 @@ namespace RoomRental.Controllers
         public async Task<IActionResult> Edit(string userId)
         {
             // получаем пользователя
-            User user = await _userManager.FindByIdAsync(userId);
+            IdentityUser user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
                 // получем список ролей пользователя
@@ -78,7 +78,7 @@ namespace RoomRental.Controllers
         public async Task<IActionResult> Edit(string userId, List<string> roles)
         {
             // получаем пользователя
-            User user = await _userManager.FindByIdAsync(userId);
+            IdentityUser user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
                 // получем список ролей пользователя
