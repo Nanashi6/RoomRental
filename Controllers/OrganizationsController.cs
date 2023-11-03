@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using RoomRental.Data;
 using RoomRental.Models;
+using RoomRental.Services;
 using RoomRental.ViewModels;
 using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
@@ -18,25 +20,24 @@ namespace RoomRental.Controllers
     [Authorize(Roles = "User")]
     public class OrganizationsController : Controller
     {
-        private readonly RoomRentalsContext _context;
+        private readonly OrganizationService _cache;
         private readonly int _pageSize = 10;
 
-        public OrganizationsController(RoomRentalsContext context)
+        public OrganizationsController(RoomRentalsContext context, OrganizationService cache)
         {
-            _context = context;
+            _cache = cache;
         }
 
         // GET: Organizations
         public async Task<IActionResult> Index(int page = 1, string organizationNameFind = "", OrganizationSortState sortOrder = OrganizationSortState.NameAsc)
         {
-            var organizationsQuery = await _context.Organizations.ToListAsync();
-
+            var organizationsQuery = await _cache.GetOrganizations();
             //Фильтрация
-            if(!String.IsNullOrEmpty(organizationNameFind))
+            if (!String.IsNullOrEmpty(organizationNameFind))
                 organizationsQuery = organizationsQuery.Where(e => e.Name.Contains(organizationNameFind)).ToList();
 
             //Сортировка
-            switch(sortOrder)
+            switch (sortOrder)
             {
                 case OrganizationSortState.NameAsc:
                     organizationsQuery = organizationsQuery.OrderBy(e => e.Name).ToList();
@@ -71,13 +72,12 @@ namespace RoomRental.Controllers
         // GET: Organizations/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Organizations == null)
+            if (id == null || _cache.GetOrganizations() == null)
             {
                 return NotFound();
             }
 
-            var organization = await _context.Organizations
-                .FirstOrDefaultAsync(m => m.OrganizationId == id);
+            var organization = _cache.GetOrganization(id).Result;
             if (organization == null)
             {
                 return NotFound();
@@ -99,8 +99,7 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(organization);
-                await _context.SaveChangesAsync();
+                _cache.AddOrganization(organization);
                 return RedirectToAction(nameof(Index));
             }
             return View(organization);
@@ -109,12 +108,12 @@ namespace RoomRental.Controllers
         // GET: Organizations/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Organizations == null)
+            if (id == null || _cache.GetOrganizations() == null)
             {
                 return NotFound();
             }
 
-            var organization = await _context.Organizations.FindAsync(id);
+            var organization = await _cache.GetOrganization(id);
             if (organization == null)
             {
                 return NotFound();
@@ -136,8 +135,7 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    _context.Update(organization);
-                    await _context.SaveChangesAsync();
+                    _cache.UpdateOrganization(organization);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -158,13 +156,12 @@ namespace RoomRental.Controllers
         // GET: Organizations/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Organizations == null)
+            if (id == null || _cache.GetOrganizations() == null)
             {
                 return NotFound();
             }
 
-            var organization = await _context.Organizations
-                .FirstOrDefaultAsync(m => m.OrganizationId == id);
+            var organization = await _cache.GetOrganization(id);
             if (organization == null)
             {
                 return NotFound();
@@ -178,48 +175,19 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Organizations == null)
+            if (_cache.GetOrganizations() == null)
             {
-                return Problem("Entity set 'RoomRentalsContext.Organizations'  is null.");
+                return Problem("Entity set 'RoomRentalsContext.Organizations' is null.");
             }
-            var organization = await _context.Organizations.FindAsync(id);
 
-            var rentals = await _context.Rentals.Where(e => e.RentalOrganizationId == organization.OrganizationId).ToListAsync();
-            var invoices = await _context.Invoices.Where(e => e.RentalOrganizationId == organization.OrganizationId).ToListAsync();
+            _cache.DeleteOrganization(_cache.GetOrganization(id).Result);
 
-            var rooms = await _context.Rooms
-                        .Where(r => _context.Buildings
-                            .Where(b => organization.OrganizationId == b.OwnerOrganizationId)
-                            .Select(b => b.BuildingId)
-                            .Contains(r.BuildingId))
-                        .Select(r => r.RoomId)
-                        .ToListAsync();
-
-            rentals.AddRange(await _context.Rentals.Where(r => rooms.Contains(r.RoomId)).ToListAsync());
-            invoices.AddRange(await _context.Invoices.Where(i => rooms.Contains(i.RoomId)).ToListAsync());
-
-            if (rentals != null)
-            {
-                _context.Rentals.RemoveRange(rentals);
-            }
-            if (invoices != null)
-            {
-                _context.Invoices.RemoveRange(invoices);
-            }
-            await _context.SaveChangesAsync();
-
-            if (organization != null)
-            {
-                _context.Organizations.Remove(organization);
-            }
-            
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool OrganizationExists(int id)
         {
-          return (_context.Organizations?.Any(e => e.OrganizationId == id)).GetValueOrDefault();
+            return (_cache.GetOrganizations().Result?.Any(e => e.OrganizationId == id)).GetValueOrDefault();
         }
     }
 }
