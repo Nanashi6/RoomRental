@@ -34,12 +34,16 @@ namespace RoomRental.TagHelpers
             tag.AddCssClass("pagination justify-content-center");
 
             // формируем три ссылки - на текущую, предыдущую и следующую
-            TagBuilder currentItem = CreateTag(PageModel.PageNumber, urlHelper);
+            TagBuilder currentItem = CreateTag(PageModel.PageNumber, PageModel.PageNumber.ToString(), urlHelper);
 
             // создаем ссылку на предыдущую страницу, если она есть
             if (PageModel.HasPreviousPage)
             {
-                TagBuilder prevItem = CreateTag(PageModel.PageNumber - 1, urlHelper);
+                TagBuilder prevItem = CreateTag(1, "<<", urlHelper);
+                tag.InnerHtml.AppendHtml(prevItem);
+                prevItem = CreateTag(PageModel.PageNumber - 1, "<", urlHelper);
+                tag.InnerHtml.AppendHtml(prevItem);
+                prevItem = CreateTag(PageModel.PageNumber - 1, (PageModel.PageNumber - 1).ToString(), urlHelper);
                 tag.InnerHtml.AppendHtml(prevItem);
             }
 
@@ -47,13 +51,17 @@ namespace RoomRental.TagHelpers
             // создаем ссылку на следующую страницу, если она есть
             if (PageModel.HasNextPage)
             {
-                TagBuilder nextItem = CreateTag(PageModel.PageNumber + 1, urlHelper);
+                TagBuilder nextItem = CreateTag(PageModel.PageNumber + 1, (PageModel.PageNumber + 1).ToString(), urlHelper);
+                tag.InnerHtml.AppendHtml(nextItem);
+                nextItem = CreateTag(PageModel.PageNumber + 1, ">", urlHelper);
+                tag.InnerHtml.AppendHtml(nextItem);
+                nextItem = CreateTag(PageModel.TotalPages, ">>", urlHelper);
                 tag.InnerHtml.AppendHtml(nextItem);
             }
             output.Content.AppendHtml(tag);
         }
 
-        TagBuilder CreateTag(int pageNumber, IUrlHelper urlHelper)
+        TagBuilder CreateTag(int pageNumber, string content, IUrlHelper urlHelper)
         {
             TagBuilder item = new TagBuilder("li");
             TagBuilder link = new TagBuilder("a");
@@ -68,7 +76,7 @@ namespace RoomRental.TagHelpers
             }
             item.AddCssClass("page-item");
             link.AddCssClass("page-link");
-            link.InnerHtml.Append(pageNumber.ToString());
+            link.InnerHtml.Append(content);
             item.InnerHtml.AppendHtml(link);
             return item;
         }
