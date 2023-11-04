@@ -1,18 +1,90 @@
-html {
-  font-size: 14px;
-}
-
 @media (min-width: 768px) {
   html {
     font-size: 16px;
   }
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+* {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    list-style-type: none;
+    font-family: sans-serif;
 }
 
-body {
-  margin-bottom: 60px;
+
+/*Формы входа и регистрации*/
+.loginLabel {
+    position: relative;
+    font-size: 14px;
+    color: rgb(87, 87, 87);
 }
+
+.loginInput {
+    margin-top: 10px;
+    width: 260px;
+    display: block;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    border-bottom: 1px solid black;
+    position: relative;
+}
+
+.loginHeader {
+    flex: 1 1 auto;
+    margin: 0 5px;
+    text-align: center;
+}
+
+form {
+    flex: 1 1 auto;
+    margin: 0 5px;
+}
+
+.block {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.parent {
+    background: rgb(255,0,236);
+    background: linear-gradient(45deg, rgba(0,212,255,1), rgba(255,0,236,1) 100%);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    width: 300px;
+    margin: -5px 0;
+    border-radius: 10px;
+    padding: 25px 35px;
+    background: white;
+}
+
+.submitButton {
+    text-decoration: none;
+    display: inline-block;
+    width: 290px;
+    line-height: 45px;
+    border: 2px solid white;
+    border-radius: 40px;
+    margin: 10px 0;
+    font-size: 15px;
+    text-align: center;
+    font-weight: 300;
+    color: white;
+    background: linear-gradient(90deg, rgba(255,0,236,1) 0%, rgba(0,212,255,1) 100%);
+}
+
+    .submitButton:hover {
+        cursor: pointer;
+        background: linear-gradient(90deg, rgba(0,212,255,1)0%, rgba(255,0,236,1) 100%);
+    }
+/*Формы входа и регистрации*/

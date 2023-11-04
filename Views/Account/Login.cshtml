@@ -1,20 +1,49 @@
 ﻿@model LoginViewModel
 
-<h2>Вход в приложение</h2>
-<form method="post" asp-controller="Account" asp-action="Login"
-      asp-route-returnUrl="@Model.ReturnUrl">
-    <div asp-validation-summary="ModelOnly"></div>
-    <div>
-        <label asp-for="Login"></label><br />
-        <input asp-for="Login" />
-        <span asp-validation-for="Login"></span>
+@* <h2>Вход в приложение</h2>
+<div>
+    <form method="post" asp-controller="Account" asp-action="Login"
+          asp-route-returnUrl="@Model.ReturnUrl">
+        <div asp-validation-summary="ModelOnly"></div>
+        <div>
+            <label asp-for="Login"></label><br />
+            <input asp-for="Login" />
+            <span asp-validation-for="Login"></span>
+        </div>
+        <div>
+            <label asp-for="Password"></label><br />
+            <input asp-for="Password" />
+            <span asp-validation-for="Password"></span>
+        </div>
+        <div>
+            <input type="submit" value="Войти" />
+        </div>
+    </form>
+</div> *@
+
+
+<div class="parent">
+    <div class="container">
+        <h1 class="loginHeader">Вход</h1>
+        <form method="post" asp-controller="Account" asp-action="Login"
+              asp-route-returnUrl="@Model.ReturnUrl">
+            <div class="block">
+                @* <label class="loginLabel" asp-for="Login"></label> *@
+                <input class="loginInput" asp-for=" Login" placeholder="Введите имя пользователя" />
+                <span asp-validation-for="Login"></span>
+            </div>
+            <div class="block">
+                @* <label class="loginLabel" asp-for="Password"></label> *@
+                <input class="loginInput" asp-for="Password" placeholder="Введите пароль" />
+                <span asp-validation-for="Password"></span>
+            </div>
+            <div class="block">
+                <input class ="submitButton" type="submit" value="Войти" />
+            </div>
+            <div class="block">
+                <label>Ещё нет аккаунта?</label>
+                <a asp-area="" asp-controller="Account" asp-action="Register">Зарегистрировать</a>
+            </div>
+        </form>
     </div>
-    <div>
-        <label asp-for="Password"></label><br />
-        <input asp-for="Password" />
-        <span asp-validation-for="Password"></span>
-    </div>
-    <div>
-        <input type="submit" value="Войти" />
-    </div>
-</form>
+</div>
