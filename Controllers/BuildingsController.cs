@@ -9,6 +9,7 @@ using RoomRental.ViewModels;
 using RoomRental.ViewModels.FilterViewModels;
 using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
+using System.IO;
 
 namespace RoomRental.Controllers
 {
@@ -18,11 +19,13 @@ namespace RoomRental.Controllers
         private readonly BuildingService _cache;
         private readonly OrganizationService _organizationCache;
         private readonly int _pageSize = 10;
+        private readonly IWebHostEnvironment _appEnvironment;
 
-        public BuildingsController(BuildingService cache, OrganizationService organizationCache)
+        public BuildingsController(BuildingService cache, OrganizationService organizationCache, IWebHostEnvironment appEnvironment)
         {
             _cache = cache;
             _organizationCache = organizationCache;
+            _appEnvironment = appEnvironment;
         }
 
         // GET: Buildings
@@ -133,8 +136,14 @@ namespace RoomRental.Controllers
                     PostalAddress = building.PostalAddress,
                     Floors = building.Floors,
                     Description = building.Description,
-                    FloorPlan = ConvertIFormFileToByteArray(building.FloorPlan)
+                    FloorPlan = "\\Images\\FloorPlans\\" + building.FloorPlan.FileName/*ConvertIFormFileToByteArray(building.FloorPlan)*/
                 });
+
+                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + "\\Images\\FloorPlans\\" + building.FloorPlan.FileName, FileMode.Create))
+                {
+                    await building.FloorPlan.CopyToAsync(fileStream);
+                }
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["OwnerOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name", building.OwnerOrganizationId);
@@ -180,8 +189,13 @@ namespace RoomRental.Controllers
                         PostalAddress = building.PostalAddress,
                         Floors = building.Floors,
                         Description = building.Description,
-                        FloorPlan = ConvertIFormFileToByteArray(building.FloorPlan)
+                        FloorPlan = "\\Images\\FloorPlans\\" + building.FloorPlan.FileName/*ConvertIFormFileToByteArray(building.FloorPlan)*/
                     });
+
+                    using (var fileStream = new FileStream(_appEnvironment.WebRootPath + "\\Images\\FloorPlans\\" + building.FloorPlan.FileName, FileMode.Create))
+                    {
+                        await building.FloorPlan.CopyToAsync(fileStream);
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {

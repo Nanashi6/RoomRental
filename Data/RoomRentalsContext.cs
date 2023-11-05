@@ -46,7 +46,8 @@ public partial class RoomRentalsContext : IdentityDbContext<IdentityUser>
                 .IsUnicode(false)
                 .HasColumnName("description");
             entity.Property(e => e.FloorPlan)
-                .HasColumnType("image")
+                .HasMaxLength(50)
+                .IsUnicode(false)
                 .HasColumnName("floorPlan");
             entity.Property(e => e.Floors).HasColumnName("floors");
             entity.Property(e => e.Name)
@@ -165,7 +166,6 @@ public partial class RoomRentalsContext : IdentityDbContext<IdentityUser>
                 .HasMaxLength(255)
                 .IsUnicode(false)
                 .HasColumnName("description");
-            entity.Property(e => e.Photo).HasColumnName("photo");
 
             entity.HasOne(d => d.Building).WithMany(p => p.Rooms)
                 .HasForeignKey(d => d.BuildingId)

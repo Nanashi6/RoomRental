@@ -101,7 +101,7 @@
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                    <img src=" data:image /jpeg;base64,@(Convert.ToBase64String(item.FloorPlan))">
+                    <img src="@item.FloorPlan"@*  data:image /jpeg;base64,@(Convert.ToBase64String(item.FloorPlan)) *@>
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.BuildingId">Edit</a> |

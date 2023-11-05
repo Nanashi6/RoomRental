@@ -18,9 +18,9 @@ namespace RoomRental.ViewModels
         [Display(Name = "Описание")]
         public string Description { get; set; }
         [Display(Name = "План этажа")]
-        public byte[] FloorPlan { get; set; }
+        public string FloorPlan { get; set; }
 
-        public BuildingViewModel(int id, string name, string organization, string address, int floors, string description, byte[] plan)
+        public BuildingViewModel(int id, string name, string organization, string address, int floors, string description, string plan)
         {
             BuildingId = id;
             Name = name;

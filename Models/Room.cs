@@ -14,8 +14,6 @@ public partial class Room
     public decimal Area { get; set; }
     [Display(Name = "Описание")]
     public string Description { get; set; }
-    [Display(Name = "Фотография")]
-    public byte[] Photo { get; set; } = new byte[0];
     public virtual Building Building { get; set; }
 
     public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
