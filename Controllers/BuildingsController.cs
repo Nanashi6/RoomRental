@@ -39,7 +39,7 @@ namespace RoomRental.Controllers
             foreach (var item in buildingsQuery)
             {
                 var organization = organizationsQuery.Single(e => e.OrganizationId == item.OwnerOrganizationId);
-                buildings.Add(new BuildingViewModel(item.BuildingId, item.Name, organization.Name, item.PostalAddress, item.Floors, item.Description, item.FloorPlan));
+                buildings.Add(new BuildingViewModel((int)item.BuildingId, item.Name, organization.Name, item.PostalAddress, item.Floors, item.Description, item.FloorPlan));
             }
 
             //Фильтрация
@@ -124,24 +124,16 @@ namespace RoomRental.Controllers
         // POST: Buildings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlan")] BuildingBindModel building/*int BuildingId, string Name, int OwnerOrganizationId, string PostalAddress, int Floors, string Description, IFormFile FloorPlan*/)
+        public async Task<IActionResult> Create([Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlanImage")] Building building)
         {
             if (ModelState.IsValid)
             {
-                _cache.AddBuilding(new Building()
-                {
-                    BuildingId = building.BuildingId,
-                    Name = building.Name,
-                    OwnerOrganizationId = building.OwnerOrganizationId,
-                    PostalAddress = building.PostalAddress,
-                    Floors = building.Floors,
-                    Description = building.Description,
-                    FloorPlan = "\\Images\\FloorPlans\\" + building.FloorPlan.FileName/*ConvertIFormFileToByteArray(building.FloorPlan)*/
-                });
+                building.FloorPlan = "\\Images\\FloorPlans\\" + building.FloorPlanImage.FileName;
+                _cache.AddBuilding(building);
 
-                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + "\\Images\\FloorPlans\\" + building.FloorPlan.FileName, FileMode.Create))
+                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + "\\Images\\FloorPlans\\" + building.FloorPlanImage.FileName, FileMode.Create))
                 {
-                    await building.FloorPlan.CopyToAsync(fileStream);
+                    await building.FloorPlanImage.CopyToAsync(fileStream);
                 }
 
                 return RedirectToAction(nameof(Index));
@@ -170,7 +162,7 @@ namespace RoomRental.Controllers
         // POST: Buildings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlan")] BuildingBindModel building)
+        public async Task<IActionResult> Edit(int id, [Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlanImage")] Building building)
         {
             if (id != building.BuildingId)
             {
@@ -181,25 +173,17 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    _cache.UpdateBuilding(new Building()
-                    {
-                        BuildingId = building.BuildingId,
-                        Name = building.Name,
-                        OwnerOrganizationId = building.OwnerOrganizationId,
-                        PostalAddress = building.PostalAddress,
-                        Floors = building.Floors,
-                        Description = building.Description,
-                        FloorPlan = "\\Images\\FloorPlans\\" + building.FloorPlan.FileName/*ConvertIFormFileToByteArray(building.FloorPlan)*/
-                    });
+                    building.FloorPlan = "\\Images\\FloorPlans\\" + building.FloorPlanImage.FileName;
+                    _cache.UpdateBuilding(building);
 
-                    using (var fileStream = new FileStream(_appEnvironment.WebRootPath + "\\Images\\FloorPlans\\" + building.FloorPlan.FileName, FileMode.Create))
+                    using (var fileStream = new FileStream(_appEnvironment.WebRootPath + "\\Images\\FloorPlans\\" + building.FloorPlanImage.FileName, FileMode.Create))
                     {
-                        await building.FloorPlan.CopyToAsync(fileStream);
+                        await building.FloorPlanImage.CopyToAsync(fileStream);
                     }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BuildingExists(building.BuildingId))
+                    if (!BuildingExists((int)building.BuildingId))
                     {
                         return NotFound();
                     }

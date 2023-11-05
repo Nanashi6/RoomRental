@@ -1,16 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Caching.Memory;
 using RoomRental.Data;
 using RoomRental.Models;
 
 namespace RoomRental.Services
 {
-    public class RoomService
+    public class RoomImageService
     {
         private RoomRentalsContext _context;
         private IMemoryCache _cache;
-        public RoomService(RoomRentalsContext context, IMemoryCache memoryCache)
+        public RoomImageService(RoomRentalsContext context, IMemoryCache memoryCache)
         {
             _context = context;
             _cache = memoryCache;
@@ -19,53 +18,63 @@ namespace RoomRental.Services
         /// Возвращает все объекты Building, хранящиеся в базы данных
         /// </summary>
         /// <returns></returns>
-        public async Task<List<Room>?> GetRooms()
+        public async Task<List<RoomImage>?> GetImages()
         {
-            if (!_cache.TryGetValue("Rooms", out List<Room>? rooms))
+            if (!_cache.TryGetValue("Images", out List<RoomImage>? images))
             {
-                rooms = AddCache().Result;
+                images = AddCache().Result;
             }
             else
             {
                 Console.WriteLine($"Список извлечен из кэша");
             }
-            return rooms;
+            return images;
         }
         /// <summary>
         /// Возвращает объект Room
         /// </summary>
         /// <returns></returns>
-        public async Task<Room> GetRoom(int? id)
+        public async Task<RoomImage> GetImage(int? id)
         {
-            if (!_cache.TryGetValue("Rooms", out List<Room>? rooms))
+            if (!_cache.TryGetValue("Images", out List<RoomImage>? images))
             {
-                rooms = AddCache().Result;
+                images = AddCache().Result;
             }
             else
             {
                 Console.WriteLine($"Список извлечен из кэша");
             }
-            return rooms.Single(e => e.RoomId == id);
+            return images.Single(e => e.RoomId == id);
+        }
+        public async Task<List<RoomImage>> GetImageForRoom(int? roomId)
+        {
+            if (!_cache.TryGetValue("Images", out List<RoomImage>? images))
+            {
+                images = AddCache().Result;
+            }
+            else
+            {
+                Console.WriteLine($"Список извлечен из кэша");
+            }
+            return images.Where(e => e.RoomId == roomId).ToList();
         }
         /// <summary>
         /// Добавляет объект Room
         /// </summary>
         /// <returns></returns>
-        public async Task<int?> AddRoom(Room room)
+        public async void AddImage(RoomImage image)
         {
-            EntityEntry<Room> entRoom = _context.Add(room);
+            _context.Add(image);
             _context.SaveChanges();
             await AddCache();
-
-            return entRoom.Entity.RoomId;
         }
         /// <summary>
         /// Обновляет объект Room
         /// </summary>
         /// <returns></returns>
-        public async void UpdateRoom(Room room)
+        public async void UpdateImage(RoomImage image)
         {
-            _context.Update(room);
+            _context.Update(image);
             _context.SaveChanges();
             await AddCache();
         }
@@ -73,24 +82,11 @@ namespace RoomRental.Services
         /// Удаляет объект Room
         /// </summary>
         /// <returns></returns>
-        public async void DeleteRoom(Room room)
+        public async void DeleteImage(RoomImage image)
         {
-            var rentals = _context.Rentals.Where(e => e.RoomId == room.RoomId).ToList();
-            var invoices = _context.Invoices.Where(e => e.RoomId == room.RoomId).ToList();
-
-            if (rentals != null)
+            if (image != null)
             {
-                _context.Rentals.RemoveRange(rentals);
-            }
-            if (invoices != null)
-            {
-                _context.Invoices.RemoveRange(invoices);
-            }
-            _context.SaveChanges();
-
-            if (room != null)
-            {
-                _context.Rooms.Remove(room);
+                _context.RoomImages.Remove(image);
             }
 
             _context.SaveChanges();
@@ -101,19 +97,18 @@ namespace RoomRental.Services
         /// Обновляет кэш
         /// </summary>
         /// <returns></returns>
-        public async Task<List<Room>?> AddCache()
+        public async Task<List<RoomImage>?> AddCache()
         {
-            _cache.Remove("Rooms");
+            _cache.Remove("Images");
             // обращаемся к базе данных
-            var rooms = _context.Rooms.ToList();
-            // если пользователь найден, то добавляем в кэш - время кэширования 5 минут
+            var images = _context.RoomImages.ToList();
 
-            if (rooms != null)
+            if (images != null)
             {
                 Console.WriteLine($"Список извлечен из базы данных");
-                _cache.Set("Rooms", rooms, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+                _cache.Set("Images", images, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
-            return rooms.ToList();
+            return images.ToList();
         }
     }
 }

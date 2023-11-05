@@ -22,25 +22,37 @@ namespace RoomRental.Controllers
     {
         private readonly RoomService _cache;
         private readonly BuildingService _buildingCache;
+        private readonly RoomImageService _imageCache;
         private readonly int _pageSize = 10;
+        private readonly IWebHostEnvironment _appEnvironment;
 
-        public RoomsController(RoomService cache, BuildingService buildingCache)
+        public RoomsController(RoomService cache, BuildingService buildingCache, RoomImageService imageCache, IWebHostEnvironment appEnvironment)
         {
             _cache = cache;
             _buildingCache = buildingCache;
+            _imageCache = imageCache;
+            _appEnvironment = appEnvironment;
         }
 
         // GET: Rooms
         public async Task<IActionResult> Index(int page = 1, string buildingNameFind = "", decimal? areaFind = null, RoomSortState sortOrder = RoomSortState.BuildingNameAsc)
         {
             var roomsQuery = await _cache.GetRooms();
+            var imagesQuery = await _imageCache.GetImages();
             var buildingsQuery = await _buildingCache.GetBuildings();
             //Формирование осмысленных связей
             List<RoomViewModel> rooms = new List<RoomViewModel>();
             foreach (var item in roomsQuery)
             {
+                var images = imagesQuery.Where(e => e.RoomId == item.RoomId).ToList();
+                string[] paths = new string[images.Count()];
+                for(int i = 0; i < paths.Length; i++ )
+                {
+                    paths[i] = images[i].ImagePath;
+                }
+
                 var building = buildingsQuery.Single(e => e.BuildingId == item.BuildingId);
-                rooms.Add(new RoomViewModel(item.RoomId, building.Name, item.Area, item.Description, item.Photo));
+                rooms.Add(new RoomViewModel((int)item.RoomId, building.Name, (decimal)item.Area, item.Description, paths /*item.Photo*/));
             }
 
             //Фильтрация
@@ -109,18 +121,40 @@ namespace RoomRental.Controllers
         // POST: Rooms/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RoomId,BuildingId,Area,Description,Photo")] RoomBindModel room)
+        public async Task<IActionResult> Create([Bind("RoomId,BuildingId,Area,Description,Photos")] Room room)
         {
+            // Если ModelState не валидна, просмотрите ошибки
+            foreach (var key in ModelState.Keys)
+            {
+                var errors = ModelState[key].Errors;
+                foreach (var error in errors)
+                {
+                    // Выведите ошибки или выполните другую логику обработки ошибок
+                    Console.WriteLine($"Error in {key}: {error.ErrorMessage}");
+                }
+            }
+
             if (ModelState.IsValid)
             {
-                _cache.AddRoom(new Room()
+                int? roomId = _cache.AddRoom(room).Result;
+
+                string[] paths = new string[room.Photos.Count()];
+                for (int i = 0; i < paths.Length; i++)
                 {
-                    RoomId = room.RoomId,
-                    BuildingId = room.BuildingId,
-                    Area = room.Area,
-                    Description = room.Description,
-                    Photo = ConvertIFormFileToByteArray(room.Photo)
-                });
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(room.Photos[i].FileName);
+
+                    using (var fileStream = new FileStream(_appEnvironment.WebRootPath + Path.Combine("\\images\\Rooms\\", fileName), FileMode.Create))
+                    {
+                        await room.Photos[i].CopyToAsync(fileStream);
+                    }
+
+                    _imageCache.AddImage(new RoomImage()
+                    {
+                        ImagePath = Path.Combine("\\images\\Rooms\\", fileName),
+                        RoomId = (int)roomId
+                    });
+                }
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["BuildingId"] = new SelectList(_buildingCache.GetBuildings().Result, "BuildingId", "Name", room.BuildingId);
@@ -140,6 +174,7 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
+
             ViewData["BuildingId"] = new SelectList(_buildingCache.GetBuildings().Result, "BuildingId", "Name", room.BuildingId);
             return View(room);
         }
@@ -147,7 +182,7 @@ namespace RoomRental.Controllers
         // POST: Rooms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RoomId,BuildingId,Area,Description,Photo")] RoomBindModel room)
+        public async Task<IActionResult> Edit(int id, [Bind("RoomId,BuildingId,Area,Description,Photos")] Room room)
         {
             if (id != room.RoomId)
             {
@@ -158,18 +193,28 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    _cache.UpdateRoom(new Room()
+                    string[] paths = new string[room.Photos.Count()];
+                    for (int i = 0; i < paths.Length; i++)
                     {
-                        RoomId = room.RoomId,
-                        BuildingId = room.BuildingId,
-                        Area = room.Area,
-                        Description = room.Description,
-                        Photo = ConvertIFormFileToByteArray(room.Photo)
-                    });
+                        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(room.Photos[i].FileName);
+
+                        using (var fileStream = new FileStream(_appEnvironment.WebRootPath + Path.Combine("\\images\\Rooms\\", fileName), FileMode.Create))
+                        {
+                            await room.Photos[i].CopyToAsync(fileStream);
+                        }
+
+                        _imageCache.AddImage(new RoomImage()
+                        {
+                            ImagePath = Path.Combine("\\images\\Rooms\\", fileName),
+                            RoomId = (int)room.RoomId
+                        });
+                    }
+
+                    _cache.UpdateRoom(room);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RoomExists(room.RoomId))
+                    if (!RoomExists((int)room.RoomId))
                     {
                         return NotFound();
                     }

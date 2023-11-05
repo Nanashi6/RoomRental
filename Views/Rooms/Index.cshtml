@@ -45,7 +45,7 @@
                 @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Photo)
+                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().PhotoPaths)
             </th>
             <th></th>
         </tr>
@@ -63,7 +63,7 @@
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                    <img src=" data:image /jpeg;base64,@(Convert.ToBase64String(item.Photo))">
+                    <img src="@item.PhotoPaths[0]">
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.RoomId">Edit</a> |

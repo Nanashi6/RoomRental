@@ -48,6 +48,7 @@ namespace RoomRental
             services.AddScoped<OrganizationService>();
             services.AddScoped<BuildingService>();
             services.AddScoped<RoomService>();
+            services.AddScoped<RoomImageService>();
             services.AddScoped<RentalService>();
             services.AddScoped<InvoiceService>();
             services.AddScoped<PeopleService>();

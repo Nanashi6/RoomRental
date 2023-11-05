@@ -23,7 +23,7 @@ public partial class Invoice
 
     public virtual Organization? RentalOrganization { get; set; }
 
-    public virtual ResponsiblePerson ResponsiblePersonNavigation { get; set; } = null!;
+    public virtual ResponsiblePerson? ResponsiblePersonNavigation { get; set; } = null!;
 
-    public virtual Room Room { get; set; } = null!;
+    public virtual Room? Room { get; set; } = null!;
 }

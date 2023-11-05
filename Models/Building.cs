@@ -1,26 +1,30 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RoomRental.Models;
 
 public partial class Building
 {
     [Display(Name = "Идентификатор")]
-    public int BuildingId { get; set; }
+    public int? BuildingId { get; set; }
     [Display(Name = "Название здания")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
     [Display(Name = "Организация-владелец")]
-    public int OwnerOrganizationId { get; set; }
+    public int? OwnerOrganizationId { get; set; }
     [Display(Name = "Почтовый адрес")]
-    public string PostalAddress { get; set; }
+    public string? PostalAddress { get; set; }
     [Display(Name = "Этажность")]
     public int Floors { get; set; }
     [Display(Name = "Описание")]
-    public string Description { get; set; }
+    public string? Description { get; set; }
     [Display(Name = "План этажа")]
-    public string FloorPlan { get; set; }
-
-    public virtual Organization OwnerOrganization { get; set; }
+    [BindNever]
+    public string? FloorPlan { get; set; }
+    [NotMapped]
+    public IFormFile? FloorPlanImage { get; set; }
+    public virtual Organization? OwnerOrganization { get; set; }
 
     public virtual ICollection<Room> Rooms { get; set; } = new List<Room>();
 }

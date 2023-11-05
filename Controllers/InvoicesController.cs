@@ -48,7 +48,7 @@ namespace RoomRental.Controllers
                 var organization = organizationsQuery.Single(e => e.OrganizationId == item.RentalOrganizationId);
                 var room = roomsQuery.Single(e => e.RoomId == item.RoomId);
                 var person = peopleQuery.Single(e => e.PersonId == item.ResponsiblePerson);
-                invoices.Add(new InvoiceViewModel(item.InvoiceId, organization.Name, room.RoomId, item.Amount, item.PaymentDate,
+                invoices.Add(new InvoiceViewModel(item.InvoiceId, organization.Name, (int)room.RoomId, item.Amount, item.PaymentDate,
                                 person.Surname + " " + person.Name + " " + person.Lastname));
             }
 
@@ -141,7 +141,7 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("InvoiceId,RentalOrganizationId,RoomId,Amount,PaymentDate,ResponsiblePerson")] Invoice invoice)
         {
-            if (/*ModelState.IsValid*/true)
+            if (ModelState.IsValid)
             {
                 _cache.AddInvoice(invoice);
                 return RedirectToAction(nameof(Index));
@@ -187,7 +187,7 @@ namespace RoomRental.Controllers
                 return NotFound();
             }
 
-            if (/*ModelState.IsValid*/true)
+            if (ModelState.IsValid)
             {
                 try
                 {

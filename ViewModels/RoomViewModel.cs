@@ -18,15 +18,15 @@ namespace RoomRental.ViewModels
         public string? Description { get; set; }
 
         [Display(Name = "Фотография")]
-        public byte[]? Photo { get; set; }
+        public string[]? PhotoPaths { get; set; }
 
-        public RoomViewModel(int id, string buildingName, decimal area, string description, byte[] photo)
+        public RoomViewModel(int id, string buildingName, decimal area, string description, string[] paths)
         {
             RoomId = id;
             Building = buildingName;
             Area = area;
             Description = description;
-            Photo = photo;
+            PhotoPaths = paths;
         }
     }
 }

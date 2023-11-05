@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\Images\FloorPlans\" />
-    <Folder Include="wwwroot\Images\Rooms\" />
   </ItemGroup>
 
 </Project>

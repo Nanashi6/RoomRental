@@ -29,6 +29,8 @@ public partial class RoomRentalsContext : IdentityDbContext<IdentityUser>
 
     public virtual DbSet<Room> Rooms { get; set; }
 
+    public virtual DbSet<RoomImage> RoomImages { get; set; }
+
 /*    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Server=localhost;Database=RoomRentals;Trusted_Connection=True;TrustServerCertificate=True;");*/
 
@@ -170,6 +172,20 @@ public partial class RoomRentalsContext : IdentityDbContext<IdentityUser>
             entity.HasOne(d => d.Building).WithMany(p => p.Rooms)
                 .HasForeignKey(d => d.BuildingId)
                 .HasConstraintName("FK__Rooms__buildingI__3C69FB99");
+        });
+
+        modelBuilder.Entity<RoomImage>(entity =>
+        {
+            entity.HasKey(e => e.ImageId);
+
+            entity.Property(e => e.ImagePath)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("imagePath");
+
+            entity.HasIndex(e => e.RoomId, "IX_RoomImages_RoomId");
+
+            entity.HasOne(d => d.Room).WithMany(p => p.RoomImages).HasForeignKey(d => d.RoomId);
         });
 
         OnModelCreatingPartial(modelBuilder);

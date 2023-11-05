@@ -45,7 +45,7 @@ namespace RoomRental.Controllers
             {
                 var organization = organizationsQuery.Single(e => e.OrganizationId == item.RentalOrganizationId);
                 var room = roomQuery.Single(e => e.RoomId == item.RoomId);
-                rentals.Add(new RentalViewModel(item.RentalId, room.RoomId, organization.Name, item.CheckInDate, item.CheckOutDate));
+                rentals.Add(new RentalViewModel(item.RentalId, (int)room.RoomId, organization.Name, item.CheckInDate, item.CheckOutDate));
             }
 
             //Фильтрация
@@ -125,7 +125,7 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("RentalId,RoomId,RentalOrganizationId,CheckInDate,CheckOutDate")] Rental rental)
         {
-            if (/*ModelState.IsValid*/true)
+            if (ModelState.IsValid)
             {
                 _cache.AddRental(rental);
                 return RedirectToAction(nameof(Index));
@@ -163,7 +163,7 @@ namespace RoomRental.Controllers
                 return NotFound();
             }
 
-            if (true)
+            if (ModelState.IsValid)
             {
                 try
                 {

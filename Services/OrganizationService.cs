@@ -64,7 +64,7 @@ namespace RoomRental.Services
                         .Where(r => _context.Buildings
                             .Where(b => organization.OrganizationId == b.OwnerOrganizationId)
                             .Select(b => b.BuildingId)
-                            .Contains(r.BuildingId))
+                            .Contains((int)r.BuildingId))
                         .Select(r => r.RoomId)
                         .ToList();
 

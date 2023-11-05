@@ -22,6 +22,6 @@ public partial class Rental
     [Display(Name = "Дата окончания аренды")]
     [DataType(DataType.Date)]
     public DateTime? CheckOutDate { get; set; }
-    public virtual Organization RentalOrganization { get; set; } = null!;
-    public virtual Room Room { get; set; } = null!;
+    public virtual Organization? RentalOrganization { get; set; } = null!;
+    public virtual Room? Room { get; set; } = null!;
 }
