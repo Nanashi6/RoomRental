@@ -1,7 +1,7 @@
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 * {
@@ -12,6 +12,22 @@
     font-family: sans-serif;
 }
 
+html, body {
+    height: 100%;
+}
+
+.wrapper {
+    min-height:100%;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
 
 /*‘ормы входа и регистрации*/
 .loginLabel {
@@ -37,7 +53,7 @@
     text-align: center;
 }
 
-form {
+.loginForm {
     flex: 1 1 auto;
     margin: 0 5px;
 }
@@ -47,9 +63,17 @@ form {
     margin-top: 10px;
 }
 
+.block a {
+    color: #e84545;
+    transition: linear 0.2s;
+}
+
+.block a:hover {
+    color: #e52e2e;
+}
+
 .parent {
-    background: rgb(255,0,236);
-    background: linear-gradient(45deg, rgba(0,212,255,1), rgba(255,0,236,1) 100%);
+    background: #3a3e64;
     width: 100%;
     height: 100%;
     position: fixed;
@@ -60,7 +84,7 @@ form {
     justify-content: center;
 }
 
-.container {
+.loginContainer {
     width: 300px;
     margin: -5px 0;
     border-radius: 10px;
@@ -73,18 +97,221 @@ form {
     display: inline-block;
     width: 290px;
     line-height: 45px;
-    border: 2px solid white;
-    border-radius: 40px;
+    border: 0;
+    border-radius: 2px;
     margin: 10px 0;
     font-size: 15px;
     text-align: center;
     font-weight: 300;
     color: white;
-    background: linear-gradient(90deg, rgba(255,0,236,1) 0%, rgba(0,212,255,1) 100%);
+    background: #e84545;
+    transition: linear 0.3s;
 }
 
-    .submitButton:hover {
-        cursor: pointer;
-        background: linear-gradient(90deg, rgba(0,212,255,1)0%, rgba(255,0,236,1) 100%);
-    }
-/*‘ормы входа и регистрации*/
+.submitButton:hover {
+    cursor: pointer;
+    background: #e52e2e;
+}
+
+/*ѕанель навигации*/
+header {
+    border-bottom: 2px solid black;
+    background: #3a3e64;
+}
+
+header > div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 15px 0;
+}
+
+nav {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+nav > div > a {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 13px;
+    font-weight: 700;
+    margin-left: 10px;
+    text-transform: uppercase;
+    transition: 0.2s;
+}
+
+nav > div > a:hover {
+    color: #fff;
+}
+
+.logo > a {
+    color: rgba(255, 255, 255, 0.582);
+    font-size: 20px;
+    font-weight: 700;
+    margin-left: 40px;
+    text-transform: uppercase;
+    transition: 0.2s;
+}
+
+.logo > a:hover {
+    color: #fff;
+}
+
+.nav-log-elements:last-child {
+    margin-right: 40px;
+}
+
+.nav-tables:first-child {
+    margin-left: 40px;
+}
+/*ѕанель навигации*/
+
+/*Home/Privacy*/
+.text-center {
+    text-align: center;
+}
+/*Home/Privacy*/
+
+/*Index*/
+.index-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+
+.form-container {
+    position: relative;
+    background: #53354a;
+    border-radius: 2px 0 0 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-container > form {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    position: relative;
+}
+
+.submitButton-index {
+    text-decoration: none;
+    display: inline-block;
+    line-height: 45px;
+    border: 0;
+    border-radius: 2px;
+    margin: 10px 0;
+    font-size: 15px;
+    text-align: center;
+    font-weight: 300;
+    color: white;
+    background: #e84545;
+    transition: linear 0.3s;
+}
+
+.submitButton-index:hover {
+    cursor: pointer;
+    background: #e52e2e;
+}
+
+.filter-input {
+    margin-top: 10px;
+    display: block;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    border-bottom: 1px solid black;
+    position: relative;
+}
+
+.table-container {
+    padding: 0 5%;
+    display: flex;
+    flex-direction: column;
+}
+
+.row {
+    border-bottom: 1px solid rgba(87, 87, 87, 0.7);
+}
+
+.element {
+    padding: 10px 15px;
+    text-align: center; /*ћб убрать выравнивание внутри €чеек*/
+}
+
+.table-container > h1 {
+    text-align: center;
+}
+
+.table-container > div {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    padding: 15px 0;
+}
+
+.table {
+    border-collapse: collapse;
+}
+
+.table > thead{
+    border-bottom: 2px solid black;
+}
+
+.pagination {
+    display: flex;
+}
+
+.page-link {
+    color: rgba(13,108,253,1);
+}
+
+.page-item {
+    padding: 6px 8px;
+    border-color: rgba(87, 87, 87, 0.7);;
+}
+
+.active {
+    background: rgba(13,108,253,1);
+}
+
+.active > .page-link {
+    color: white;
+}
+
+a {
+    color: rgba(13,108,253,1);
+}
+/*Index*/
+
+
+
+/*FOOTER*/
+footer {
+    background-color: #3a3e64;
+}
+
+.footer_copyright {
+    background-color: #313454;
+    padding: 20px 0;
+}
+
+.copyright_text {
+    font-size: 14px;
+    color: #808080;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.copyright_text span a {
+    color: #fff;
+    transition: linear 0.2s;
+}
+
+.copyright_text span a:hover {
+    color: #e52e2e;
+}

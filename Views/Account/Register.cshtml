@@ -28,9 +28,9 @@
 </form> *@
 
 <div class="parent">
-    <div class="container">
+    <div class="loginContainer">
         <h1 class="loginHeader">Регистрация</h1>
-        <form method="post" asp-controller="Account" asp-action="Login">
+        <form class="loginForm" method="post" asp-controller="Account" asp-action="Login">
             <div class="block">
                 @* <label class="loginLabel" asp-for="Login"></label> *@
                 <input class="loginInput" asp-for=" Login" placeholder="Введите имя пользователя" />

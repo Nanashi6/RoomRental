@@ -8,7 +8,7 @@
 
 <form method="get">
     <label>Название организации: </label>
-    <input name="organizationNameFind" value="@organizationNameFind"  />
+    <input name="organizationNameFind" value="@organizationNameFind" />
     <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
     <input type="submit" value="Фильтр" />
 </form>
@@ -24,7 +24,7 @@
                    asp-route-sortOrder="@(Model.SortViewModel.NameSort)"
                    asp-route-organizationNameFind="@organizationNameFind">
                     @Html.DisplayNameFor(model => model.Organizations.SingleOrDefault().Name)
-               </a>
+                </a>
             </th>
             <th>
                 <a asp-action="Index"
@@ -37,21 +37,22 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Organizations) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PostalAddress)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.OrganizationId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.OrganizationId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.OrganizationId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Organizations)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PostalAddress)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.OrganizationId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.OrganizationId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.OrganizationId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
