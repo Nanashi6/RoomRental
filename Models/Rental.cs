@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using RoomRental.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -22,6 +23,7 @@ public partial class Rental
 
     [Display(Name = "Дата окончания аренды")]
     [DataType(DataType.Date)]
+    [CheckOutDate("CheckInDate")]
     public DateTime CheckOutDate { get; set; }
     [ValidateNever]
     public virtual Organization RentalOrganization { get; set; }
