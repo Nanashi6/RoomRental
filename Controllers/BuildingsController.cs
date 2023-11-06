@@ -128,13 +128,15 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                building.FloorPlan = "\\Images\\FloorPlans\\" + building.FloorPlanImage.FileName;
-                _cache.AddBuilding(building);
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(building.FloorPlanImage.FileName);
 
-                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + "\\Images\\FloorPlans\\" + building.FloorPlanImage.FileName, FileMode.Create))
+                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + Path.Combine("\\images\\FloorPlans\\", fileName), FileMode.Create))
                 {
                     await building.FloorPlanImage.CopyToAsync(fileStream);
                 }
+
+                building.FloorPlan = Path.Combine("\\images\\FloorPlans\\", fileName);
+                _cache.AddBuilding(building);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -173,13 +175,15 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    building.FloorPlan = "\\Images\\FloorPlans\\" + building.FloorPlanImage.FileName;
-                    _cache.UpdateBuilding(building);
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(building.FloorPlanImage.FileName);
 
-                    using (var fileStream = new FileStream(_appEnvironment.WebRootPath + "\\Images\\FloorPlans\\" + building.FloorPlanImage.FileName, FileMode.Create))
+                    using (var fileStream = new FileStream(_appEnvironment.WebRootPath + Path.Combine("\\images\\FloorPlans\\", fileName), FileMode.Create))
                     {
                         await building.FloorPlanImage.CopyToAsync(fileStream);
                     }
+
+                    building.FloorPlan = Path.Combine("\\images\\FloorPlans\\", fileName);
+                    _cache.UpdateBuilding(building);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
