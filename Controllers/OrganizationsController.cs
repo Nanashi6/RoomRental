@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RoomRental.Attributes;
 using RoomRental.Models;
 using RoomRental.Services;
 using RoomRental.ViewModels;
@@ -12,36 +13,61 @@ namespace RoomRental.Controllers
     [Authorize(Roles = "User")]
     public class OrganizationsController : Controller
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         private readonly OrganizationService _cache;
         private readonly int _pageSize = 10;
 
-        public OrganizationsController(OrganizationService cache)
+        public OrganizationsController(OrganizationService cache, IHttpContextAccessor httpContextAccessor)
         {
             _cache = cache;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: Organizations
-        public async Task<IActionResult> Index(int page = 1, string organizationNameFind = "", OrganizationSortState sortOrder = OrganizationSortState.NameAsc)
+        public async Task<IActionResult> Index(string organizationNameFind = "", int page = 1, OrganizationSortState sortOrder = OrganizationSortState.NameAsc, bool userReq = false)
         {
-             var organizationsQuery = await _cache.GetOrganizations();
+            if(!userReq)
+                organizationNameFind = Request.Cookies["organizationNameFind"];
+            else
+            {
+                //Запись в куки
+                if (organizationNameFind != null)
+                {
+                    Response.Cookies.Append("organizationNameFind", organizationNameFind,
+                        new CookieOptions
+                        {
+                            Expires = DateTimeOffset.Now.AddMinutes(5)
+                        });
+                }
+                else
+                {
+                    Response.Cookies.Delete("organizationNameFind");
+                }
+            }
+
+            var organizationsQuery = await _cache.GetOrganizations();
+            
             //Фильтрация
             if (!String.IsNullOrEmpty(organizationNameFind))
+            {
                 organizationsQuery = organizationsQuery.Where(e => e.Name.Contains(organizationNameFind)).ToList();
+            }
 
             //Сортировка
             switch (sortOrder)
             {
-                case OrganizationSortState.NameAsc:
-                    organizationsQuery = organizationsQuery.OrderBy(e => e.Name).ToList();
-                    break;
                 case OrganizationSortState.NameDesc:
                     organizationsQuery = organizationsQuery.OrderByDescending(e => e.Name).ToList();
                     break;
                 case OrganizationSortState.AddressAsc:
                     organizationsQuery = organizationsQuery.OrderBy(e => e.PostalAddress).ToList();
                     break;
-                default:
+                case OrganizationSortState.AddressDesc:
                     organizationsQuery = organizationsQuery.OrderByDescending(e => e.PostalAddress).ToList();
+                    break;
+                default:
+                    organizationsQuery = organizationsQuery.OrderBy(e => e.Name).ToList();
                     break;
             }
 

@@ -53,6 +53,8 @@ namespace RoomRental
             services.AddScoped<InvoiceService>();
             services.AddScoped<PeopleService>();
 
+            services.AddHttpContextAccessor();
+
             services.AddRazorPages();/*.AddRazorRuntimeCompilation();*/
             services.AddMvc();
             services.AddControllersWithViews(mvcOtions =>
