@@ -25,11 +25,12 @@ namespace RoomRental.Controllers
         private readonly RoomService _roomCache;
         private readonly int _pageSize = 10;
 
-        public RentalsController(RentalService cache, OrganizationService organizationCache, RoomService roomCache)
+        public RentalsController(RentalService cache, OrganizationService organizationCache, RoomService roomCache, IConfiguration appConfig)
         {
             _cache = cache;
             _organizationCache = organizationCache;
             _roomCache = roomCache;
+            _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
         }
 
         // GET: Rentals

@@ -26,12 +26,13 @@ namespace RoomRental.Controllers
         private readonly RoomService _roomCache;
         private readonly int _pageSize = 10;
 
-        public InvoicesController(InvoiceService cache, PeopleService peopleCache, RoomService roomCache, OrganizationService organizationCache)
+        public InvoicesController(InvoiceService cache, PeopleService peopleCache, RoomService roomCache, OrganizationService organizationCache, IConfiguration appConfig)
         {
             _cache = cache;
             _organizationCache = organizationCache;
             _peopleCache = peopleCache;
             _roomCache = roomCache;
+            _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
         }
 
         // GET: Invoices

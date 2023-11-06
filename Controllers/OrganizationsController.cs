@@ -18,10 +18,11 @@ namespace RoomRental.Controllers
         private readonly OrganizationService _cache;
         private readonly int _pageSize = 10;
 
-        public OrganizationsController(OrganizationService cache, IHttpContextAccessor httpContextAccessor)
+        public OrganizationsController(OrganizationService cache, IHttpContextAccessor httpContextAccessor, IConfiguration appConfig)
         {
             _cache = cache;
             _httpContextAccessor = httpContextAccessor;
+            _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
         }
 
         // GET: Organizations

@@ -22,9 +22,10 @@ namespace RoomRental.Controllers
         private readonly PeopleService _cache;
         private readonly int _pageSize = 10;
 
-        public ResponsiblePeopleController(PeopleService cache)
+        public ResponsiblePeopleController(PeopleService cache, IConfiguration appConfig)
         {
             _cache = cache;
+            _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
         }
 
         // GET: ResponsiblePersons

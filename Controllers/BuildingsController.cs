@@ -21,11 +21,12 @@ namespace RoomRental.Controllers
         private readonly int _pageSize = 10;
         private readonly IWebHostEnvironment _appEnvironment;
 
-        public BuildingsController(BuildingService cache, OrganizationService organizationCache, IWebHostEnvironment appEnvironment)
+        public BuildingsController(BuildingService cache, OrganizationService organizationCache, IWebHostEnvironment appEnvironment, IConfiguration appConfig)
         {
             _cache = cache;
             _organizationCache = organizationCache;
             _appEnvironment = appEnvironment;
+            _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
         }
 
         // GET: Buildings
