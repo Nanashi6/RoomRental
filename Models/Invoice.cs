@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
@@ -10,7 +11,7 @@ public partial class Invoice
     [Display(Name = "Идентификатор")]
     public int InvoiceId { get; set; }
     [Display(Name = "Организация-арендатор")]
-    public int? RentalOrganizationId { get; set; }
+    public int RentalOrganizationId { get; set; }
     [Display(Name = "Помещение")]
     public int RoomId { get; set; }
     [Display(Name = "Сумма оплаты")]
@@ -20,10 +21,10 @@ public partial class Invoice
     public DateTime PaymentDate { get; set; }
     [Display(Name = "Оформляющий")]
     public int ResponsiblePerson { get; set; }
-
-    public virtual Organization? RentalOrganization { get; set; }
-
-    public virtual ResponsiblePerson? ResponsiblePersonNavigation { get; set; } = null!;
-
-    public virtual Room? Room { get; set; } = null!;
+    [ValidateNever]
+    public virtual Organization RentalOrganization { get; set; }
+    [ValidateNever]
+    public virtual ResponsiblePerson ResponsiblePersonNavigation { get; set; } = null!;
+    [ValidateNever]
+    public virtual Room Room { get; set; } = null!;
 }

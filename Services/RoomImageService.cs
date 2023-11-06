@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using RoomRental.Data;
 using RoomRental.Models;
 
@@ -89,6 +88,13 @@ namespace RoomRental.Services
                 _context.RoomImages.Remove(image);
             }
 
+            _context.SaveChanges();
+
+            await AddCache();
+        }
+        public async void DeleteImageForRoom(int roomId)
+        {
+            _context.RemoveRange(_context.RoomImages.Where(e => roomId == e.RoomId).ToList());
             _context.SaveChanges();
 
             await AddCache();

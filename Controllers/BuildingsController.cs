@@ -110,8 +110,8 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-
-            return View(building);
+            var organization = await _organizationCache.GetOrganization(building.OwnerOrganizationId);
+            return View(new BuildingViewModel(building.BuildingId, building.Name, organization.Name, building.PostalAddress, building.Floors, building.Description, building.FloorPlan));
         }
 
         // GET: Buildings/Create
@@ -206,13 +206,13 @@ namespace RoomRental.Controllers
                 return NotFound();
             }
 
-            var building = await _cache.GetBuilding(id);
+            var building = _cache.GetBuilding(id).Result;
             if (building == null)
             {
                 return NotFound();
             }
-
-            return View(building);
+            var organization = await _organizationCache.GetOrganization(building.OwnerOrganizationId);
+            return View(new BuildingViewModel(building.BuildingId, building.Name, organization.Name, building.PostalAddress, building.Floors, building.Description, building.FloorPlan));
         }
 
         // POST: Buildings/Delete/5

@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using RoomRental.Data;
 using RoomRental.Models;
+using RoomRental.Services;
+using RoomRental.ViewModels;
 using RoomRental.ViewModels.FilterViewModels;
 using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
-using RoomRental.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using RoomRental.Services;
 
 namespace RoomRental.Controllers
 {
@@ -46,7 +40,7 @@ namespace RoomRental.Controllers
             {
                 var images = imagesQuery.Where(e => e.RoomId == item.RoomId).ToList();
                 string[] paths = new string[images.Count()];
-                for(int i = 0; i < paths.Length; i++ )
+                for (int i = 0; i < paths.Length; i++)
                 {
                     paths[i] = images[i].ImagePath;
                 }
@@ -107,8 +101,16 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
+            var images = await _imageCache.GetImageForRoom(id);
+            var building = await _buildingCache.GetBuilding(room.BuildingId);
 
-            return View(room);
+            string[] paths = new string[images.Count()];
+            for (int i = 0; i < paths.Length; i++)
+            {
+                paths[i] = images[i].ImagePath;
+            }
+
+            return View(new RoomViewModel((int)room.RoomId, building.Name, (decimal)room.Area, room.Description, paths));
         }
 
         // GET: Rooms/Create
@@ -123,17 +125,6 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("RoomId,BuildingId,Area,Description,Photos")] Room room)
         {
-            // Если ModelState не валидна, просмотрите ошибки
-            foreach (var key in ModelState.Keys)
-            {
-                var errors = ModelState[key].Errors;
-                foreach (var error in errors)
-                {
-                    // Выведите ошибки или выполните другую логику обработки ошибок
-                    Console.WriteLine($"Error in {key}: {error.ErrorMessage}");
-                }
-            }
-
             if (ModelState.IsValid)
             {
                 int? roomId = _cache.AddRoom(room).Result;
@@ -193,6 +184,7 @@ namespace RoomRental.Controllers
             {
                 try
                 {
+                    _imageCache.DeleteImageForRoom(room.RoomId);
                     string[] paths = new string[room.Photos.Count()];
                     for (int i = 0; i < paths.Length; i++)
                     {
@@ -202,7 +194,7 @@ namespace RoomRental.Controllers
                         {
                             await room.Photos[i].CopyToAsync(fileStream);
                         }
-
+                        
                         _imageCache.AddImage(new RoomImage()
                         {
                             ImagePath = Path.Combine("\\images\\Rooms\\", fileName),
@@ -242,8 +234,16 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
+            var images = await _imageCache.GetImageForRoom(id);
+            var building = await _buildingCache.GetBuilding(room.BuildingId);
 
-            return View(room);
+            string[] paths = new string[images.Count()];
+            for (int i = 0; i < paths.Length; i++)
+            {
+                paths[i] = images[i].ImagePath;
+            }
+
+            return View(new RoomViewModel((int)room.RoomId, building.Name, (decimal)room.Area, room.Description, paths));
         }
 
         // POST: Rooms/Delete/5
@@ -261,7 +261,7 @@ namespace RoomRental.Controllers
 
         private bool RoomExists(int id)
         {
-          return (_cache.GetRooms().Result?.Any(e => e.RoomId == id)).GetValueOrDefault();
+            return (_cache.GetRooms().Result?.Any(e => e.RoomId == id)).GetValueOrDefault();
         }
         public byte[] ConvertIFormFileToByteArray(IFormFile file)
         {

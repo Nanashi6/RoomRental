@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -9,17 +10,17 @@ namespace RoomRental.Models;
 public partial class Room
 {
     [Display(Name = "Идентификатор")]
-    public int? RoomId { get; set; }
+    public int RoomId { get; set; }
     [Display(Name = "Здание")]
-    public int? BuildingId { get; set; }
+    public int BuildingId { get; set; }
     [Display(Name = "Площадь")]
-    public decimal? Area { get; set; }
+    public decimal Area { get; set; }
     [Display(Name = "Описание")]
-    public string? Description { get; set; }
+    public string Description { get; set; }
     [NotMapped]
-    public List<IFormFile>? Photos { get; set; }
-
-    public virtual Building? Building { get; set; }
+    public List<IFormFile> Photos { get; set; }
+    [ValidateNever]
+    public virtual Building Building { get; set; }
 
     public virtual ICollection<RoomImage> RoomImages { get; set; } = new List<RoomImage>();
 

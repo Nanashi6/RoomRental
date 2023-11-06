@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -17,11 +18,13 @@ public partial class Rental
 
     [Display(Name = "Дата начала аренды")]
     [DataType(DataType.Date)]
-    public DateTime? CheckInDate { get; set; }
+    public DateTime CheckInDate { get; set; }
 
     [Display(Name = "Дата окончания аренды")]
     [DataType(DataType.Date)]
-    public DateTime? CheckOutDate { get; set; }
-    public virtual Organization? RentalOrganization { get; set; } = null!;
-    public virtual Room? Room { get; set; } = null!;
+    public DateTime CheckOutDate { get; set; }
+    [ValidateNever]
+    public virtual Organization RentalOrganization { get; set; }
+    [ValidateNever]
+    public virtual Room Room { get; set; }
 }
