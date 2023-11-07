@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using RoomRental.Attributes;
 using RoomRental.Models;
 using RoomRental.Services;
@@ -25,30 +27,41 @@ namespace RoomRental.Controllers
             _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
         }
 
-        // GET: Organizations
-        public async Task<IActionResult> Index(string organizationNameFind = "", int page = 1, OrganizationSortState sortOrder = OrganizationSortState.NameAsc, bool userReq = false)
+        // GET/POST: Organizations
+        [HttpGet]
+        [HttpPost]
+        public async Task<IActionResult> Index(string organizationNameFind = "", int page = 1, OrganizationSortState sortOrder = OrganizationSortState.NameAsc)
         {
-            if(!userReq)
-                organizationNameFind = Request.Cookies["organizationNameFind"];
-            else
+            if (HttpContext.Request.Method == "GET")
             {
-                //Запись в куки
-                if (organizationNameFind != null)
-                {
-                    Response.Cookies.Append("organizationNameFind", organizationNameFind,
+                // Обработка GET запроса
+                //organizationNameFind = Request.Cookies["organizationNameFind"];
+                //organizationNameFind = _httpContextAccessor.HttpContext.Session.GetString("organizationNameFind");
+                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Organization");
+
+                if (dict != null)
+                    organizationNameFind = dict["organizationNameFind"];
+            }
+            else if (HttpContext.Request.Method == "POST")
+            {
+                // Обработка POST запроса
+                //Запись в куки/Session
+
+                    Dictionary<string, string> dict = new Dictionary<string, string>()
+                    {
+                        {"organizationNameFind", organizationNameFind},
+                    };
+                    Infrastructure.SessionExtensions.Set(HttpContext.Session, "Organization", dict);
+/*                    Response.Cookies.Append("organizationNameFind", organizationNameFind,
                         new CookieOptions
                         {
                             Expires = DateTimeOffset.Now.AddMinutes(5)
-                        });
-                }
-                else
-                {
-                    Response.Cookies.Delete("organizationNameFind");
-                }
+                        });*/
+
             }
 
             var organizationsQuery = await _cache.GetOrganizations();
-            
+
             //Фильтрация
             if (!String.IsNullOrEmpty(organizationNameFind))
             {

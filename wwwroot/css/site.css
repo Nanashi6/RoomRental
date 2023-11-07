@@ -7,6 +7,7 @@
 * {
     margin: 0;
     padding: 0;
+    box-sizing: content-box;
     text-decoration: none;
     list-style-type: none;
     font-family: sans-serif;
@@ -22,7 +23,7 @@ html, body {
     flex-direction: column;
 }
 
-main {
+main, .container {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -114,7 +115,7 @@ main {
 }
 
 /*ѕанель навигации*/
-header {
+/*header {
     border-bottom: 2px solid black;
     background: #3a3e64;
 }
@@ -165,17 +166,17 @@ nav > div > a:hover {
 
 .nav-tables:first-child {
     margin-left: 40px;
-}
+}*/
 /*ѕанель навигации*/
 
 /*Home/Privacy*/
-.text-center {
+/*.text-center {
     text-align: center;
-}
+}*/
 /*Home/Privacy*/
 
 /*Index*/
-.index-container {
+/*.index-container {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
@@ -240,8 +241,8 @@ nav > div > a:hover {
 
 .element {
     padding: 10px 15px;
-    text-align: center; /*ћб убрать выравнивание внутри €чеек*/
-}
+    text-align: center;*/ /*ћб убрать выравнивание внутри €чеек*/
+/*}
 
 .table-container > h1 {
     text-align: center;
@@ -285,18 +286,16 @@ nav > div > a:hover {
 
 a {
     color: rgba(13,108,253,1);
-}
+}*/
 /*Index*/
 
-
-
 /*FOOTER*/
-footer {
+/*footer {
     background-color: #3a3e64;
-}
+}*/
 
 .footer_copyright {
-    background-color: #313454;
+    /*background-color: #313454;*/
     padding: 20px 0;
 }
 
@@ -308,7 +307,7 @@ footer {
 }
 
 .copyright_text span a {
-    color: #fff;
+    color: mediumblue;
     transition: linear 0.2s;
 }
 

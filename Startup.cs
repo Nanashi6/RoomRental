@@ -53,9 +53,17 @@ namespace RoomRental
             services.AddScoped<InvoiceService>();
             services.AddScoped<PeopleService>();
 
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.Cookie.Name = ".RoomRental.Session";
+                //options.IdleTimeout = System.TimeSpan.FromSeconds(3600);
+                options.Cookie.IsEssential = true;
+            });
+
             services.AddHttpContextAccessor();
 
-            services.AddRazorPages();/*.AddRazorRuntimeCompilation();*/
+            services.AddRazorPages().AddRazorRuntimeCompilation();
             services.AddMvc();
             services.AddControllersWithViews(mvcOtions =>
             {
@@ -75,6 +83,8 @@ namespace RoomRental
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseSession();
 
             app.UseAuthentication();    // аутентификация
             app.UseAuthorization();     // авторизация

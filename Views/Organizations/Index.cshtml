@@ -6,10 +6,9 @@
 
 <h1>Organizations</h1>
 
-<form method="get">
+<form method="post">
     <label>Название организации: </label>
     <input name="organizationNameFind" value="@organizationNameFind" />
-    <input name="userReq" type="hidden" value="true" />
     <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
     <input type="submit" value="Фильтр" />
 </form>
