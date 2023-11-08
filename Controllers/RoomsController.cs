@@ -32,8 +32,8 @@ namespace RoomRental.Controllers
         // GET: Rooms
         public async Task<IActionResult> Index(int page = 1, string buildingNameFind = "", decimal? areaFind = null, RoomSortState sortOrder = RoomSortState.BuildingNameAsc)
         {
-            var roomsQuery = await _cache.GetRooms();
-            var imagesQuery = await _imageCache.GetImages();
+            var rooms/*Query */= await _cache.GetRooms();
+            /*var imagesQuery = await _imageCache.GetImages();
             var buildingsQuery = await _buildingCache.GetBuildings();
             //Формирование осмысленных связей
             List<RoomViewModel> rooms = new List<RoomViewModel>();
@@ -48,11 +48,11 @@ namespace RoomRental.Controllers
 
                 var building = buildingsQuery.Single(e => e.BuildingId == item.BuildingId);
                 rooms.Add(new RoomViewModel(item.RoomId, building.Name, item.Area, item.Description, paths));
-            }
+            }*/
 
             //Фильтрация
             if (!String.IsNullOrEmpty(buildingNameFind))
-                rooms = rooms.Where(e => e.Building.Contains(buildingNameFind)).ToList();
+                rooms = rooms.Where(e => e.Building.Name.Contains(buildingNameFind)).ToList();
             if (areaFind != null)
                 rooms = rooms.Where(e => e.Area == areaFind).ToList();
 
@@ -60,10 +60,10 @@ namespace RoomRental.Controllers
             switch (sortOrder)
             {
                 case RoomSortState.BuildingNameAsc:
-                    rooms = rooms.OrderBy(e => e.Building).ToList();
+                    rooms = rooms.OrderBy(e => e.Building.Name).ToList();
                     break;
                 case RoomSortState.BuildingNameDesc:
-                    rooms = rooms.OrderByDescending(e => e.Building).ToList();
+                    rooms = rooms.OrderByDescending(e => e.Building.Name).ToList();
                     break;
                 case RoomSortState.AreaAsc:
                     rooms = rooms.OrderBy(e => e.Area).ToList();

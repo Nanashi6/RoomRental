@@ -43,7 +43,7 @@
                    asp-route-organizationNameFind="@organizationNameFind"
                    asp-route-personFind="@personFind"
                    asp-route-paymentDateFind="@paymentDateFind">
-                    @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().RentalOrganization)
+                    @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().RentalOrganization.Name)
                 </a>
             </th>
             <th>
@@ -73,7 +73,7 @@
                    asp-route-organizationNameFind="@organizationNameFind"
                    asp-route-personFind="@personFind"
                    asp-route-paymentDateFind="@paymentDateFind">
-                    @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().ResponsiblePerson)
+                    @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().ResponsiblePersonNavigation)
                 </a>
             </th>
             <th></th>
@@ -86,7 +86,7 @@
                 @Html.DisplayFor(modelItem => item.RoomId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.RentalOrganization)
+                @Html.DisplayFor(modelItem => item.RentalOrganization.Name)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Amount)
@@ -95,7 +95,7 @@
                 @Html.DisplayFor(modelItem => item.PaymentDate)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ResponsiblePerson)
+                @item.ResponsiblePersonNavigation.Surname @item.ResponsiblePersonNavigation.Name @item.ResponsiblePersonNavigation.Lastname
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.InvoiceId">Edit</a> |

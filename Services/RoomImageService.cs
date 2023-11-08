@@ -89,7 +89,7 @@ namespace RoomRental.Services
 
         public async Task<List<RoomImage>?> AddCache()
         {
-            var images = await _context.RoomImages.ToListAsync();
+            var images = await _context.RoomImages.Include(r => r.Room).ToListAsync();
 
             if (images != null)
             {

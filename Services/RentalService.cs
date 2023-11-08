@@ -69,7 +69,7 @@ namespace RoomRental.Services
 
         public async Task<List<Rental>?> AddCache()
         {
-            var rentals = await _context.Rentals.ToListAsync();
+            var rentals = await _context.Rentals.Include(r => r.RentalOrganization).Include(r => r.Room).ToListAsync();
 
             if (rentals != null)
             {

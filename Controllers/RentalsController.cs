@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using RoomRental.Data;
 using RoomRental.Models;
+using RoomRental.Services;
+using RoomRental.ViewModels;
 using RoomRental.ViewModels.FilterViewModels;
 using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
-using RoomRental.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using RoomRental.Services;
 
 namespace RoomRental.Controllers
 {
@@ -37,8 +31,8 @@ namespace RoomRental.Controllers
         public async Task<IActionResult> Index(int page = 1, string organizationNameFind = "", DateTime? checkInDateFind = null,
                                                 DateTime? checkOutDateFind = null, RentalSortState sortOrder = RentalSortState.OrganizationNameAsc)
         {
-            var rentalsQuery = await _cache.GetRentals();
-            var organizationsQuery = await _organizationCache.GetOrganizations();
+            var rentals/*Query*/ = await _cache.GetRentals();
+            /*var organizationsQuery = await _organizationCache.GetOrganizations();
             var roomQuery = await _roomCache.GetRooms();
             //Формирование осмысленных связей
             List<RentalViewModel> rentals = new List<RentalViewModel>();
@@ -47,11 +41,11 @@ namespace RoomRental.Controllers
                 var organization = organizationsQuery.Single(e => e.OrganizationId == item.RentalOrganizationId);
                 var room = roomQuery.Single(e => e.RoomId == item.RoomId);
                 rentals.Add(new RentalViewModel(item.RentalId, (int)room.RoomId, organization.Name, item.CheckInDate, item.CheckOutDate));
-            }
+            }*/
 
             //Фильтрация
             if (!String.IsNullOrEmpty(organizationNameFind))
-                rentals = rentals.Where(e => e.RentalOrganization.Contains(organizationNameFind)).ToList();
+                rentals = rentals.Where(e => e.RentalOrganization.Name.Contains(organizationNameFind)).ToList();
             if (checkInDateFind != null)
                 rentals = rentals.Where(e => e.CheckInDate >= checkInDateFind).ToList();
             if (checkOutDateFind != null)
@@ -61,10 +55,10 @@ namespace RoomRental.Controllers
             switch (sortOrder)
             {
                 case RentalSortState.OrganizationNameAsc:
-                    rentals = rentals.OrderBy(e => e.RentalOrganization).ToList();
+                    rentals = rentals.OrderBy(e => e.RentalOrganization.Name).ToList();
                     break;
                 case RentalSortState.OrganizationNameDesc:
-                    rentals = rentals.OrderByDescending(e => e.RentalOrganization).ToList();
+                    rentals = rentals.OrderByDescending(e => e.RentalOrganization.Name).ToList();
                     break;
                 case RentalSortState.CheckInDateAsc:
                     rentals = rentals.OrderBy(e => e.CheckInDate).ToList();
@@ -117,7 +111,7 @@ namespace RoomRental.Controllers
         public async Task<IActionResult> CreateAsync()
         {
             ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetOrganizations(), "OrganizationId", "Name");
-            ViewData["RoomId"] = new SelectList(await  _roomCache.GetRooms(), "RoomId", "RoomId");
+            ViewData["RoomId"] = new SelectList(await _roomCache.GetRooms(), "RoomId", "RoomId");
             return View();
         }
 

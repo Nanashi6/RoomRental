@@ -106,7 +106,7 @@ namespace RoomRental.Services
         public async Task<List<Building>?> AddCache()
         {
             // обращаемся к базе данных
-            var buildings = await _context.Buildings.ToListAsync();
+            var buildings = await _context.Buildings.Include(b => b.OwnerOrganization).ToListAsync();
             // если пользователь найден, то добавляем в кэш - время кэширования 5 минут
 
             if (buildings != null)

@@ -30,7 +30,7 @@
                    asp-route-sortOrder="@(Model.SortViewModel.BuildingNameSort)"
                    asp-route-buildingNameFind="@buildingNameFind"
                    asp-route-areaFind="@areaFind">
-                    @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Building)
+                    @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Building.Name)
                 </a>
             </th>
             <th>
@@ -45,7 +45,7 @@
                 @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().PhotoPaths)
+                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().RoomImages)
             </th>
             <th></th>
         </tr>
@@ -54,7 +54,7 @@
 @foreach (var item in Model.Rooms) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Building)
+                @Html.DisplayFor(modelItem => item.Building.Name)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Area)
@@ -63,7 +63,10 @@
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                    <img src="@item.PhotoPaths[0]">
+                    @foreach(var photo in item.RoomImages)
+                    {
+                        <img src="@photo.ImagePath">
+                    }
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.RoomId">Edit</a> |

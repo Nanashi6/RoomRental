@@ -33,15 +33,15 @@ namespace RoomRental.Controllers
         public async Task<IActionResult> Index(int page = 1, string buildingNameFind = "", string organizationNameFind = "", string addressFind = "",
                                                 int? floorsFind = null, BuildingSortState sortOrder = BuildingSortState.NameAsc)
         {
-            var buildingsQuery = await _cache.GetBuildings();
-            var organizationsQuery = await _organizationCache.GetOrganizations();
+            var buildings/*Query*/ = await _cache.GetBuildings();
+            /*var organizationsQuery = await _organizationCache.GetOrganizations();
             //Формирование осмысленных связей
             var buildings = new List<BuildingViewModel>();
             foreach (var item in buildingsQuery)
             {
                 var organization = organizationsQuery.Single(e => e.OrganizationId == item.OwnerOrganizationId);
                 buildings.Add(new BuildingViewModel(item.BuildingId, item.Name, organization.Name, item.PostalAddress, item.Floors, item.Description, item.FloorPlan));
-            }
+            }*/
 
             //Фильтрация
             if (!String.IsNullOrEmpty(buildingNameFind))
@@ -49,7 +49,7 @@ namespace RoomRental.Controllers
             if (!String.IsNullOrEmpty(addressFind))
                 buildings = buildings.Where(e => e.PostalAddress.Contains(addressFind)).ToList();
             if (!String.IsNullOrEmpty(organizationNameFind))
-                buildings = buildings.Where(e => e.OwnerOrganization.Contains(organizationNameFind)).ToList();
+                buildings = buildings.Where(e => e.OwnerOrganization.Name.Contains(organizationNameFind)).ToList();
             if (floorsFind != null)
                 buildings = buildings.Where(e => e.Floors == floorsFind).ToList();
 
@@ -69,10 +69,10 @@ namespace RoomRental.Controllers
                     buildings = buildings.OrderByDescending(e => e.PostalAddress).ToList();
                     break;
                 case BuildingSortState.OrganizationNameAsc:
-                    buildings = buildings.OrderBy(e => e.OwnerOrganization).ToList();
+                    buildings = buildings.OrderBy(e => e.OwnerOrganization.Name).ToList();
                     break;
                 case BuildingSortState.OrganizationNameDesc:
-                    buildings = buildings.OrderByDescending(e => e.OwnerOrganization).ToList();
+                    buildings = buildings.OrderByDescending(e => e.OwnerOrganization.Name).ToList();
                     break;
                 case BuildingSortState.FloorsAsc:
                     buildings = buildings.OrderBy(e => e.Floors).ToList();

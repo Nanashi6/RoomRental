@@ -38,8 +38,8 @@ namespace RoomRental.Controllers
         // GET: Invoices
         public async Task<IActionResult> Index(int page = 1, string organizationNameFind = "", string personFind = "", decimal? amountFind = null, DateTime? paymentDateFind = null, InvoiceSortState sortOrder = InvoiceSortState.OrganizationNameAsc)
         {
-            var invoicesQuery = await _cache.GetInvoices();
-            var organizationsQuery = await _organizationCache.GetOrganizations();
+            var invoices/*Query*/ = await _cache.GetInvoices();
+            /*var organizationsQuery = await _organizationCache.GetOrganizations();
             var peopleQuery = await _peopleCache.GetPeople();
             var roomsQuery = await _roomCache.GetRooms();
             //Формирование осмысленных связей
@@ -51,13 +51,13 @@ namespace RoomRental.Controllers
                 var person = peopleQuery.Single(e => e.PersonId == item.ResponsiblePerson);
                 invoices.Add(new InvoiceViewModel(item.InvoiceId, organization.Name, room.RoomId, item.Amount, item.PaymentDate,
                                 person.Surname + " " + person.Name + " " + person.Lastname));
-            }
+            }*/
 
             //Фильтрация
             if (!String.IsNullOrEmpty(organizationNameFind))
-                invoices = invoices.Where(e => e.RentalOrganization.Contains(organizationNameFind)).ToList();
+                invoices = invoices.Where(e => e.RentalOrganization.Name.Contains(organizationNameFind)).ToList();
             if (!String.IsNullOrEmpty(personFind))
-                invoices = invoices.Where(e => e.ResponsiblePerson.Contains(personFind)).ToList();
+                invoices = invoices.Where(e => e.ResponsiblePersonNavigation.ToString().Contains(personFind)).ToList();
             if (amountFind != null)
                 invoices = invoices.Where(e => e.Amount == amountFind).ToList();
             if (paymentDateFind != null)
@@ -67,10 +67,10 @@ namespace RoomRental.Controllers
             switch (sortOrder)
             {
                 case InvoiceSortState.OrganizationNameAsc:
-                    invoices = invoices.OrderBy(e => e.RentalOrganization).ToList();
+                    invoices = invoices.OrderBy(e => e.RentalOrganization.Name).ToList();
                     break;
                 case InvoiceSortState.OrganizationNameDesc:
-                    invoices = invoices.OrderByDescending(e => e.RentalOrganization).ToList();
+                    invoices = invoices.OrderByDescending(e => e.RentalOrganization.Name).ToList();
                     break;
                 case InvoiceSortState.PaymentDateAsc:
                     invoices = invoices.OrderBy(e => e.PaymentDate).ToList();
@@ -85,10 +85,10 @@ namespace RoomRental.Controllers
                     invoices = invoices.OrderByDescending(e => e.Amount).ToList();
                     break;
                 case InvoiceSortState.ResponsiblePersonAsc:
-                    invoices = invoices.OrderBy(e => e.ResponsiblePerson).ToList();
+                    invoices = invoices.OrderBy(e => e.ResponsiblePerson.ToString()).ToList();
                     break;
                 default:
-                    invoices = invoices.OrderByDescending(e => e.ResponsiblePerson).ToList();
+                    invoices = invoices.OrderByDescending(e => e.ResponsiblePerson.ToString()).ToList();
                     break;
             }
 
