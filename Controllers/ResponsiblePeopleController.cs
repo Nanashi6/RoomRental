@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using RoomRental.Attributes;
 using RoomRental.Data;
 using RoomRental.Models;
 using RoomRental.Services;
@@ -29,9 +30,19 @@ namespace RoomRental.Controllers
         }
 
         // GET: ResponsiblePersons
+        [SetSession("Person", "surnameFind")]
         public async Task<IActionResult> Index(int page = 1, string surnameFind = "", string nameFind = "", string lastnameFind = "",
                                                 PersonSortState sortOrder = PersonSortState.SurnameAsc)
         {
+            if (HttpContext.Request.Method == "GET")
+            {
+                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Person");
+
+                if (dict != null)
+                {
+                    surnameFind = dict["surnameFind"];
+                }
+            }
             var peopleQuery = await _cache.GetPeople();
 
             //Фильтрация
@@ -84,7 +95,7 @@ namespace RoomRental.Controllers
         // GET: ResponsiblePersons/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _cache.GetPeople() == null)
+            if (id == null || await _cache.GetPeople() == null)
             {
                 return NotFound();
             }
@@ -111,7 +122,7 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                _cache.AddPerson(responsiblePerson);
+                await _cache.AddPerson(responsiblePerson);
                 return RedirectToAction(nameof(Index));
             }
             return View(responsiblePerson);
@@ -120,7 +131,7 @@ namespace RoomRental.Controllers
         // GET: ResponsiblePersons/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _cache.GetPeople() == null)
+            if (id == null || await _cache.GetPeople() == null)
             {
                 return NotFound();
             }
@@ -147,11 +158,11 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    _cache.UpdatePerson(responsiblePerson);
+                    await _cache.UpdatePerson(responsiblePerson);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ResponsiblePersonExists(responsiblePerson.PersonId))
+                    if (!(await ResponsiblePersonExistsAsync(responsiblePerson.PersonId)))
                     {
                         return NotFound();
                     }
@@ -168,7 +179,7 @@ namespace RoomRental.Controllers
         // GET: ResponsiblePersons/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _cache.GetPeople() == null)
+            if (id == null || await _cache.GetPeople() == null)
             {
                 return NotFound();
             }
@@ -187,17 +198,17 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_cache.GetPeople() == null)
+            if (await _cache.GetPeople() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.ResponsiblePeople'  is null.");
             }
-            _cache.DeletePerson(_cache.GetPerson(id).Result);
+            await _cache.DeletePerson(await _cache.GetPerson(id));
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ResponsiblePersonExists(int id)
+        private async Task<bool> ResponsiblePersonExistsAsync(int id)
         {
-            return (_cache.GetPeople().Result?.Any(e => e.PersonId == id)).GetValueOrDefault();
+            return ((await _cache.GetPeople())?.Any(e => e.PersonId == id)).GetValueOrDefault();
         }
     }
 }

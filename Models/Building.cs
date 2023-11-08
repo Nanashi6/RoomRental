@@ -27,6 +27,7 @@ public partial class Building
     [NotMapped]
     public IFormFile FloorPlanImage { get; set; }
     [ValidateNever]
+    [Display(Name = "Организация-владелец")]
     public virtual Organization OwnerOrganization { get; set; }
 
     public virtual ICollection<Room> Rooms { get; set; } = new List<Room>();

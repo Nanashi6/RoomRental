@@ -8,22 +8,20 @@ namespace RoomRental.Services
 {
     public class RoomService
     {
-        private RoomRentalsContext _context;
-        private IMemoryCache _cache;
+        private readonly RoomRentalsContext _context;
+        private readonly IMemoryCache _cache;
+
         public RoomService(RoomRentalsContext context, IMemoryCache memoryCache)
         {
             _context = context;
             _cache = memoryCache;
         }
-        /// <summary>
-        /// Возвращает все объекты Building, хранящиеся в базы данных
-        /// </summary>
-        /// <returns></returns>
+
         public async Task<List<Room>?> GetRooms()
         {
             if (!_cache.TryGetValue("Rooms", out List<Room>? rooms))
             {
-                rooms = AddCache().Result;
+                rooms = await AddCache();
             }
             else
             {
@@ -31,15 +29,12 @@ namespace RoomRental.Services
             }
             return rooms;
         }
-        /// <summary>
-        /// Возвращает объект Room
-        /// </summary>
-        /// <returns></returns>
+
         public async Task<Room> GetRoom(int? id)
         {
             if (!_cache.TryGetValue("Rooms", out List<Room>? rooms))
             {
-                rooms = AddCache().Result;
+                rooms = await AddCache();
             }
             else
             {
@@ -47,36 +42,27 @@ namespace RoomRental.Services
             }
             return rooms.Single(e => e.RoomId == id);
         }
-        /// <summary>
-        /// Добавляет объект Room
-        /// </summary>
-        /// <returns></returns>
+
         public async Task<int?> AddRoom(Room room)
         {
-            EntityEntry<Room> entRoom = _context.Add(room);
-            _context.SaveChanges();
+            EntityEntry<Room> entRoom = await _context.AddAsync(room);
+            await _context.SaveChangesAsync();
             await AddCache();
 
             return entRoom.Entity.RoomId;
         }
-        /// <summary>
-        /// Обновляет объект Room
-        /// </summary>
-        /// <returns></returns>
-        public async void UpdateRoom(Room room)
+
+        public async Task UpdateRoom(Room room)
         {
             _context.Update(room);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             await AddCache();
         }
-        /// <summary>
-        /// Удаляет объект Room
-        /// </summary>
-        /// <returns></returns>
-        public async void DeleteRoom(Room room)
+
+        public async Task DeleteRoom(Room room)
         {
-            var rentals = _context.Rentals.Where(e => e.RoomId == room.RoomId).ToList();
-            var invoices = _context.Invoices.Where(e => e.RoomId == room.RoomId).ToList();
+            var rentals = await _context.Rentals.Where(e => e.RoomId == room.RoomId).ToListAsync();
+            var invoices = await _context.Invoices.Where(e => e.RoomId == room.RoomId).ToListAsync();
 
             if (rentals != null)
             {
@@ -86,34 +72,27 @@ namespace RoomRental.Services
             {
                 _context.Invoices.RemoveRange(invoices);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             if (room != null)
             {
                 _context.Rooms.Remove(room);
             }
 
-            _context.SaveChanges();
-
+            await _context.SaveChangesAsync();
             await AddCache();
         }
-        /// <summary>
-        /// Обновляет кэш
-        /// </summary>
-        /// <returns></returns>
+
         public async Task<List<Room>?> AddCache()
         {
-            _cache.Remove("Rooms");
-            // обращаемся к базе данных
-            var rooms = _context.Rooms.ToList();
-            // если пользователь найден, то добавляем в кэш - время кэширования 5 минут
+            var rooms = await _context.Rooms.ToListAsync(); /*.Include(r => r.Building)*/
 
             if (rooms != null)
             {
                 Console.WriteLine($"Список извлечен из базы данных");
                 _cache.Set("Rooms", rooms, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
-            return rooms.ToList();
+            return rooms;
         }
     }
 }

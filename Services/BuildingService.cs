@@ -23,7 +23,7 @@ namespace RoomRental.Services
         {
             if (!_cache.TryGetValue("Buildings", out List<Building>? buildings))
             {
-                buildings = AddCache().Result;
+                buildings = await AddCache();
             }
             else
             {
@@ -39,7 +39,7 @@ namespace RoomRental.Services
         {
             if (!_cache.TryGetValue("Buildings", out List<Building>? buildings))
             {
-                buildings = AddCache().Result;
+                buildings = await AddCache();
             }
             else
             {
@@ -51,35 +51,35 @@ namespace RoomRental.Services
         /// Добавляет объект Building
         /// </summary>
         /// <returns></returns>
-        public async void AddBuilding(Building building)
+        public async Task AddBuilding(Building building)
         {
-            _context.Add(building);
-            _context.SaveChanges();
+            await _context.AddAsync(building);
+            await _context.SaveChangesAsync();
             await AddCache();
         }
         /// <summary>
         /// Обновляет объект Building
         /// </summary>
         /// <returns></returns>
-        public async void UpdateBuilding(Building building)
+        public async Task UpdateBuilding(Building building)
         {
             _context.Update(building);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             await AddCache();
         }
         /// <summary>
         /// Удаляет объект Building
         /// </summary>
         /// <returns></returns>
-        public async void DeleteBuilding(Building building)
+        public async Task DeleteBuilding(Building building)
         {
-            var rooms = _context.Rooms
+            var rooms = await _context.Rooms
                         .Where(r => building.BuildingId == r.BuildingId)
                         .Select(r => r.RoomId)
-                        .ToList();
+                        .ToListAsync();
 
-            var rentals = _context.Rentals.Where(r => rooms.Contains(r.RoomId)).ToList();
-            var invoices = _context.Invoices.Where(i => rooms.Contains(i.RoomId)).ToList();
+            var rentals = await _context.Rentals.Where(r => rooms.Contains(r.RoomId)).ToListAsync();
+            var invoices = await _context.Invoices.Where(i => rooms.Contains(i.RoomId)).ToListAsync();
 
             if (rentals != null)
             {
@@ -89,14 +89,13 @@ namespace RoomRental.Services
             {
                 _context.Invoices.RemoveRange(invoices);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             if (building != null)
             {
                 _context.Buildings.Remove(building);
             }
-
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             await AddCache();
         }
@@ -106,9 +105,8 @@ namespace RoomRental.Services
         /// <returns></returns>
         public async Task<List<Building>?> AddCache()
         {
-            _cache.Remove("Buildings");
             // обращаемся к базе данных
-            var buildings = _context.Buildings.ToList();
+            var buildings = await _context.Buildings.ToListAsync();
             // если пользователь найден, то добавляем в кэш - время кэширования 5 минут
 
             if (buildings != null)

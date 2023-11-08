@@ -30,12 +30,12 @@
             <div class="block">
                 @* <label class="loginLabel" asp-for="Login"></label> *@
                 <input class="loginInput" asp-for=" Login" placeholder="Введите имя пользователя" />
-                <span asp-validation-for="Login"></span>
+                <span asp-validation-for="Login" class="text-danger"></span>
             </div>
             <div class="block">
                 @* <label class="loginLabel" asp-for="Password"></label> *@
                 <input class="loginInput" asp-for="Password" placeholder="Введите пароль" />
-                <span asp-validation-for="Password"></span>
+                <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="block">
                 <input class ="submitButton" type="submit" value="Войти" />

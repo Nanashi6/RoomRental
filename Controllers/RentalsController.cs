@@ -99,7 +99,7 @@ namespace RoomRental.Controllers
         // GET: Rentals/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _cache.GetRentals() == null)
+            if (id == null || await _cache.GetRentals() == null)
             {
                 return NotFound();
             }
@@ -114,10 +114,10 @@ namespace RoomRental.Controllers
         }
 
         // GET: Rentals/Create
-        public IActionResult Create()
+        public async Task<IActionResult> CreateAsync()
         {
-            ViewData["RentalOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name");
-            ViewData["RoomId"] = new SelectList(_roomCache.GetRooms().Result, "RoomId", "RoomId");
+            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetOrganizations(), "OrganizationId", "Name");
+            ViewData["RoomId"] = new SelectList(await  _roomCache.GetRooms(), "RoomId", "RoomId");
             return View();
         }
 
@@ -128,18 +128,18 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                _cache.AddRental(rental);
+                await _cache.AddRental(rental);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentalOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name", rental.RentalOrganizationId);
-            ViewData["RoomId"] = new SelectList(_roomCache.GetRooms().Result, "RoomId", "RoomId", rental.RoomId);
+            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetOrganizations(), "OrganizationId", "Name", rental.RentalOrganizationId);
+            ViewData["RoomId"] = new SelectList(await _roomCache.GetRooms(), "RoomId", "RoomId", rental.RoomId);
             return View(rental);
         }
 
         // GET: Rentals/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _cache.GetRentals() == null)
+            if (id == null || await _cache.GetRentals() == null)
             {
                 return NotFound();
             }
@@ -149,8 +149,8 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-            ViewData["RentalOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name", rental.RentalOrganizationId);
-            ViewData["RoomId"] = new SelectList(_roomCache.GetRooms().Result, "RoomId", "RoomId", rental.RoomId);
+            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetOrganizations(), "OrganizationId", "Name", rental.RentalOrganizationId);
+            ViewData["RoomId"] = new SelectList(await _roomCache.GetRooms(), "RoomId", "RoomId", rental.RoomId);
             return View(rental);
         }
 
@@ -168,11 +168,11 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    _cache.UpdateRental(rental);
+                    await _cache.UpdateRental(rental);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RentalExists(rental.RentalId))
+                    if (!(await RentalExistsAsync(rental.RentalId)))
                     {
                         return NotFound();
                     }
@@ -183,15 +183,15 @@ namespace RoomRental.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentalOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name", rental.RentalOrganizationId);
-            ViewData["RoomId"] = new SelectList(_roomCache.GetRooms().Result, "RoomId", "RoomId", rental.RoomId);
+            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetOrganizations(), "OrganizationId", "Name", rental.RentalOrganizationId);
+            ViewData["RoomId"] = new SelectList(await _roomCache.GetRooms(), "RoomId", "RoomId", rental.RoomId);
             return View(rental);
         }
 
         // GET: Rentals/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _cache.GetRentals() == null)
+            if (id == null || await _cache.GetRentals() == null)
             {
                 return NotFound();
             }
@@ -210,17 +210,17 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_cache.GetRentals() == null)
+            if (await _cache.GetRentals() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.Rentals'  is null.");
             }
-            _cache.DeleteRental(_cache.GetRental(id).Result);
+            await _cache.DeleteRental(await _cache.GetRental(id));
             return RedirectToAction(nameof(Index));
         }
 
-        private bool RentalExists(int id)
+        private async Task<bool> RentalExistsAsync(int id)
         {
-            return (_cache.GetRentals().Result?.Any(e => e.RentalId == id)).GetValueOrDefault();
+            return ((await _cache.GetRentals())?.Any(e => e.RentalId == id)).GetValueOrDefault();
         }
     }
 }

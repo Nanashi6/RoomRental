@@ -19,7 +19,7 @@ namespace RoomRental.Services
         {
             if (!_cache.TryGetValue("Organizations", out List<Organization>? organizations))
             {
-                organizations = AddCache().Result;
+                organizations = await AddCache();
             }
             else
             {
@@ -32,7 +32,7 @@ namespace RoomRental.Services
         {
             if (!_cache.TryGetValue("Organizations", out List<Organization>? organizations))
             {
-                organizations = AddCache().Result;
+                organizations = await AddCache();
             }
             else
             {
@@ -41,35 +41,35 @@ namespace RoomRental.Services
             return organizations.Single(e => e.OrganizationId == id);
         }
 
-        public async void AddOrganization(Organization organization)
+        public async Task AddOrganization(Organization organization)
         {
-            _context.Add(organization);
-            _context.SaveChanges();
+            await _context.AddAsync(organization);
+            await _context.SaveChangesAsync();
             await AddCache();
         }
 
-        public async void UpdateOrganization(Organization organization)
+        public async Task UpdateOrganization(Organization organization)
         {
             _context.Update(organization);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             await AddCache();
         }
 
-        public async void DeleteOrganization(Organization organization)
+        public async Task DeleteOrganization(Organization organization)
         {
-            var rentals = _context.Rentals.Where(e => e.RentalOrganizationId == organization.OrganizationId).ToList();
-            var invoices = _context.Invoices.Where(e => e.RentalOrganizationId == organization.OrganizationId).ToList();
+            var rentals = await _context.Rentals.Where(e => e.RentalOrganizationId == organization.OrganizationId).ToListAsync();
+            var invoices = await _context.Invoices.Where(e => e.RentalOrganizationId == organization.OrganizationId).ToListAsync();
 
-            var rooms = _context.Rooms
+            var rooms = await _context.Rooms
                         .Where(r => _context.Buildings
                             .Where(b => organization.OrganizationId == b.OwnerOrganizationId)
                             .Select(b => b.BuildingId)
                             .Contains((int)r.BuildingId))
                         .Select(r => r.RoomId)
-                        .ToList();
+                        .ToListAsync();
 
-            rentals.AddRange(_context.Rentals.Where(r => rooms.Contains(r.RoomId)).ToList());
-            invoices.AddRange(_context.Invoices.Where(i => rooms.Contains(i.RoomId)).ToList());
+            rentals.AddRange(await _context.Rentals.Where(r => rooms.Contains(r.RoomId)).ToListAsync());
+            invoices.AddRange(await _context.Invoices.Where(i => rooms.Contains(i.RoomId)).ToListAsync());
 
             if (rentals != null)
             {
@@ -79,23 +79,22 @@ namespace RoomRental.Services
             {
                 _context.Invoices.RemoveRange(invoices);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             if (organization != null)
             {
                 _context.Organizations.Remove(organization);
             }
-
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             await AddCache();
         }
 
         public async Task<List<Organization>?> AddCache()
         {
-            _cache.Remove("Organizations");
+            //_cache.Remove("Organizations");
             // обращаемся к базе данных
-            var organizations = _context.Organizations.ToList();
+            var organizations = await _context.Organizations.ToListAsync();
             // если пользователь найден, то добавляем в кэш - время кэширования 5 минут
             if (organizations != null)
             {

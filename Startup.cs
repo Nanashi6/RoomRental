@@ -22,7 +22,8 @@ namespace RoomRental
         public void ConfigureServices(IServiceCollection services)
         {
             string connection = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<RoomRentalsContext>(options => options.UseSqlServer(connection));
+            services.AddDbContext<RoomRentalsContext>(options => options.UseSqlServer(connection),
+        ServiceLifetime.Scoped);
 
             //Добавление классов авторизации
             services.AddIdentity<IdentityUser, IdentityRole>(opts => {
@@ -42,8 +43,6 @@ namespace RoomRental
                     options.AccessDeniedPath = new PathString("/Account/Login");
                 });
 
-            // добавление кэширования
-            services.AddMemoryCache();
             // внедрение зависимости CachedService
             services.AddScoped<OrganizationService>();
             services.AddScoped<BuildingService>();
@@ -53,11 +52,14 @@ namespace RoomRental
             services.AddScoped<InvoiceService>();
             services.AddScoped<PeopleService>();
 
+                        // добавление кэширования
+            services.AddMemoryCache();
+
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
                 options.Cookie.Name = ".RoomRental.Session";
-                //options.IdleTimeout = System.TimeSpan.FromSeconds(3600);
+                //options.IdleTimeout = System.TimeSpan.FromSeconds(2*10+240);
                 options.Cookie.IsEssential = true;
             });
 

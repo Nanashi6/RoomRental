@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using RoomRental.Data;
 using RoomRental.Models;
 
@@ -21,7 +22,7 @@ namespace RoomRental.Services
         {
             if (!_cache.TryGetValue("Invoices", out List<Invoice>? invoices))
             {
-                invoices = AddCache().Result;
+                invoices = await AddCache();
             }
             else
             {
@@ -37,7 +38,7 @@ namespace RoomRental.Services
         {
             if (!_cache.TryGetValue("Invoices", out List<Invoice>? invoices))
             {
-                invoices = AddCache().Result;
+                invoices = await AddCache();
             }
             else
             {
@@ -49,34 +50,34 @@ namespace RoomRental.Services
         /// Добавляет объект Invoice
         /// </summary>
         /// <returns></returns>
-        public async void AddInvoice(Invoice invoice)
+        public async Task AddInvoice(Invoice invoice)
         {
-            _context.Add(invoice);
-            _context.SaveChanges();
+            await _context.AddAsync(invoice);
+            await _context.SaveChangesAsync();
             await AddCache();
         }
         /// <summary>
         /// Обновляет объект Invoice
         /// </summary>
         /// <returns></returns>
-        public async void UpdateInvoice(Invoice invoice)
+        public async Task UpdateInvoice(Invoice invoice)
         {
             _context.Update(invoice);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             await AddCache();
         }
         /// <summary>
         /// Удаляет объект Invoice
         /// </summary>
         /// <returns></returns>
-        public async void DeleteInvoice(Invoice invoice)
+        public async Task DeleteInvoice(Invoice invoice)
         {
             if (invoice != null)
             {
                 _context.Invoices.Remove(invoice);
             }
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             await AddCache();
         }
@@ -86,9 +87,8 @@ namespace RoomRental.Services
         /// <returns></returns>
         public async Task<List<Invoice>?> AddCache()
         {
-            _cache.Remove("Invoices");
             // обращаемся к базе данных
-            var invoices = _context.Invoices.ToList();
+            var invoices = await _context.Invoices.ToListAsync();
             // если пользователь найден, то добавляем в кэш - время кэширования 5 минут
 
             if (invoices != null)
