@@ -1,4 +1,4 @@
-﻿@model RoomRental.ViewModels.BuildingViewModel
+﻿@model RoomRental.Models.Building
 
 @{
     ViewData["Title"] = "Delete";
@@ -45,7 +45,7 @@
             @Html.DisplayNameFor(model => model.OwnerOrganization)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OwnerOrganization)
+            @Html.DisplayFor(model => model.OwnerOrganization.Name)
         </dd>
     </dl>
     

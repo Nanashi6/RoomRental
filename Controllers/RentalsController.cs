@@ -28,8 +28,7 @@ namespace RoomRental.Controllers
         }
 
         // GET: Rentals
-        public async Task<IActionResult> Index(int page = 1, string organizationNameFind = "", DateTime? checkInDateFind = null,
-                                                DateTime? checkOutDateFind = null, RentalSortState sortOrder = RentalSortState.OrganizationNameAsc)
+        public async Task<IActionResult> Index(RentalFilterViewModel filterViewModel, int page = 1, RentalSortState sortOrder = RentalSortState.OrganizationNameAsc)
         {
             var rentals/*Query*/ = await _cache.GetRentals();
             /*var organizationsQuery = await _organizationCache.GetOrganizations();
@@ -44,12 +43,12 @@ namespace RoomRental.Controllers
             }*/
 
             //Фильтрация
-            if (!String.IsNullOrEmpty(organizationNameFind))
-                rentals = rentals.Where(e => e.RentalOrganization.Name.Contains(organizationNameFind)).ToList();
-            if (checkInDateFind != null)
-                rentals = rentals.Where(e => e.CheckInDate >= checkInDateFind).ToList();
-            if (checkOutDateFind != null)
-                rentals = rentals.Where(e => e.CheckOutDate <= checkOutDateFind).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
+                rentals = rentals.Where(e => e.RentalOrganization.Name.Contains(filterViewModel.OrganizationNameFind)).ToList();
+            if (filterViewModel.CheckInDateFind != null)
+                rentals = rentals.Where(e => e.CheckInDate >= filterViewModel.CheckInDateFind).ToList();
+            if (filterViewModel.CheckOutDateFind != null)
+                rentals = rentals.Where(e => e.CheckOutDate <= filterViewModel.CheckOutDateFind).ToList();
 
             //Сортировка
             switch (sortOrder)
@@ -83,7 +82,7 @@ namespace RoomRental.Controllers
             {
                 Rentals = rentals,
                 PageViewModel = new PageViewModel(page, count, _pageSize),
-                FilterViewModel = new RentalFilterViewModel(organizationNameFind, checkInDateFind, checkOutDateFind),
+                FilterViewModel = filterViewModel,
                 SortViewModel = new RentalSortViewModel(sortOrder)
             };
 
@@ -108,7 +107,7 @@ namespace RoomRental.Controllers
         }
 
         // GET: Rentals/Create
-        public async Task<IActionResult> CreateAsync()
+        public async Task<IActionResult> Create()
         {
             ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetOrganizations(), "OrganizationId", "Name");
             ViewData["RoomId"] = new SelectList(await _roomCache.GetRooms(), "RoomId", "RoomId");

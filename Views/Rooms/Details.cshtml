@@ -1,4 +1,4 @@
-﻿@model RoomRental.ViewModels.RoomViewModel
+﻿@model RoomRental.Models.Room
 
 @{
     ViewData["Title"] = "Details";
@@ -14,7 +14,7 @@
             @Html.DisplayNameFor(model => model.Building)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Building)
+            @Html.DisplayFor(model => model.Building.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Area)
@@ -29,12 +29,12 @@
             @Html.DisplayFor(model => model.Description)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.PhotoPaths)
+            @Html.DisplayNameFor(model => model.RoomImages)
         </dt>
-        @for (int i = 0; i < Model.PhotoPaths.Length; i++)
+        @foreach (var photo in Model.RoomImages)
         {
             <dd class="col-sm-10">
-                <img src="@Model.PhotoPaths[i]" />
+                <img src="@photo.ImagePath" />
             </dd>
         }
     </dl>

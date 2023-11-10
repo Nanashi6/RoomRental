@@ -30,7 +30,7 @@ namespace RoomRental.Controllers
         }
 
         // GET: Rooms
-        public async Task<IActionResult> Index(int page = 1, string buildingNameFind = "", decimal? areaFind = null, RoomSortState sortOrder = RoomSortState.BuildingNameAsc)
+        public async Task<IActionResult> Index(RoomFilterViewModel filterViewModel, int page = 1, RoomSortState sortOrder = RoomSortState.BuildingNameAsc)
         {
             var rooms/*Query */= await _cache.GetRooms();
             /*var imagesQuery = await _imageCache.GetImages();
@@ -51,10 +51,10 @@ namespace RoomRental.Controllers
             }*/
 
             //Фильтрация
-            if (!String.IsNullOrEmpty(buildingNameFind))
-                rooms = rooms.Where(e => e.Building.Name.Contains(buildingNameFind)).ToList();
-            if (areaFind != null)
-                rooms = rooms.Where(e => e.Area == areaFind).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.BuildingNameFind))
+                rooms = rooms.Where(e => e.Building.Name.Contains(filterViewModel.BuildingNameFind)).ToList();
+            if (filterViewModel.AreaFind != null)
+                rooms = rooms.Where(e => e.Area == filterViewModel.AreaFind).ToList();
 
             //Сортировка
             switch (sortOrder)
@@ -82,7 +82,7 @@ namespace RoomRental.Controllers
             {
                 Rooms = rooms,
                 PageViewModel = new PageViewModel(page, count, _pageSize),
-                FilterViewModel = new RoomFilterViewModel(buildingNameFind, areaFind),
+                FilterViewModel = filterViewModel,
                 SortViewModel = new RoomSortViewModel(sortOrder)
             };
 
@@ -102,20 +102,20 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-            var images = await _imageCache.GetImageForRoom(id);
+/*            var images = await _imageCache.GetImageForRoom(id);
             var building = await _buildingCache.GetBuilding(room.BuildingId);
 
             string[] paths = new string[images.Count()];
             for (int i = 0; i < paths.Length; i++)
             {
                 paths[i] = images[i].ImagePath;
-            }
+            }*/
 
-            return View(new RoomViewModel((int)room.RoomId, building.Name, (decimal)room.Area, room.Description, paths));
+            return View(room);
         }
 
         // GET: Rooms/Create
-        public async Task<IActionResult> CreateAsync()
+        public async Task<IActionResult> Create()
         {
             ViewData["BuildingId"] = new SelectList(await _buildingCache.GetBuildings(), "BuildingId", "Name");
             return View();
@@ -185,6 +185,8 @@ namespace RoomRental.Controllers
             {
                 try
                 {
+                    await _cache.UpdateRoom(room);
+
                     await _imageCache.DeleteImageForRoom(room.RoomId);
                     string[] paths = new string[room.Photos.Count()];
                     for (int i = 0; i < paths.Length; i++)
@@ -202,8 +204,6 @@ namespace RoomRental.Controllers
                             RoomId = (int)room.RoomId
                         });
                     }
-
-                    await _cache.UpdateRoom(room);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -235,16 +235,16 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-            var images = await _imageCache.GetImageForRoom(id);
+/*            var images = await _imageCache.GetImageForRoom(id);
             var building = await _buildingCache.GetBuilding(room.BuildingId);
 
             string[] paths = new string[images.Count()];
             for (int i = 0; i < paths.Length; i++)
             {
                 paths[i] = images[i].ImagePath;
-            }
+            }*/
 
-            return View(new RoomViewModel(room.RoomId, building.Name, room.Area, room.Description, paths));
+            return View(room);
         }
 
         // POST: Rooms/Delete/5

@@ -27,13 +27,13 @@
             @Html.DisplayNameFor(model => model.RentalOrganization)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RentalOrganization.OrganizationId)
+            @Html.DisplayFor(model => model.RentalOrganization.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.ResponsiblePersonNavigation)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ResponsiblePersonNavigation.PersonId)
+            @Model.ResponsiblePersonNavigation.Surname @Model.ResponsiblePersonNavigation.Name @Model.ResponsiblePersonNavigation.Lastname
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Room)

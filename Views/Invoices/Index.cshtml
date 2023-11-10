@@ -15,16 +15,16 @@
 
 <form method="get">
     <label>Название организации: </label>
-    <input name="organizationNameFind" value="@organizationNameFind" />
+    <input name="OrganizationNameFind" value="@organizationNameFind" />
 
     <label>Сумма: </label>
-    <input type="number" step="any" name="amountFind" value="@amountFind" />
+    <input type="number" step="any" min="0" name="AmountFind" value="@amountFind" />
 
     <label>Ответственное лицо: </label>
-    <input name="personFind" value="@personFind" />
+    <input name="ResponsiblePersonFind" value="@personFind" />
 
     <label>Дата платежа: </label>
-    <input type="date" name="paymentDateFind" value="@paymentDateFind" />
+    <input type="date" name="PaymentDateFind" value="@paymentDateFind" />
 
     <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
     <input type="submit" value="Фильтр" />
@@ -43,7 +43,7 @@
                    asp-route-organizationNameFind="@organizationNameFind"
                    asp-route-personFind="@personFind"
                    asp-route-paymentDateFind="@paymentDateFind">
-                    @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().RentalOrganization.Name)
+                    @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().RentalOrganization)
                 </a>
             </th>
             <th>

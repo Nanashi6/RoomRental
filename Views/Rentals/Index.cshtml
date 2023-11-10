@@ -15,13 +15,13 @@
 
 <form method="get">
     <label>Название организации: </label>
-    <input name="organizationNameFind" value="@organizationNameFind" />
+    <input name="OrganizationNameFind" value="@organizationNameFind" />
 
     <label>Дата заезда: </label>
-    <input type="date" name="checkInDateFind" value="@checkInDateFind" />
+    <input type="date" name="CheckInDateFind" value="@checkInDateFind" />
 
     <label>Дата выезда: </label>
-    <input type="date" name="checkOutDateFind" value="@checkOutDateFind" />
+    <input type="date" name="CheckOutDateFind" value="@checkOutDateFind" />
 
     <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
     <input type="submit" value="Фильтр" />
@@ -39,7 +39,7 @@
                    asp-route-organizationNameFind="@organizationNameFind"
                    asp-route-checkInDateFind="@checkInDateFind"
                    asp-route-checkOutDateFind="@checkOutDateFind">
-                    @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RentalOrganization.Name)
+                    @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RentalOrganization)
                 </a>
             </th>
             <th>

@@ -54,7 +54,7 @@ namespace RoomRental.Services
 
         public async Task UpdateRoom(Room room)
         {
-            _context.Update(room);
+            _context.Rooms.Update(room);
             await _context.SaveChangesAsync();
             await AddCache();
         }

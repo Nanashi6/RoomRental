@@ -87,7 +87,6 @@ namespace RoomRental.Controllers
             int count = organizationsQuery.Count;
             organizationsQuery = organizationsQuery.Skip((page - 1) * _pageSize).Take(_pageSize).ToList();
 
-
             //Модель отображения
             OrganizationsViewModel organizationsViewModel = new OrganizationsViewModel()
             {

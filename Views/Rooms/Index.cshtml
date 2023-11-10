@@ -13,10 +13,10 @@
 
 <form method="get">
     <label>Название здания: </label>
-    <input name="buildingNameFind" value="@buildingNameFind" />
+    <input name="BuildingNameFind" value="@buildingNameFind" />
 
     <label>Площадь: </label>
-    <input type="number" step="any" name="areaFind" value="@areaFind" />
+    <input type="number" step="any" min="0" name="AreaFind" value="@areaFind" />
 
     <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
     <input type="submit" value="Фильтр" />
@@ -30,7 +30,7 @@
                    asp-route-sortOrder="@(Model.SortViewModel.BuildingNameSort)"
                    asp-route-buildingNameFind="@buildingNameFind"
                    asp-route-areaFind="@areaFind">
-                    @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Building.Name)
+                    @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Building)
                 </a>
             </th>
             <th>
@@ -63,10 +63,7 @@
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                    @foreach(var photo in item.RoomImages)
-                    {
-                        <img src="@photo.ImagePath">
-                    }
+                <img src="@item.RoomImages.First().ImagePath">
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.RoomId">Edit</a> |

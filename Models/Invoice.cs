@@ -21,8 +21,10 @@ public partial class Invoice
     public DateTime PaymentDate { get; set; }
     [Display(Name = "Оформляющий")]
     public int ResponsiblePerson { get; set; }
+    [Display(Name = "Организация-арендатор")]
     [ValidateNever]
     public virtual Organization RentalOrganization { get; set; }
+    [Display(Name = "Оформляющий")]
     [ValidateNever]
     public virtual ResponsiblePerson ResponsiblePersonNavigation { get; set; } = null!;
     [ValidateNever]

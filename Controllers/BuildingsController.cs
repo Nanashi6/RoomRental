@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RoomRental.Data;
 using RoomRental.Models;
 using RoomRental.Services;
@@ -10,6 +11,7 @@ using RoomRental.ViewModels.FilterViewModels;
 using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
 using System.IO;
+using System.Linq;
 
 namespace RoomRental.Controllers
 {
@@ -30,8 +32,7 @@ namespace RoomRental.Controllers
         }
 
         // GET: Buildings
-        public async Task<IActionResult> Index(int page = 1, string buildingNameFind = "", string organizationNameFind = "", string addressFind = "",
-                                                int? floorsFind = null, BuildingSortState sortOrder = BuildingSortState.NameAsc)
+        public async Task<IActionResult> Index(BuildingFilterViewModel filterViewModel, int page = 1, BuildingSortState sortOrder = BuildingSortState.NameAsc)
         {
             var buildings/*Query*/ = await _cache.GetBuildings();
             /*var organizationsQuery = await _organizationCache.GetOrganizations();
@@ -44,14 +45,14 @@ namespace RoomRental.Controllers
             }*/
 
             //Фильтрация
-            if (!String.IsNullOrEmpty(buildingNameFind))
-                buildings = buildings.Where(e => e.Name.Contains(buildingNameFind)).ToList();
-            if (!String.IsNullOrEmpty(addressFind))
-                buildings = buildings.Where(e => e.PostalAddress.Contains(addressFind)).ToList();
-            if (!String.IsNullOrEmpty(organizationNameFind))
-                buildings = buildings.Where(e => e.OwnerOrganization.Name.Contains(organizationNameFind)).ToList();
-            if (floorsFind != null)
-                buildings = buildings.Where(e => e.Floors == floorsFind).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.BuildingNameFind))
+                buildings = buildings.Where(e => e.Name.Contains(filterViewModel.BuildingNameFind)).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.AddressFind))
+                buildings = buildings.Where(e => e.PostalAddress.Contains(filterViewModel.AddressFind)).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
+                buildings = buildings.Where(e => e.OwnerOrganization.Name.Contains(filterViewModel.OrganizationNameFind)).ToList();
+            if (filterViewModel.FloorsFind != null)
+                buildings = buildings.Where(e => e.Floors == filterViewModel.FloorsFind).ToList();
 
             //Сортировка
             switch (sortOrder)
@@ -91,7 +92,7 @@ namespace RoomRental.Controllers
             {
                 Buildings = buildings,
                 PageViewModel = new PageViewModel(page, count, _pageSize),
-                FilterViewModel = new BuildingFilterViewModel(buildingNameFind, organizationNameFind, addressFind, floorsFind),
+                FilterViewModel = filterViewModel,
                 SortViewModel = new RoomSortrViewModel(sortOrder)
             };
 
@@ -111,8 +112,8 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-            var organization = await _organizationCache.GetOrganization(building.OwnerOrganizationId);
-            return View(new BuildingViewModel(building.BuildingId, building.Name, organization.Name, building.PostalAddress, building.Floors, building.Description, building.FloorPlan));
+/*            var organization = await _organizationCache.GetOrganization(building.OwnerOrganizationId);*/
+            return View(building);
         }
 
         // GET: Buildings/Create
@@ -216,8 +217,8 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-            var organization = await _organizationCache.GetOrganization(building.OwnerOrganizationId);
-            return View(new BuildingViewModel(building.BuildingId, building.Name, organization.Name, building.PostalAddress, building.Floors, building.Description, building.FloorPlan));
+/*            var organization = await _organizationCache.GetOrganization(building.OwnerOrganizationId);*/
+            return View(building);
         }
 
         // POST: Buildings/Delete/5

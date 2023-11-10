@@ -2,10 +2,14 @@
 {
     public class PersonFilterViewModel
     {
-        public string SurnameFind { get; }
-        public string NameFind { get; }
-        public string LastnameFind { get; }
+        public string SurnameFind { get; set; }
+        public string NameFind { get; set; }
+        public string LastnameFind { get; set; }
 
+        public PersonFilterViewModel()
+        {
+            
+        }
         public PersonFilterViewModel(string surname, string name, string lastname)
         {
             SurnameFind = surname;

@@ -19,9 +19,10 @@ public partial class Room
     public string Description { get; set; }
     [NotMapped]
     public List<IFormFile> Photos { get; set; }
+    [Display(Name = "Здание")]
     [ValidateNever]
     public virtual Building Building { get; set; }
-
+    [Display(Name = "Фото")]
     public virtual ICollection<RoomImage> RoomImages { get; set; } = new List<RoomImage>();
 
     public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();

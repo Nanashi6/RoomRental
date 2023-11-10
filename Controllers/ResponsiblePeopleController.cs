@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RoomRental.Attributes;
-using RoomRental.Data;
 using RoomRental.Models;
 using RoomRental.Services;
 using RoomRental.ViewModels;
@@ -31,8 +25,7 @@ namespace RoomRental.Controllers
 
         // GET: ResponsiblePersons
         [SetSession("Person", "surnameFind")]
-        public async Task<IActionResult> Index(int page = 1, string surnameFind = "", string nameFind = "", string lastnameFind = "",
-                                                PersonSortState sortOrder = PersonSortState.SurnameAsc)
+        public async Task<IActionResult> Index(PersonFilterViewModel filterViewModel, int page = 1, PersonSortState sortOrder = PersonSortState.SurnameAsc)
         {
             if (HttpContext.Request.Method == "GET")
             {
@@ -40,18 +33,18 @@ namespace RoomRental.Controllers
 
                 if (dict != null)
                 {
-                    surnameFind = dict["surnameFind"];
+                    filterViewModel.SurnameFind = dict["surnameFind"];
                 }
             }
             var peopleQuery = await _cache.GetPeople();
 
             //Фильтрация
-            if (!String.IsNullOrEmpty(surnameFind))
-                peopleQuery = peopleQuery.Where(e => e.Surname.Contains(surnameFind)).ToList();
-            if (!String.IsNullOrEmpty(nameFind))
-                peopleQuery = peopleQuery.Where(e => e.Name.Contains(nameFind)).ToList();
-            if (!String.IsNullOrEmpty(lastnameFind))
-                peopleQuery = peopleQuery.Where(e => e.Lastname.Contains(lastnameFind)).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.SurnameFind))
+                peopleQuery = peopleQuery.Where(e => e.Surname.Contains(filterViewModel.SurnameFind)).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.NameFind))
+                peopleQuery = peopleQuery.Where(e => e.Name.Contains(filterViewModel.NameFind)).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.LastnameFind))
+                peopleQuery = peopleQuery.Where(e => e.Lastname.Contains(filterViewModel.LastnameFind)).ToList();
 
             //Сортировка
             switch (sortOrder)
@@ -85,7 +78,7 @@ namespace RoomRental.Controllers
             {
                 People = peopleQuery,
                 PageViewModel = new PageViewModel(page, count, _pageSize),
-                FilterViewModel = new PersonFilterViewModel(surnameFind, nameFind, lastnameFind),
+                FilterViewModel = filterViewModel,
                 SortViewModel = new PersonSortViewModel(sortOrder)
             };
 

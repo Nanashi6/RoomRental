@@ -15,16 +15,16 @@
 
 <form method="get">
     <label>Название здания: </label>
-    <input name="buildingNameFind" value="@buildingNameFind" />
+    <input name="BuildingNameFind" value="@buildingNameFind" />
 
     <label>Название организации: </label>
-    <input name="organizationNameFind" value="@organizationNameFind" />
+    <input name="OrganizationNameFind" value="@organizationNameFind" />
 
     <label>Этажность: </label>
-    <input type="number" name="floorsFind" min="0" value="@floorsFind" />
+    <input type="number" name="FloorsFind" min="0" value="@floorsFind" />
 
     <label>Адрес: </label>
-    <input name="addressFind" value="@addressFind" />
+    <input name="AddressFind" value="@addressFind" />
 
     <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
     <input type="submit" value="Фильтр" />
@@ -50,7 +50,7 @@
                    asp-route-organizationNameFind="@organizationNameFind"
                    asp-route-floorsFind="@floorsFind"
                    asp-route-addressFind="@addressFind">
-                    @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().OwnerOrganization.Name)
+                    @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().OwnerOrganization)
                 </a>
             </th>
             <th>

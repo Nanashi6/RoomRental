@@ -25,6 +25,7 @@ public partial class Rental
     [DataType(DataType.Date)]
     [CheckOutDate("CheckInDate")]
     public DateTime CheckOutDate { get; set; }
+    [Display(Name = "Организация-арендатор")]
     [ValidateNever]
     public virtual Organization RentalOrganization { get; set; }
     [ValidateNever]

@@ -36,7 +36,7 @@ namespace RoomRental.Controllers
         }
 
         // GET: Invoices
-        public async Task<IActionResult> Index(int page = 1, string organizationNameFind = "", string personFind = "", decimal? amountFind = null, DateTime? paymentDateFind = null, InvoiceSortState sortOrder = InvoiceSortState.OrganizationNameAsc)
+        public async Task<IActionResult> Index(InvoiceFilterViewModel filterViewModel, int page = 1, InvoiceSortState sortOrder = InvoiceSortState.OrganizationNameAsc)
         {
             var invoices/*Query*/ = await _cache.GetInvoices();
             /*var organizationsQuery = await _organizationCache.GetOrganizations();
@@ -54,14 +54,14 @@ namespace RoomRental.Controllers
             }*/
 
             //Фильтрация
-            if (!String.IsNullOrEmpty(organizationNameFind))
-                invoices = invoices.Where(e => e.RentalOrganization.Name.Contains(organizationNameFind)).ToList();
-            if (!String.IsNullOrEmpty(personFind))
-                invoices = invoices.Where(e => e.ResponsiblePersonNavigation.ToString().Contains(personFind)).ToList();
-            if (amountFind != null)
-                invoices = invoices.Where(e => e.Amount == amountFind).ToList();
-            if (paymentDateFind != null)
-                invoices = invoices.Where(e => e.PaymentDate == paymentDateFind).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
+                invoices = invoices.Where(e => e.RentalOrganization.Name.Contains(filterViewModel.OrganizationNameFind)).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.ResponsiblePersonFind))
+                invoices = invoices.Where(e => $"{e.ResponsiblePersonNavigation.Surname} {e.ResponsiblePersonNavigation.Name} {e.ResponsiblePersonNavigation.Lastname}".Contains(filterViewModel.ResponsiblePersonFind)).ToList();
+            if (filterViewModel.AmountFind != null)
+                invoices = invoices.Where(e => e.Amount == filterViewModel.AmountFind).ToList();
+            if (filterViewModel.PaymentDateFind != null)
+                invoices = invoices.Where(e => e.PaymentDate == filterViewModel.PaymentDateFind).ToList();
 
             //Сортировка
             switch (sortOrder)
@@ -101,7 +101,7 @@ namespace RoomRental.Controllers
             {
                 Invoices = invoices,
                 PageViewModel = new PageViewModel(page, count, _pageSize),
-                FilterViewModel = new InvoiceFilterViewModel(organizationNameFind, paymentDateFind, amountFind, personFind),
+                FilterViewModel = filterViewModel,
                 SortViewModel = new InvoiceSortViewModel(sortOrder)
             };
 
