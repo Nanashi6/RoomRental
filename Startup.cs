@@ -85,7 +85,7 @@ namespace RoomRental
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            
             app.UseSession();
 
             app.UseAuthentication();    // аутентификация

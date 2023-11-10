@@ -73,6 +73,10 @@ main, .container {
     color: #e52e2e;
 }
 
+.block ul {
+    padding: 0;
+}
+
 .parent {
     background: #3a3e64;
     width: 100%;

@@ -31,23 +31,20 @@
     <div class="loginContainer">
         <h1 class="loginHeader">Регистрация</h1>
         <form class="loginForm" method="post" asp-controller="Account" asp-action="Register">
+            <div class="block text-danger" asp-validation-summary="ModelOnly"></div>
             <div class="block">
-@*                 <label class="loginLabel" asp-for="Login"></label> *@
                 <input class="loginInput" asp-for="Login" placeholder="Введите имя пользователя" />
                 <span asp-validation-for="Login" class="text-danger"></span>
             </div>
             <div class="block">
-               @*  <label class="loginLabel" asp-for="Email"></label> *@
                 <input class="loginInput" asp-for="Email" placeholder="Введите электронную почту" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="block">
-               @*  <label class="loginLabel" asp-for="Password"></label> *@
                 <input class="loginInput" asp-for="Password" placeholder="Введите пароль" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="block">
-               @*  <label class="loginLabel" asp-for="PasswordConfirm"></label> *@
                 <input class="loginInput" asp-for="PasswordConfirm" placeholder="Подтвердите пароль" />
                 <span asp-validation-for="PasswordConfirm" class="text-danger"></span>
             </div>
