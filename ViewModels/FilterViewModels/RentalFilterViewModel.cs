@@ -8,7 +8,7 @@
 
         public RentalFilterViewModel()
         {
-            
+
         }
         public RentalFilterViewModel(string name, DateTime? checkInDate, DateTime? checkOutDate)
         {

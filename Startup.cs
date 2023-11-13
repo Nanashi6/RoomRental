@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.EntityFrameworkCore;
 using RoomRental.Data;
-using RoomRental.Models;
 using RoomRental.Services;
-using System.Security.Principal;
 
 namespace RoomRental
 {
@@ -22,11 +18,11 @@ namespace RoomRental
         public void ConfigureServices(IServiceCollection services)
         {
             string connection = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<RoomRentalsContext>(options => options.UseSqlServer(connection),
-        ServiceLifetime.Scoped);
+            services.AddDbContext<RoomRentalsContext>(options => options.UseSqlServer(connection), ServiceLifetime.Scoped);
 
             //Добавление классов авторизации
-            services.AddIdentity<IdentityUser, IdentityRole>(opts => {
+            services.AddIdentity<IdentityUser, IdentityRole>(opts =>
+            {
                 opts.User.RequireUniqueEmail = true;    // уникальный email
                 opts.Password.RequiredLength = 6;   // минимальная длина
                 opts.Password.RequireNonAlphanumeric = false;   // требуются ли не алфавитно-цифровые символы
@@ -52,7 +48,7 @@ namespace RoomRental
             services.AddScoped<InvoiceService>();
             services.AddScoped<PeopleService>();
 
-                        // добавление кэширования
+            // добавление кэширования
             services.AddMemoryCache();
 
             services.AddDistributedMemoryCache();
@@ -67,9 +63,9 @@ namespace RoomRental
 
             services.AddRazorPages().AddRazorRuntimeCompilation();
             services.AddMvc();
-            services.AddControllersWithViews(mvcOtions =>
+            services.AddControllersWithViews(mvcOptions =>
             {
-                mvcOtions.EnableEndpointRouting = false;
+                mvcOptions.EnableEndpointRouting = false;
             });
         }
 
@@ -85,7 +81,7 @@ namespace RoomRental
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            
+
             app.UseSession();
 
             app.UseAuthentication();    // аутентификация

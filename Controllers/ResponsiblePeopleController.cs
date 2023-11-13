@@ -33,7 +33,7 @@ namespace RoomRental.Controllers
 
                 if (dict != null)
                 {
-                    filterViewModel.SurnameFind = dict["surnameFind"];
+                    filterViewModel.SurnameFind = dict["SurnameFind"];
                 }
             }
             var peopleQuery = await _cache.GetPeople();

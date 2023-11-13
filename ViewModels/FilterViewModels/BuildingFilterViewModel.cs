@@ -9,7 +9,7 @@
 
         public BuildingFilterViewModel()
         {
-            
+
         }
         public BuildingFilterViewModel(string name, string organizationName, string address, int? floors)
         {

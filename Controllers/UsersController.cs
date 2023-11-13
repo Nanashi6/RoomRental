@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using RoomRental.Models;
 using RoomRental.ViewModels.IdentityViewModels;
 
 namespace RoomRental.Controllers
@@ -25,7 +24,7 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                IdentityUser user = new IdentityUser { Email = model.Email, UserName = model.UserName};
+                IdentityUser user = new IdentityUser { Email = model.Email, UserName = model.UserName };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

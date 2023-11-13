@@ -102,14 +102,14 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-/*            var images = await _imageCache.GetImageForRoom(id);
-            var building = await _buildingCache.GetBuilding(room.BuildingId);
+            /*            var images = await _imageCache.GetImageForRoom(id);
+                        var building = await _buildingCache.GetBuilding(room.BuildingId);
 
-            string[] paths = new string[images.Count()];
-            for (int i = 0; i < paths.Length; i++)
-            {
-                paths[i] = images[i].ImagePath;
-            }*/
+                        string[] paths = new string[images.Count()];
+                        for (int i = 0; i < paths.Length; i++)
+                        {
+                            paths[i] = images[i].ImagePath;
+                        }*/
 
             return View(room);
         }
@@ -235,14 +235,14 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-/*            var images = await _imageCache.GetImageForRoom(id);
-            var building = await _buildingCache.GetBuilding(room.BuildingId);
+            /*            var images = await _imageCache.GetImageForRoom(id);
+                        var building = await _buildingCache.GetBuilding(room.BuildingId);
 
-            string[] paths = new string[images.Count()];
-            for (int i = 0; i < paths.Length; i++)
-            {
-                paths[i] = images[i].ImagePath;
-            }*/
+                        string[] paths = new string[images.Count()];
+                        for (int i = 0; i < paths.Length; i++)
+                        {
+                            paths[i] = images[i].ImagePath;
+                        }*/
 
             return View(room);
         }

@@ -16,7 +16,7 @@
     <input name="BuildingNameFind" value="@buildingNameFind" />
 
     <label>Площадь: </label>
-    <input type="number" step="any" min="0" name="AreaFind" value="@areaFind" />
+    <input type="number" step="any" min="0" name="AreaFind" value="@(areaFind.ToString().Replace(",", "."))" />
 
     <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
     <input type="submit" value="Фильтр" />

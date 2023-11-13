@@ -8,7 +8,7 @@
 
         public PersonFilterViewModel()
         {
-            
+
         }
         public PersonFilterViewModel(string surname, string name, string lastname)
         {

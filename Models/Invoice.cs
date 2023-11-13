@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
 
 namespace RoomRental.Models;
 
@@ -20,13 +17,13 @@ public partial class Invoice
     [DataType(DataType.Date)]
     public DateTime PaymentDate { get; set; }
     [Display(Name = "Оформляющий")]
-    public int ResponsiblePerson { get; set; }
+    public int ResponsiblePersonId { get; set; }
     [Display(Name = "Организация-арендатор")]
     [ValidateNever]
-    public virtual Organization RentalOrganization { get; set; }
+    public virtual Organization? RentalOrganization { get; set; }
     [Display(Name = "Оформляющий")]
     [ValidateNever]
-    public virtual ResponsiblePerson ResponsiblePersonNavigation { get; set; } = null!;
+    public virtual ResponsiblePerson? ResponsiblePerson { get; set; } = null!;
     [ValidateNever]
-    public virtual Room Room { get; set; } = null!;
+    public virtual Room? Room { get; set; } = null!;
 }

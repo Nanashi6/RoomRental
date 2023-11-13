@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using RoomRental.Data;
 using RoomRental.Models;
-using RoomRental.ViewModels;
 
 namespace RoomRental.Services
 {
@@ -115,6 +114,119 @@ namespace RoomRental.Services
                 _cache.Set("Buildings", buildings, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return buildings.ToList();
+        }
+
+        //Функции для дополнительного отображения
+
+        //Полная информация по организациям-арендаторам выбранного здания за период:
+
+        public async Task<IEnumerable<Organization>> GetRentingOrganizationsForBuilding(int buildingId, DateTime startDate, DateTime endDate)
+        {
+            if (!_cache.TryGetValue("RentingOrganizationsForBuilding", out IEnumerable<Organization>? organizations))
+            {
+                organizations = await _context.Buildings
+                        .Where(e => e.BuildingId == buildingId)
+                        .SelectMany(b => b.Rooms.SelectMany(r => r.Rentals))
+                        .Where(r => r.CheckInDate >= startDate && r.CheckOutDate <= endDate)
+                        .Select(r => r.RentalOrganization)
+                        .Distinct()
+                        .ToListAsync();
+                _cache.Set("RentingOrganizationsForBuilding", organizations, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+            }
+            else
+            {
+                Console.WriteLine($"Список извлечен из кэша");
+            }
+            return organizations;
+        }
+
+        //Полная информация по аренде помещений выбранного здания на дату, общая площадь помещений, процент аренды здания:
+
+        public async Task<BuildingRentInfo> GetBuildingRentInfo(int buildingId, DateTime date)
+        {
+            if (!_cache.TryGetValue("BuildingRentInfo", out BuildingRentInfo? rentInfo))
+            {
+                var building = await _context.Buildings
+                .Include(b => b.Rooms)
+                    .ThenInclude(r => r.Rentals)
+                .FirstOrDefaultAsync(b => b.BuildingId == buildingId);
+
+                if (building == null)
+                {
+                    return null;
+                }
+
+                decimal totalArea = building.Rooms.Sum(r => r.Area);
+                decimal rentedArea = building.Rooms
+                    .SelectMany(r => r.Rentals)
+                    .Where(r => r.CheckInDate <= date && r.CheckOutDate >= date)
+                    .Sum(r => r.Room.Area);
+
+                decimal rentPercentage = rentedArea / totalArea * 100;
+
+                rentInfo = new BuildingRentInfo
+                {
+                    TotalArea = totalArea,
+                    RentedArea = rentedArea,
+                    RentPercentage = rentPercentage,
+                    RentingOrganizations = building.Rooms
+                        .SelectMany(r => r.Rentals)
+                        .Where(r => r.CheckInDate <= date && r.CheckOutDate >= date)
+                        .Select(r => r.RentalOrganization)
+                        .Distinct()
+                        .ToList()
+                };
+                _cache.Set("BuildingRentInfo", rentInfo, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+            }
+            else
+            {
+                Console.WriteLine($"Список извлечен из кэша");
+            }
+            return rentInfo;
+        }
+
+        //Полная информация по организациям-арендаторам, въехавшим в выбранное здание за период:
+
+        public async Task<IEnumerable<Organization>> GetRentingOrganizationsMovedIn(int buildingId, DateTime startDate, DateTime endDate)
+        {
+            if (!_cache.TryGetValue("RentingOrganizationsMovedIn", out IEnumerable<Organization>? organizations))
+            {
+                organizations = await _context.Buildings
+                    .Where(b => b.BuildingId == buildingId)
+                    .SelectMany(b => b.Rooms.SelectMany(r => r.Rentals))
+                    .Where(r => r.CheckInDate >= startDate && r.CheckInDate <= endDate)
+                    .Select(r => r.RentalOrganization)
+                    .Distinct()
+                    .ToListAsync();
+                _cache.Set("RentingOrganizationsMovedIn", organizations, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+            }
+            else
+            {
+                Console.WriteLine($"Список извлечен из кэша");
+            }
+            return organizations;
+        }
+
+        //Полная информация по организациям-арендаторам, выехавшим из выбранного здания за период:
+
+        public async Task<IEnumerable<Organization>> GetRentingOrganizationsMovedOut(int buildingId, DateTime startDate, DateTime endDate)
+        {
+            if (!_cache.TryGetValue("RentingOrganizationsMovedOut", out IEnumerable<Organization>? organizations))
+            {
+                organizations = await _context.Buildings
+                    .Where(b => b.BuildingId == buildingId)
+                    .SelectMany(b => b.Rooms.SelectMany(r => r.Rentals))
+                    .Where(r => r.CheckOutDate >= startDate && r.CheckOutDate <= endDate)
+                    .Select(r => r.RentalOrganization)
+                    .Distinct()
+                    .ToListAsync();
+                _cache.Set("RentingOrganizationsMovedOut", organizations, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+            }
+            else
+            {
+                Console.WriteLine($"Список извлечен из кэша");
+            }
+            return organizations;
         }
     }
 }

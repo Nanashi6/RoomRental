@@ -88,7 +88,7 @@ namespace RoomRental.Services
         public async Task<List<Invoice>?> AddCache()
         {
             // обращаемся к базе данных
-            var invoices = await _context.Invoices.Include(i => i.RentalOrganization).Include(i => i.ResponsiblePersonNavigation).Include(i => i.Room).ToListAsync();
+            var invoices = await _context.Invoices.Include(i => i.RentalOrganization).Include(i => i.ResponsiblePerson).Include(i => i.Room).ToListAsync();
             // если пользователь найден, то добавляем в кэш - время кэширования 5 минут
 
             if (invoices != null)

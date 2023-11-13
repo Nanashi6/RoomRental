@@ -7,7 +7,7 @@
 
         public RoomFilterViewModel()
         {
-            
+
         }
         public RoomFilterViewModel(string name, decimal? area)
         {

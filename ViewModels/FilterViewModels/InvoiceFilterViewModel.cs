@@ -9,7 +9,7 @@
 
         public InvoiceFilterViewModel()
         {
-            
+
         }
         public InvoiceFilterViewModel(string name, DateTime? date, decimal? amount, string person)
         {

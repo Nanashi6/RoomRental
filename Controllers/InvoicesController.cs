@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using RoomRental.Data;
 using RoomRental.Models;
+using RoomRental.Services;
+using RoomRental.ViewModels;
 using RoomRental.ViewModels.FilterViewModels;
 using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
-using RoomRental.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using RoomRental.Services;
 
 namespace RoomRental.Controllers
 {
@@ -57,7 +51,7 @@ namespace RoomRental.Controllers
             if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
                 invoices = invoices.Where(e => e.RentalOrganization.Name.Contains(filterViewModel.OrganizationNameFind)).ToList();
             if (!String.IsNullOrEmpty(filterViewModel.ResponsiblePersonFind))
-                invoices = invoices.Where(e => $"{e.ResponsiblePersonNavigation.Surname} {e.ResponsiblePersonNavigation.Name} {e.ResponsiblePersonNavigation.Lastname}".Contains(filterViewModel.ResponsiblePersonFind)).ToList();
+                invoices = invoices.Where(e => $"{e.ResponsiblePerson.Surname} {e.ResponsiblePerson.Name} {e.ResponsiblePerson.Lastname}".Contains(filterViewModel.ResponsiblePersonFind)).ToList();
             if (filterViewModel.AmountFind != null)
                 invoices = invoices.Where(e => e.Amount == filterViewModel.AmountFind).ToList();
             if (filterViewModel.PaymentDateFind != null)
@@ -85,10 +79,10 @@ namespace RoomRental.Controllers
                     invoices = invoices.OrderByDescending(e => e.Amount).ToList();
                     break;
                 case InvoiceSortState.ResponsiblePersonAsc:
-                    invoices = invoices.OrderBy(e => e.ResponsiblePerson.ToString()).ToList();
+                    invoices = invoices.OrderBy(e => e.ResponsiblePersonId).ToList();
                     break;
                 default:
-                    invoices = invoices.OrderByDescending(e => e.ResponsiblePerson.ToString()).ToList();
+                    invoices = invoices.OrderByDescending(e => e.ResponsiblePersonId).ToList();
                     break;
             }
 
@@ -140,8 +134,9 @@ namespace RoomRental.Controllers
         // POST: Invoices/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("InvoiceId,RentalOrganizationId,RoomId,Amount,PaymentDate,ResponsiblePerson")] Invoice invoice)
+        public async Task<IActionResult> Create([Bind("InvoiceId,RentalOrganizationId,RoomId,Amount,PaymentDate,ResponsiblePersonId")] Invoice invoice)
         {
+            Console.WriteLine(invoice.ResponsiblePersonId);
             if (ModelState.IsValid)
             {
                 await _cache.AddInvoice(invoice);
@@ -151,7 +146,7 @@ namespace RoomRental.Controllers
 
             var people = (await _peopleCache.GetPeople()).Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
 
-            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL", invoice.ResponsiblePerson);
+            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "PersonId", invoice.ResponsiblePersonId);
             ViewData["RoomId"] = new SelectList(await _roomCache.GetRooms(), "RoomId", "RoomId", invoice.RoomId);
             return View(invoice);
         }
@@ -173,7 +168,7 @@ namespace RoomRental.Controllers
 
             var people = (await _peopleCache.GetPeople()).Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
 
-            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL", invoice.ResponsiblePerson);
+            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL", invoice.ResponsiblePersonId);
             ViewData["RoomId"] = new SelectList(await _roomCache.GetRooms(), "RoomId", "RoomId", invoice.RoomId);
             return View(invoice);
         }
@@ -181,7 +176,7 @@ namespace RoomRental.Controllers
         // POST: Invoices/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("InvoiceId,RentalOrganizationId,RoomId,Amount,PaymentDate,ResponsiblePerson")] Invoice invoice)
+        public async Task<IActionResult> Edit(int id, [Bind("InvoiceId,RentalOrganizationId,RoomId,Amount,PaymentDate,ResponsiblePersonId")] Invoice invoice)
         {
             if (id != invoice.InvoiceId)
             {
@@ -211,7 +206,7 @@ namespace RoomRental.Controllers
 
             var people = (await _peopleCache.GetPeople()).Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
 
-            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL", invoice.ResponsiblePerson);
+            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL", invoice.ResponsiblePersonId);
             ViewData["RoomId"] = new SelectList(await _roomCache.GetRooms(), "RoomId", "RoomId", invoice.RoomId);
             return View(invoice);
         }
@@ -248,7 +243,7 @@ namespace RoomRental.Controllers
 
         private async Task<bool> InvoiceExists(int id)
         {
-          return ((await _cache.GetInvoices())?.Any(e => e.InvoiceId == id)).GetValueOrDefault();
+            return ((await _cache.GetInvoices())?.Any(e => e.InvoiceId == id)).GetValueOrDefault();
         }
     }
 }

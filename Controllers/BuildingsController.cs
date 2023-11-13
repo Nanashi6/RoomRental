@@ -2,16 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using RoomRental.Data;
 using RoomRental.Models;
 using RoomRental.Services;
 using RoomRental.ViewModels;
 using RoomRental.ViewModels.FilterViewModels;
 using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
-using System.IO;
-using System.Linq;
 
 namespace RoomRental.Controllers
 {
@@ -112,7 +108,10 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-/*            var organization = await _organizationCache.GetOrganization(building.OwnerOrganizationId);*/
+
+            
+
+            /*            var organization = await _organizationCache.GetOrganization(building.OwnerOrganizationId);*/
             return View(building);
         }
 
@@ -217,7 +216,7 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-/*            var organization = await _organizationCache.GetOrganization(building.OwnerOrganizationId);*/
+            /*            var organization = await _organizationCache.GetOrganization(building.OwnerOrganizationId);*/
             return View(building);
         }
 
