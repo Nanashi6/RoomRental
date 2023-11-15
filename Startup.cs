@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using RoomRental.Data;
 using RoomRental.Services;
 
@@ -19,7 +20,7 @@ namespace RoomRental
         {
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<RoomRentalsContext>(options => options.UseSqlServer(connection), ServiceLifetime.Scoped);
-
+            
             //Добавление классов авторизации
             services.AddIdentity<IdentityUser, IdentityRole>(opts =>
             {
@@ -64,7 +65,7 @@ namespace RoomRental
 
             services.AddRazorPages().AddRazorRuntimeCompilation();
             services.AddMvc();
-            
+
             //Отключение конечных точек
             services.AddControllersWithViews(mvcOptions =>
             {
@@ -83,6 +84,7 @@ namespace RoomRental
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

@@ -38,11 +38,6 @@ namespace RoomRental.Controllers
 
                 if (dict != null)
                 {
-                    foreach (var key in dict.Keys)
-                    {
-                        Console.WriteLine(key);
-                    }
-
                     filterViewModel.AddressFind = dict["AddressFind"];
                     filterViewModel.BuildingNameFind = dict["BuildingNameFind"];
                     filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
