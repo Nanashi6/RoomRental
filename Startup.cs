@@ -51,6 +51,7 @@ namespace RoomRental
             // добавление кэширования
             services.AddMemoryCache();
 
+            //Добавление сессий
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
@@ -63,12 +64,15 @@ namespace RoomRental
 
             services.AddRazorPages().AddRazorRuntimeCompilation();
             services.AddMvc();
+            
+            //Отключение конечных точек
             services.AddControllersWithViews(mvcOptions =>
             {
                 mvcOptions.EnableEndpointRouting = false;
             });
         }
 
+        [Obsolete]
         public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
             if (env.IsDevelopment())

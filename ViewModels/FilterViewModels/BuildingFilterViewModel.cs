@@ -5,7 +5,7 @@
         public string BuildingNameFind { get; set; }
         public string OrganizationNameFind { get; set; }
         public string AddressFind { get; set; }
-        public int? FloorsFind { get; set; }
+        public int? FloorsFind { get; set; } = null;
 
         public BuildingFilterViewModel()
         {

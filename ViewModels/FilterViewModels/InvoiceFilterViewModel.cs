@@ -4,8 +4,8 @@
     {
         public string OrganizationNameFind { get; set; }
         public string ResponsiblePersonFind { get; set; }
-        public decimal? AmountFind { get; set; }
-        public DateTime? PaymentDateFind { get; set; }
+        public decimal? AmountFind { get; set; } = null;
+        public DateTime? PaymentDateFind { get; set; } = null;
 
         public InvoiceFilterViewModel()
         {

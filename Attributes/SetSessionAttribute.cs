@@ -4,8 +4,8 @@ namespace RoomRental.Attributes
 {
     public class SetSessionAttribute : Attribute, IActionFilter
     {
-        private string _name;//имя ключа
-        private string[] _saveNames;//имя ключа
+        private readonly string _name;//имя ключа
+        private readonly string[] _saveNames;//имя ключа
         public SetSessionAttribute(string name, params string[] saveNames)
         {
             _name = name;

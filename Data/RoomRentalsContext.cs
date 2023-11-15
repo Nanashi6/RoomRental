@@ -33,8 +33,8 @@ public partial class RoomRentalsContext : IdentityDbContext<IdentityUser>
     public virtual DbSet<RoomImage> RoomImages { get; set; }
 
 
-    /*protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseSqlServer("Server=localhost;Database=RoomRentals;Trusted_Connection=True;TrustServerCertificate=True;");*/
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            => optionsBuilder.UseLazyLoadingProxies();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

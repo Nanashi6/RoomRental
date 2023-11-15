@@ -11,7 +11,7 @@ namespace RoomRental.Attributes
             _startDatePropertyName = startDatePropertyName;
         }
 
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             var startDateProperty = validationContext.ObjectType.GetProperty(_startDatePropertyName);
             if (startDateProperty == null)
@@ -19,8 +19,8 @@ namespace RoomRental.Attributes
                 return new ValidationResult($"Unknown property: {_startDatePropertyName}");
             }
 
-            var startDateValue = (DateTime)startDateProperty.GetValue(validationContext.ObjectInstance);
-            var endDateValue = (DateTime)value;
+            var startDateValue = (DateTime?)startDateProperty.GetValue(validationContext.ObjectInstance);
+            var endDateValue = (DateTime?)value;
 
             if (endDateValue < startDateValue)
             {

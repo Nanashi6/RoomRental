@@ -60,7 +60,7 @@ namespace RoomRental.Services
             await UpdateCache();
         }
 
-        protected override async Task<List<Rental>?> UpdateCache()
+        protected override async Task<List<Rental>> UpdateCache()
         {
             var rentals = await _context.Rentals.Include(r => r.RentalOrganization).Include(r => r.Room).ToListAsync();
 

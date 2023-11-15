@@ -80,7 +80,7 @@ namespace RoomRental.Services
         /// Обновляет кэш
         /// </summary>
         /// <returns></returns>
-        protected override async Task<List<Invoice>?> UpdateCache()
+        protected override async Task<List<Invoice>> UpdateCache()
         {
             // обращаемся к базе данных
             var invoices = await _context.Invoices.Include(i => i.RentalOrganization).Include(i => i.ResponsiblePerson).Include(i => i.Room).ToListAsync();
@@ -91,7 +91,7 @@ namespace RoomRental.Services
                 Console.WriteLine($"Список извлечен из базы данных");
                 _cache.Set(_name, invoices, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
-            return invoices.ToList();
+            return invoices;
         }
     }
 }

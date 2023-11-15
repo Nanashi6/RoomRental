@@ -3,8 +3,8 @@
     public class RentalFilterViewModel
     {
         public string OrganizationNameFind { get; set; }
-        public DateTime? CheckInDateFind { get; set; }
-        public DateTime? CheckOutDateFind { get; set; }
+        public DateTime? CheckInDateFind { get; set; } = null;
+        public DateTime? CheckOutDateFind { get; set; } = null;
 
         public RentalFilterViewModel()
         {

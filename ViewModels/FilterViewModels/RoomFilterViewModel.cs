@@ -3,7 +3,7 @@
     public class RoomFilterViewModel
     {
         public string BuildingNameFind { get; set; }
-        public decimal? AreaFind { get; set; }
+        public decimal? AreaFind { get; set; } = null;
 
         public RoomFilterViewModel()
         {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RoomRental.Attributes;
 using RoomRental.Models;
 using RoomRental.Services;
 using RoomRental.ViewModels;
@@ -27,32 +28,17 @@ namespace RoomRental.Controllers
         // GET/POST: Organizations
         [HttpGet]
         [HttpPost]
+        [SetSession("Organization")]
         public async Task<IActionResult> Index(string organizationNameFind = "", int page = 1, OrganizationSortState sortOrder = OrganizationSortState.NameAsc)
         {
             if (HttpContext.Request.Method == "GET")
             {
-                // Обработка GET запроса
-                //organizationNameFind = Request.Cookies["organizationNameFind"];
-                //organizationNameFind = _httpContextAccessor.HttpContext.Session.GetString("organizationNameFind");
                 var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Organization");
 
                 if (dict != null)
+                {
                     organizationNameFind = dict["organizationNameFind"];
-            }
-            else if (HttpContext.Request.Method == "POST")
-            {
-                // Обработка POST запроса
-                //Запись в Session
-                Dictionary<string, string> dict = new Dictionary<string, string>()
-                    {
-                        {"organizationNameFind", organizationNameFind},
-                    };
-                Infrastructure.SessionExtensions.Set(HttpContext.Session, "Organization", dict);
-                /*                    Response.Cookies.Append("organizationNameFind", organizationNameFind,
-                                        new CookieOptions
-                                        {
-                                            Expires = DateTimeOffset.Now.AddMinutes(5)
-                                        });*/
+                }
             }
 
             var organizationsQuery = await _cache.GetAll();

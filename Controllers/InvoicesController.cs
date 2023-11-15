@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using RoomRental.Attributes;
 using RoomRental.Models;
 using RoomRental.Services;
 using RoomRental.ViewModels;
@@ -30,8 +31,32 @@ namespace RoomRental.Controllers
         }
 
         // GET: Invoices
+        [SetSession("Invoice")]
         public async Task<IActionResult> Index(InvoiceFilterViewModel filterViewModel, int page = 1, InvoiceSortState sortOrder = InvoiceSortState.OrganizationNameAsc)
         {
+            if (HttpContext.Request.Method == "GET")
+            {
+                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Invoice");
+
+                if (dict != null)
+                {
+                    filterViewModel.ResponsiblePersonFind = dict["ResponsiblePersonFind"];
+                    filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
+
+                    DateTime paymentDateFind;
+                    if (dict.ContainsKey("PaymentDateFind") && DateTime.TryParse(dict["PaymentDateFind"], out paymentDateFind))
+                        filterViewModel.PaymentDateFind = paymentDateFind;
+                    else
+                        filterViewModel.PaymentDateFind = null;
+
+                    Decimal amountFind;
+                    if (dict.ContainsKey("AmountFind") && Decimal.TryParse(dict["AmountFind"], out amountFind))
+                        filterViewModel.AmountFind = amountFind;
+                    else
+                        filterViewModel.AmountFind = null;
+                }
+            }
+
             var invoices = await _cache.GetAll();
 
             //Фильтрация

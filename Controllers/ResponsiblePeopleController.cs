@@ -24,7 +24,7 @@ namespace RoomRental.Controllers
         }
 
         // GET: ResponsiblePersons
-        [SetSession("Person", "surnameFind")]
+        [SetSession("Person", "SurnameFind", "NameFind", "LastnameFind")]
         //[Route("People/")]
         public async Task<IActionResult> Index(PersonFilterViewModel filterViewModel, int page = 1, PersonSortState sortOrder = PersonSortState.SurnameAsc)
         {
@@ -35,6 +35,8 @@ namespace RoomRental.Controllers
                 if (dict != null)
                 {
                     filterViewModel.SurnameFind = dict["SurnameFind"];
+                    filterViewModel.NameFind = dict["NameFind"];
+                    filterViewModel.LastnameFind = dict["LastnameFind"];
                 }
             }
             var peopleQuery = await _cache.GetAll();
