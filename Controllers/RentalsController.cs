@@ -30,17 +30,7 @@ namespace RoomRental.Controllers
         // GET: Rentals
         public async Task<IActionResult> Index(RentalFilterViewModel filterViewModel, int page = 1, RentalSortState sortOrder = RentalSortState.OrganizationNameAsc)
         {
-            var rentals/*Query*/ = await _cache.GetRentals();
-            /*var organizationsQuery = await _organizationCache.GetOrganizations();
-            var roomQuery = await _roomCache.GetRooms();
-            //Формирование осмысленных связей
-            List<RentalViewModel> rentals = new List<RentalViewModel>();
-            foreach (var item in rentalsQuery)
-            {
-                var organization = organizationsQuery.Single(e => e.OrganizationId == item.RentalOrganizationId);
-                var room = roomQuery.Single(e => e.RoomId == item.RoomId);
-                rentals.Add(new RentalViewModel(item.RentalId, (int)room.RoomId, organization.Name, item.CheckInDate, item.CheckOutDate));
-            }*/
+            var rentals = await _cache.GetAll();
 
             //Фильтрация
             if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
@@ -74,7 +64,7 @@ namespace RoomRental.Controllers
             }
 
             //Разбиение на страницы
-            int count = rentals.Count;
+            int count = rentals.Count();
             rentals = rentals.Skip((page - 1) * _pageSize).Take(_pageSize).ToList();
 
             //Формирование модели представления
@@ -92,12 +82,12 @@ namespace RoomRental.Controllers
         // GET: Rentals/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || await _cache.GetRentals() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var rental = await _cache.GetRental(id);
+            var rental = await _cache.Get(id);
             if (rental == null)
             {
                 return NotFound();
@@ -109,8 +99,8 @@ namespace RoomRental.Controllers
         // GET: Rentals/Create
         public async Task<IActionResult> Create()
         {
-            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetOrganizations(), "OrganizationId", "Name");
-            ViewData["RoomId"] = new SelectList(await _roomCache.GetRooms(), "RoomId", "RoomId");
+            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name");
+            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId");
             return View();
         }
 
@@ -121,29 +111,29 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _cache.AddRental(rental);
+                await _cache.Add(rental);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetOrganizations(), "OrganizationId", "Name", rental.RentalOrganizationId);
-            ViewData["RoomId"] = new SelectList(await _roomCache.GetRooms(), "RoomId", "RoomId", rental.RoomId);
+            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", rental.RentalOrganizationId);
+            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId", rental.RoomId);
             return View(rental);
         }
 
         // GET: Rentals/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || await _cache.GetRentals() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var rental = await _cache.GetRental(id);
+            var rental = await _cache.Get(id);
             if (rental == null)
             {
                 return NotFound();
             }
-            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetOrganizations(), "OrganizationId", "Name", rental.RentalOrganizationId);
-            ViewData["RoomId"] = new SelectList(await _roomCache.GetRooms(), "RoomId", "RoomId", rental.RoomId);
+            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", rental.RentalOrganizationId);
+            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId", rental.RoomId);
             return View(rental);
         }
 
@@ -161,7 +151,7 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    await _cache.UpdateRental(rental);
+                    await _cache.Update(rental);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -176,20 +166,20 @@ namespace RoomRental.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetOrganizations(), "OrganizationId", "Name", rental.RentalOrganizationId);
-            ViewData["RoomId"] = new SelectList(await _roomCache.GetRooms(), "RoomId", "RoomId", rental.RoomId);
+            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", rental.RentalOrganizationId);
+            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId", rental.RoomId);
             return View(rental);
         }
 
         // GET: Rentals/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || await _cache.GetRentals() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var rental = await _cache.GetRental(id);
+            var rental = await _cache.Get(id);
             if (rental == null)
             {
                 return NotFound();
@@ -203,17 +193,17 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (await _cache.GetRentals() == null)
+            if (await _cache.GetAll() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.Rentals'  is null.");
             }
-            await _cache.DeleteRental(await _cache.GetRental(id));
+            await _cache.Delete(await _cache.Get(id));
             return RedirectToAction(nameof(Index));
         }
 
         private async Task<bool> RentalExistsAsync(int id)
         {
-            return ((await _cache.GetRentals())?.Any(e => e.RentalId == id)).GetValueOrDefault();
+            return ((await _cache.GetAll())?.Any(e => e.RentalId == id)).GetValueOrDefault();
         }
     }
 }

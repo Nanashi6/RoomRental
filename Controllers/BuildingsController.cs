@@ -30,15 +30,7 @@ namespace RoomRental.Controllers
         // GET: Buildings
         public async Task<IActionResult> Index(BuildingFilterViewModel filterViewModel, int page = 1, BuildingSortState sortOrder = BuildingSortState.NameAsc)
         {
-            var buildings/*Query*/ = await _cache.GetBuildings();
-            /*var organizationsQuery = await _organizationCache.GetOrganizations();
-            //Формирование осмысленных связей
-            var buildings = new List<BuildingViewModel>();
-            foreach (var item in buildingsQuery)
-            {
-                var organization = organizationsQuery.Single(e => e.OrganizationId == item.OwnerOrganizationId);
-                buildings.Add(new BuildingViewModel(item.BuildingId, item.Name, organization.Name, item.PostalAddress, item.Floors, item.Description, item.FloorPlan));
-            }*/
+            var buildings = await _cache.GetAll();
 
             //Фильтрация
             if (!String.IsNullOrEmpty(filterViewModel.BuildingNameFind))
@@ -98,27 +90,24 @@ namespace RoomRental.Controllers
         // GET: Buildings/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || await _cache.GetBuildings() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var building = await _cache.GetBuilding(id);
+            var building = await _cache.Get(id);
             if (building == null)
             {
                 return NotFound();
             }
-
             
-
-            /*            var organization = await _organizationCache.GetOrganization(building.OwnerOrganizationId);*/
             return View(building);
         }
 
         // GET: Buildings/Create
         public async Task<IActionResult> Create()
         {
-            ViewData["OwnerOrganizationId"] = new SelectList((await _organizationCache.GetOrganizations()), "OrganizationId", "Name");
+            ViewData["OwnerOrganizationId"] = new SelectList((await _organizationCache.GetAll()), "OrganizationId", "Name");
             return View();
         }
 
@@ -137,28 +126,28 @@ namespace RoomRental.Controllers
                 }
 
                 building.FloorPlan = Path.Combine("\\images\\FloorPlans\\", fileName);
-                await _cache.AddBuilding(building);
+                await _cache.Add(building);
 
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["OwnerOrganizationId"] = new SelectList(await _organizationCache.GetOrganizations(), "OrganizationId", "Name", building.OwnerOrganizationId);
+            ViewData["OwnerOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", building.OwnerOrganizationId);
             return View(building);
         }
 
         // GET: Buildings/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || await _cache.GetBuildings() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var building = await _cache.GetBuilding(id);
+            var building = await _cache.Get(id);
             if (building == null)
             {
                 return NotFound();
             }
-            ViewData["OwnerOrganizationId"] = new SelectList(await _organizationCache.GetOrganizations(), "OrganizationId", "Name", building.OwnerOrganizationId);
+            ViewData["OwnerOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", building.OwnerOrganizationId);
             return View(building);
         }
 
@@ -184,7 +173,7 @@ namespace RoomRental.Controllers
                     }
 
                     building.FloorPlan = Path.Combine("\\images\\FloorPlans\\", fileName);
-                    await _cache.UpdateBuilding(building);
+                    await _cache.Update(building);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -199,24 +188,24 @@ namespace RoomRental.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["OwnerOrganizationId"] = new SelectList(await _organizationCache.GetOrganizations(), "OrganizationId", "Name", building.OwnerOrganizationId);
+            ViewData["OwnerOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", building.OwnerOrganizationId);
             return View(building);
         }
 
         // GET: Buildings/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || await _cache.GetBuildings() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var building = await _cache.GetBuilding(id);
+            var building = await _cache.Get(id);
             if (building == null)
             {
                 return NotFound();
             }
-            /*            var organization = await _organizationCache.GetOrganization(building.OwnerOrganizationId);*/
+
             return View(building);
         }
 
@@ -225,19 +214,19 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (await _cache.GetBuildings() == null)
+            if (await _cache.GetAll() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.Buildings'  is null.");
             }
 
-            await _cache.DeleteBuilding(await _cache.GetBuilding(id));
+            await _cache.Delete(await _cache.Get(id));
 
             return RedirectToAction(nameof(Index));
         }
 
         private async Task<bool> BuildingExists(int id)
         {
-            return ((await _cache.GetBuildings())?.Any(e => e.BuildingId == id)).GetValueOrDefault();
+            return ((await _cache.GetAll())?.Any(e => e.BuildingId == id)).GetValueOrDefault();
         }
     }
 }

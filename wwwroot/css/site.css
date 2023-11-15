@@ -321,3 +321,9 @@ footer {
 .copyright_text span a:hover {
     color: #e52e2e;
 }
+/*Image*/
+
+.image {
+    width: 200px;
+    height: 200px;
+}

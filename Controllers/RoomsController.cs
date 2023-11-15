@@ -32,23 +32,7 @@ namespace RoomRental.Controllers
         // GET: Rooms
         public async Task<IActionResult> Index(RoomFilterViewModel filterViewModel, int page = 1, RoomSortState sortOrder = RoomSortState.BuildingNameAsc)
         {
-            var rooms/*Query */= await _cache.GetRooms();
-            /*var imagesQuery = await _imageCache.GetImages();
-            var buildingsQuery = await _buildingCache.GetBuildings();
-            //Формирование осмысленных связей
-            List<RoomViewModel> rooms = new List<RoomViewModel>();
-            foreach (var item in roomsQuery)
-            {
-                var images = imagesQuery.Where(e => e.RoomId == item.RoomId).ToList();
-                string[] paths = new string[images.Count()];
-                for (int i = 0; i < paths.Length; i++)
-                {
-                    paths[i] = images[i].ImagePath;
-                }
-
-                var building = buildingsQuery.Single(e => e.BuildingId == item.BuildingId);
-                rooms.Add(new RoomViewModel(item.RoomId, building.Name, item.Area, item.Description, paths));
-            }*/
+            var rooms = await _cache.GetAll();
 
             //Фильтрация
             if (!String.IsNullOrEmpty(filterViewModel.BuildingNameFind))
@@ -92,24 +76,16 @@ namespace RoomRental.Controllers
         // GET: Rooms/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || await _cache.GetRooms() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var room = await _cache.GetRoom(id);
+            var room = await _cache.Get(id);
             if (room == null)
             {
                 return NotFound();
             }
-            /*            var images = await _imageCache.GetImageForRoom(id);
-                        var building = await _buildingCache.GetBuilding(room.BuildingId);
-
-                        string[] paths = new string[images.Count()];
-                        for (int i = 0; i < paths.Length; i++)
-                        {
-                            paths[i] = images[i].ImagePath;
-                        }*/
 
             return View(room);
         }
@@ -117,7 +93,7 @@ namespace RoomRental.Controllers
         // GET: Rooms/Create
         public async Task<IActionResult> Create()
         {
-            ViewData["BuildingId"] = new SelectList(await _buildingCache.GetBuildings(), "BuildingId", "Name");
+            ViewData["BuildingId"] = new SelectList(await _buildingCache.GetAll(), "BuildingId", "Name");
             return View();
         }
 
@@ -128,7 +104,7 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                int? roomId = await _cache.AddRoom(room);
+                int? roomId = await _cache.Add(room);
 
                 string[] paths = new string[room.Photos.Count()];
                 for (int i = 0; i < paths.Length; i++)
@@ -140,7 +116,7 @@ namespace RoomRental.Controllers
                         await room.Photos[i].CopyToAsync(fileStream);
                     }
 
-                    await _imageCache.AddImage(new RoomImage()
+                    await _imageCache.Add(new RoomImage()
                     {
                         ImagePath = Path.Combine("\\images\\Rooms\\", fileName),
                         RoomId = (int)roomId
@@ -149,25 +125,25 @@ namespace RoomRental.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BuildingId"] = new SelectList(await _buildingCache.GetBuildings(), "BuildingId", "Name", room.BuildingId);
+            ViewData["BuildingId"] = new SelectList(await _buildingCache.GetAll(), "BuildingId", "Name", room.BuildingId);
             return View(room);
         }
 
         // GET: Rooms/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || await _cache.GetRooms() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var room = await _cache.GetRoom(id);
+            var room = await _cache.Get(id);
             if (room == null)
             {
                 return NotFound();
             }
 
-            ViewData["BuildingId"] = new SelectList(await _buildingCache.GetBuildings(), "BuildingId", "Name", room.BuildingId);
+            ViewData["BuildingId"] = new SelectList(await _buildingCache.GetAll(), "BuildingId", "Name", room.BuildingId);
             return View(room);
         }
 
@@ -185,7 +161,7 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    await _cache.UpdateRoom(room);
+                    await _cache.Update(room);
 
                     await _imageCache.DeleteImageForRoom(room.RoomId);
                     string[] paths = new string[room.Photos.Count()];
@@ -198,7 +174,7 @@ namespace RoomRental.Controllers
                             await room.Photos[i].CopyToAsync(fileStream);
                         }
 
-                        await _imageCache.AddImage(new RoomImage()
+                        await _imageCache.Add(new RoomImage()
                         {
                             ImagePath = Path.Combine("\\images\\Rooms\\", fileName),
                             RoomId = (int)room.RoomId
@@ -218,31 +194,23 @@ namespace RoomRental.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BuildingId"] = new SelectList(await _buildingCache.GetBuildings(), "BuildingId", "Name", room.BuildingId);
+            ViewData["BuildingId"] = new SelectList(await _buildingCache.GetAll(), "BuildingId", "Name", room.BuildingId);
             return View(room);
         }
 
         // GET: Rooms/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || await _cache.GetRooms() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var room = await _cache.GetRoom(id);
+            var room = await _cache.Get(id);
             if (room == null)
             {
                 return NotFound();
             }
-            /*            var images = await _imageCache.GetImageForRoom(id);
-                        var building = await _buildingCache.GetBuilding(room.BuildingId);
-
-                        string[] paths = new string[images.Count()];
-                        for (int i = 0; i < paths.Length; i++)
-                        {
-                            paths[i] = images[i].ImagePath;
-                        }*/
 
             return View(room);
         }
@@ -252,17 +220,17 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (await _cache.GetRooms() == null)
+            if (await _cache.GetAll() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.Rooms'  is null.");
             }
-            await _cache.DeleteRoom(await _cache.GetRoom(id));
+            await _cache.Delete(await _cache.Get(id));
             return RedirectToAction(nameof(Index));
         }
 
         private async Task<bool> RoomExistsAsync(int id)
         {
-            return ((await _cache.GetRooms())?.Any(e => e.RoomId == id)).GetValueOrDefault();
+            return ((await _cache.GetAll())?.Any(e => e.RoomId == id)).GetValueOrDefault();
         }
     }
 }

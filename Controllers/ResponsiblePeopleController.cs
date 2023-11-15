@@ -25,6 +25,7 @@ namespace RoomRental.Controllers
 
         // GET: ResponsiblePersons
         [SetSession("Person", "surnameFind")]
+        //[Route("People/")]
         public async Task<IActionResult> Index(PersonFilterViewModel filterViewModel, int page = 1, PersonSortState sortOrder = PersonSortState.SurnameAsc)
         {
             if (HttpContext.Request.Method == "GET")
@@ -36,7 +37,7 @@ namespace RoomRental.Controllers
                     filterViewModel.SurnameFind = dict["SurnameFind"];
                 }
             }
-            var peopleQuery = await _cache.GetPeople();
+            var peopleQuery = await _cache.GetAll();
 
             //Фильтрация
             if (!String.IsNullOrEmpty(filterViewModel.SurnameFind))
@@ -70,7 +71,7 @@ namespace RoomRental.Controllers
             }
 
             //Разбиение на страницы
-            int count = peopleQuery.Count;
+            int count = peopleQuery.Count();
             peopleQuery = peopleQuery.Skip((page - 1) * _pageSize).Take(_pageSize).ToList();
 
             //Модель отображения
@@ -88,12 +89,12 @@ namespace RoomRental.Controllers
         // GET: ResponsiblePersons/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || await _cache.GetPeople() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var responsiblePerson = await _cache.GetPerson(id);
+            var responsiblePerson = await _cache.Get(id);
             if (responsiblePerson == null)
             {
                 return NotFound();
@@ -115,7 +116,7 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _cache.AddPerson(responsiblePerson);
+                await _cache.Add(responsiblePerson);
                 return RedirectToAction(nameof(Index));
             }
             return View(responsiblePerson);
@@ -124,12 +125,12 @@ namespace RoomRental.Controllers
         // GET: ResponsiblePersons/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || await _cache.GetPeople() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var responsiblePerson = await _cache.GetPerson(id);
+            var responsiblePerson = await _cache.Get(id);
             if (responsiblePerson == null)
             {
                 return NotFound();
@@ -151,7 +152,7 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    await _cache.UpdatePerson(responsiblePerson);
+                    await _cache.Update(responsiblePerson);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -172,12 +173,12 @@ namespace RoomRental.Controllers
         // GET: ResponsiblePersons/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || await _cache.GetPeople() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var responsiblePerson = await _cache.GetPerson(id);
+            var responsiblePerson = await _cache.Get(id);
             if (responsiblePerson == null)
             {
                 return NotFound();
@@ -191,17 +192,17 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (await _cache.GetPeople() == null)
+            if (await _cache.GetAll() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.ResponsiblePeople'  is null.");
             }
-            await _cache.DeletePerson(await _cache.GetPerson(id));
+            await _cache.Delete(await _cache.Get(id));
             return RedirectToAction(nameof(Index));
         }
 
         private async Task<bool> ResponsiblePersonExistsAsync(int id)
         {
-            return ((await _cache.GetPeople())?.Any(e => e.PersonId == id)).GetValueOrDefault();
+            return ((await _cache.GetAll())?.Any(e => e.PersonId == id)).GetValueOrDefault();
         }
     }
 }

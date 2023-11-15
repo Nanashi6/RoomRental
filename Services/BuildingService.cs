@@ -5,16 +5,10 @@ using RoomRental.Models;
 
 namespace RoomRental.Services
 {
-    public class BuildingService
+    public class BuildingService : CachedService<Building>
     {
-        private RoomRentalsContext _context;
-        private IMemoryCache _cache;
-        public BuildingService(RoomRentalsContext context, IMemoryCache memoryCache)
-        {
-            _context = context;
-            _cache = memoryCache;
-        }
-        /// <summary>
+        public BuildingService(RoomRentalsContext context, IMemoryCache memoryCache) : base(memoryCache, context, "Buildings") { }
+        /*/// <summary>
         /// Возвращает все объекты Building, хранящиеся в базы данных
         /// </summary>
         /// <returns></returns>
@@ -29,24 +23,24 @@ namespace RoomRental.Services
                 Console.WriteLine($"Список извлечен из кэша");
             }
             return buildings;
-        }
+        }*/
         /// <summary>
         /// Возвращает объект Building
         /// </summary>
         /// <returns></returns>
-        public async Task<Building> GetBuilding(int? id)
+        public override async Task<Building> Get(int? id)
         {
-            if (!_cache.TryGetValue("Buildings", out List<Building>? buildings))
+            /*if (!_cache.TryGetValue("Buildings", out List<Building>? buildings))
             {
                 buildings = await AddCache();
             }
             else
             {
                 Console.WriteLine($"Список извлечен из кэша");
-            }
-            return buildings.Single(e => e.BuildingId == id);
+            }*/
+            return (await GetAll()).Single(e => e.BuildingId == id);
         }
-        /// <summary>
+        /*/// <summary>
         /// Добавляет объект Building
         /// </summary>
         /// <returns></returns>
@@ -65,12 +59,12 @@ namespace RoomRental.Services
             _context.Update(building);
             await _context.SaveChangesAsync();
             await AddCache();
-        }
+        }*/
         /// <summary>
         /// Удаляет объект Building
         /// </summary>
         /// <returns></returns>
-        public async Task DeleteBuilding(Building building)
+        public override async Task Delete(Building building)
         {
             var rooms = await _context.Rooms
                         .Where(r => building.BuildingId == r.BuildingId)
@@ -96,13 +90,13 @@ namespace RoomRental.Services
             }
             await _context.SaveChangesAsync();
 
-            await AddCache();
+            await UpdateCache();
         }
         /// <summary>
         /// Обновляет кэш
         /// </summary>
         /// <returns></returns>
-        public async Task<List<Building>?> AddCache()
+        protected override async Task<List<Building>> UpdateCache()
         {
             // обращаемся к базе данных
             var buildings = await _context.Buildings.Include(b => b.OwnerOrganization).ToListAsync();
@@ -115,6 +109,17 @@ namespace RoomRental.Services
             }
             return buildings.ToList();
         }
+
+
+
+
+
+
+
+
+
+
+
 
         //Функции для дополнительного отображения
 

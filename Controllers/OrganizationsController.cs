@@ -55,7 +55,7 @@ namespace RoomRental.Controllers
                                         });*/
             }
 
-            var organizationsQuery = await _cache.GetOrganizations();
+            var organizationsQuery = await _cache.GetAll();
 
             //Фильтрация
             if (!String.IsNullOrEmpty(organizationNameFind))
@@ -99,12 +99,12 @@ namespace RoomRental.Controllers
         // GET: Organizations/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || await _cache.GetOrganizations() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var organization = await _cache.GetOrganization(id);
+            var organization = await _cache.Get(id);
             if (organization == null)
             {
                 return NotFound();
@@ -126,7 +126,7 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _cache.AddOrganization(organization);
+                await _cache.Add(organization);
                 return RedirectToAction(nameof(Index));
             }
             return View(organization);
@@ -135,12 +135,12 @@ namespace RoomRental.Controllers
         // GET: Organizations/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || await _cache.GetOrganizations() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var organization = await _cache.GetOrganization(id);
+            var organization = await _cache.Get(id);
             if (organization == null)
             {
                 return NotFound();
@@ -162,7 +162,7 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    await _cache.UpdateOrganization(organization);
+                    await _cache.Update(organization);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -183,12 +183,12 @@ namespace RoomRental.Controllers
         // GET: Organizations/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || await _cache.GetOrganizations() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var organization = await _cache.GetOrganization(id);
+            var organization = await _cache.Get(id);
             if (organization == null)
             {
                 return NotFound();
@@ -202,19 +202,19 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (await _cache.GetOrganizations() == null)
+            if (await _cache.GetAll() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.Organizations' is null.");
             }
 
-            await _cache.DeleteOrganization(await _cache.GetOrganization(id));
+            await _cache.Delete(await _cache.Get(id));
 
             return RedirectToAction(nameof(Index));
         }
 
         private async Task<bool> OrganizationExists(int id)
         {
-            return ((await _cache.GetOrganizations())?.Any(e => e.OrganizationId == id)).GetValueOrDefault();
+            return ((await _cache.GetAll())?.Any(e => e.OrganizationId == id)).GetValueOrDefault();
         }
     }
 }

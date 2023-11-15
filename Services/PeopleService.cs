@@ -5,18 +5,11 @@ using RoomRental.Models;
 
 namespace RoomRental.Services
 {
-    public class PeopleService
+    public class PeopleService : CachedService<ResponsiblePerson>
     {
-        private readonly RoomRentalsContext _context;
-        private readonly IMemoryCache _cache;
+        public PeopleService(RoomRentalsContext context, IMemoryCache memoryCache) : base(memoryCache, context, "People") { }
 
-        public PeopleService(RoomRentalsContext context, IMemoryCache memoryCache)
-        {
-            _context = context;
-            _cache = memoryCache;
-        }
-
-        public async Task<List<ResponsiblePerson>?> GetPeople()
+        /*public async Task<List<ResponsiblePerson>?> GetPeople()
         {
             if (!_cache.TryGetValue("People", out List<ResponsiblePerson>? people))
             {
@@ -27,22 +20,22 @@ namespace RoomRental.Services
                 Console.WriteLine($"Список извлечен из кэша");
             }
             return people;
-        }
+        }*/
 
-        public async Task<ResponsiblePerson> GetPerson(int? id)
+        public override async Task<ResponsiblePerson> Get(int? id)
         {
-            if (!_cache.TryGetValue("People", out List<ResponsiblePerson>? people))
+            /*if (!_cache.TryGetValue("People", out List<ResponsiblePerson>? people))
             {
                 people = await AddCache();
             }
             else
             {
                 Console.WriteLine($"Список извлечен из кэша");
-            }
-            return people.Single(e => e.PersonId == id);
+            }*/
+            return (await GetAll()).Single(e => e.PersonId == id);
         }
 
-        public async Task AddPerson(ResponsiblePerson person)
+        /*public async Task AddPerson(ResponsiblePerson person)
         {
             await _context.AddAsync(person);
             await _context.SaveChangesAsync();
@@ -54,9 +47,9 @@ namespace RoomRental.Services
             _context.Update(person);
             await _context.SaveChangesAsync();
             await AddCache();
-        }
+        }*/
 
-        public async Task DeletePerson(ResponsiblePerson person)
+        public override async Task Delete(ResponsiblePerson person)
         {
             if (person != null)
             {
@@ -64,17 +57,17 @@ namespace RoomRental.Services
             }
 
             await _context.SaveChangesAsync();
-            await AddCache();
+            await UpdateCache();
         }
 
-        public async Task<List<ResponsiblePerson>?> AddCache()
+        protected override async Task<List<ResponsiblePerson>> UpdateCache()
         {
             var people = await _context.ResponsiblePeople.ToListAsync();
 
             if (people != null)
             {
                 Console.WriteLine($"Список извлечен из базы данных");
-                _cache.Set("People", people, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+                _cache.Set(_name, people, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return people;
         }

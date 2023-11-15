@@ -5,18 +5,11 @@ using RoomRental.Models;
 
 namespace RoomRental.Services
 {
-    public class RentalService
+    public class RentalService : CachedService<Rental>
     {
-        private readonly RoomRentalsContext _context;
-        private readonly IMemoryCache _cache;
+        public RentalService(RoomRentalsContext context, IMemoryCache memoryCache) : base(memoryCache, context, "Rentals") { }
 
-        public RentalService(RoomRentalsContext context, IMemoryCache memoryCache)
-        {
-            _context = context;
-            _cache = memoryCache;
-        }
-
-        public async Task<List<Rental>?> GetRentals()
+        /*public async Task<List<Rental>?> GetRentals()
         {
             if (!_cache.TryGetValue("Rentals", out List<Rental>? rentals))
             {
@@ -27,22 +20,22 @@ namespace RoomRental.Services
                 Console.WriteLine($"Список извлечен из кэша");
             }
             return rentals;
-        }
+        }*/
 
-        public async Task<Rental> GetRental(int? id)
+        public async override Task<Rental> Get(int? id)
         {
-            if (!_cache.TryGetValue("Rentals", out List<Rental>? rentals))
+            /*if (!_cache.TryGetValue("Rentals", out List<Rental>? rentals))
             {
                 rentals = await AddCache();
             }
             else
             {
                 Console.WriteLine($"Список извлечен из кэша");
-            }
-            return rentals.Single(e => e.RentalId == id);
+            }*/
+            return (await GetAll()).Single(e => e.RentalId == id);
         }
 
-        public async Task AddRental(Rental rental)
+        /*public async Task AddRental(Rental rental)
         {
             await _context.AddAsync(rental);
             await _context.SaveChangesAsync();
@@ -54,9 +47,9 @@ namespace RoomRental.Services
             _context.Update(rental);
             await _context.SaveChangesAsync();
             await AddCache();
-        }
+        }*/
 
-        public async Task DeleteRental(Rental rental)
+        public override async Task Delete(Rental rental)
         {
             if (rental != null)
             {
@@ -64,17 +57,17 @@ namespace RoomRental.Services
             }
 
             await _context.SaveChangesAsync();
-            await AddCache();
+            await UpdateCache();
         }
 
-        public async Task<List<Rental>?> AddCache()
+        protected override async Task<List<Rental>?> UpdateCache()
         {
             var rentals = await _context.Rentals.Include(r => r.RentalOrganization).Include(r => r.Room).ToListAsync();
 
             if (rentals != null)
             {
                 Console.WriteLine($"Список извлечен из базы данных");
-                _cache.Set("Rentals", rentals, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+                _cache.Set(_name, rentals, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return rentals;
         }

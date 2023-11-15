@@ -5,18 +5,11 @@ using RoomRental.Models;
 
 namespace RoomRental.Services
 {
-    public class RoomImageService
+    public class RoomImageService : CachedService<RoomImage>
     {
-        private readonly RoomRentalsContext _context;
-        private readonly IMemoryCache _cache;
+        public RoomImageService(RoomRentalsContext context, IMemoryCache memoryCache) : base(memoryCache, context, "RoomImages") { }
 
-        public RoomImageService(RoomRentalsContext context, IMemoryCache memoryCache)
-        {
-            _context = context;
-            _cache = memoryCache;
-        }
-
-        public async Task<List<RoomImage>?> GetImages()
+        /*public async Task<List<RoomImage>?> GetImages()
         {
             if (!_cache.TryGetValue("Images", out List<RoomImage>? images))
             {
@@ -27,35 +20,35 @@ namespace RoomRental.Services
                 Console.WriteLine($"Список извлечен из кэша");
             }
             return images;
-        }
+        }*/
 
-        public async Task<RoomImage> GetImage(int? id)
+        public async override Task<RoomImage> Get(int? id)
         {
-            if (!_cache.TryGetValue("Images", out List<RoomImage>? images))
+            /*if (!_cache.TryGetValue("Images", out List<RoomImage>? images))
             {
                 images = await AddCache();
             }
             else
             {
                 Console.WriteLine($"Список извлечен из кэша");
-            }
-            return images.Single(e => e.RoomId == id);
+            }*/
+            return (await GetAll()).Single(e => e.RoomId == id);
         }
 
         public async Task<List<RoomImage>> GetImageForRoom(int? roomId)
         {
-            if (!_cache.TryGetValue("Images", out List<RoomImage>? images))
+            /*if (!_cache.TryGetValue("Images", out List<RoomImage>? images))
             {
-                images = await AddCache();
+                images = await UpdateCache();
             }
             else
             {
                 Console.WriteLine($"Список извлечен из кэша");
-            }
-            return images.Where(e => e.RoomId == roomId).ToList();
+            }*/
+            return (await GetAll()).Where(e => e.RoomId == roomId).ToList();
         }
 
-        public async Task AddImage(RoomImage image)
+        /*public async Task AddImage(RoomImage image)
         {
             await _context.AddAsync(image);
             await _context.SaveChangesAsync();
@@ -67,9 +60,9 @@ namespace RoomRental.Services
             _context.Update(image);
             await _context.SaveChangesAsync();
             await AddCache();
-        }
+        }*/
 
-        public async Task DeleteImage(RoomImage image)
+        public override async Task Delete(RoomImage image)
         {
             if (image != null)
             {
@@ -77,24 +70,24 @@ namespace RoomRental.Services
             }
 
             await _context.SaveChangesAsync();
-            await AddCache();
+            await UpdateCache();
         }
 
         public async Task DeleteImageForRoom(int roomId)
         {
             _context.RemoveRange(_context.RoomImages.Where(e => roomId == e.RoomId));
             await _context.SaveChangesAsync();
-            await AddCache();
+            await UpdateCache();
         }
 
-        public async Task<List<RoomImage>?> AddCache()
+        protected override async Task<List<RoomImage>> UpdateCache()
         {
             var images = await _context.RoomImages.Include(r => r.Room).ToListAsync();
 
             if (images != null)
             {
                 Console.WriteLine($"Список извлечен из базы данных");
-                _cache.Set("Images", images, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+                _cache.Set(_name, images, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return images;
         }
