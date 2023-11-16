@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using RoomRental.Models;
 using RoomRental.ViewModels.IdentityViewModels;
 
 namespace RoomRental.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-        public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -24,13 +25,13 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                IdentityUser user = new IdentityUser { Email = model.Email, UserName = model.Login };
+                User user = new User { Email = model.Email, UserName = model.Login, Surname = model.Surname, Name = model.Name };
                 // добавляем пользователя
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    // установка куки
                     await _userManager.AddToRolesAsync(user, new List<string>() { "User" });
+                    // установка куки
                     await _signInManager.SignInAsync(user, false);
                     return RedirectToAction("Index", "Home");
                 }
@@ -57,7 +58,7 @@ namespace RoomRental.Controllers
             if (ModelState.IsValid)
             {
                 var result =
-                    await _signInManager.PasswordSignInAsync(model.Login, model.Password, true, false);
+                    await _signInManager.PasswordSignInAsync(model.Login, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
                     // проверяем, принадлежит ли URL приложению
@@ -78,7 +79,6 @@ namespace RoomRental.Controllers
             return View(model);
         }
 
-        [HttpGet]
         public async Task<IActionResult> Logout()
         {
             // удаляем аутентификационные куки

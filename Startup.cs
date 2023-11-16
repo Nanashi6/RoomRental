@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RoomRental.Data;
+using RoomRental.Models;
 using RoomRental.Services;
 
 namespace RoomRental
@@ -20,9 +21,9 @@ namespace RoomRental
         {
             string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<RoomRentalsContext>(options => options.UseSqlServer(connection), ServiceLifetime.Scoped);
-            
+
             //Добавление классов авторизации
-            services.AddIdentity<IdentityUser, IdentityRole>(opts =>
+            services.AddIdentity<User, IdentityRole>(opts =>
             {
                 opts.User.RequireUniqueEmail = true;    // уникальный email
                 opts.Password.RequiredLength = 6;   // минимальная длина
@@ -33,12 +34,12 @@ namespace RoomRental
             })
                 .AddEntityFrameworkStores<RoomRentalsContext>();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.LoginPath = new PathString("/Account/Login");
-                    options.AccessDeniedPath = new PathString("/Account/Login");
-                });
+            /*            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                            .AddCookie(options =>
+                            {
+                                options.LoginPath = new PathString("/Account/Login");
+                                options.AccessDeniedPath = new PathString("/Account/Login");
+                            });*/
 
             // внедрение зависимости CachedService
             services.AddScoped<OrganizationService>();

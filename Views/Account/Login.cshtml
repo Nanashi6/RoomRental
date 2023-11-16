@@ -29,17 +29,19 @@
               asp-route-returnUrl="@Model.ReturnUrl">
             <div class="text-danger block" asp-validation-summary="ModelOnly"></div>
             <div class="block">
-                @* <label class="loginLabel" asp-for="Login"></label> *@
                 <input class="loginInput" asp-for=" Login" placeholder="Введите имя пользователя" />
                 <span asp-validation-for="Login" class="text-danger"></span>
             </div>
             <div class="block">
-                @* <label class="loginLabel" asp-for="Password"></label> *@
                 <input class="loginInput" asp-for="Password" placeholder="Введите пароль" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="block">
                 <input class ="submitButton" type="submit" value="Войти" />
+            </div>
+            <div class="block">
+                <label asp-for="RememberMe">Запомнить меня</label>
+                <input asp-for="RememberMe" />
             </div>
             <div class="block">
                 <label>Ещё нет аккаунта?</label>

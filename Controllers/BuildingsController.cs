@@ -12,7 +12,7 @@ using RoomRental.ViewModels.SortViewModels;
 
 namespace RoomRental.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize]
     public class BuildingsController : Controller
     {
         private readonly BuildingService _cache;

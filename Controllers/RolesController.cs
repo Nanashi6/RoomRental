@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using RoomRental.Models;
 using RoomRental.ViewModels.IdentityViewModels;
 
 namespace RoomRental.Controllers
@@ -9,8 +10,8 @@ namespace RoomRental.Controllers
     public class RolesController : Controller
     {
         RoleManager<IdentityRole> _roleManager;
-        UserManager<IdentityUser> _userManager;
-        public RolesController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+        UserManager<User> _userManager;
+        public RolesController(RoleManager<IdentityRole> roleManager, UserManager<User> userManager)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -55,7 +56,7 @@ namespace RoomRental.Controllers
         public async Task<IActionResult> Edit(string userId)
         {
             // получаем пользователя
-            IdentityUser user = await _userManager.FindByIdAsync(userId);
+            User user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
                 // получем список ролей пользователя
@@ -77,7 +78,7 @@ namespace RoomRental.Controllers
         public async Task<IActionResult> Edit(string userId, List<string> roles)
         {
             // получаем пользователя
-            IdentityUser user = await _userManager.FindByIdAsync(userId);
+            User user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
                 // получем список ролей пользователя

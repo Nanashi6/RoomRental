@@ -10,7 +10,7 @@ using RoomRental.ViewModels.SortViewModels;
 
 namespace RoomRental.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize]
     public class OrganizationsController : Controller
     {
         private readonly IHttpContextAccessor _httpContextAccessor;

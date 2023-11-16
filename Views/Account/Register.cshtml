@@ -33,8 +33,16 @@
         <form class="loginForm" method="post" asp-controller="Account" asp-action="Register">
             <div class="block text-danger" asp-validation-summary="ModelOnly"></div>
             <div class="block">
-                <input class="loginInput" asp-for="Login" placeholder="Введите имя пользователя" />
+                <input class="loginInput" asp-for="Login" placeholder="Введите логин" />
                 <span asp-validation-for="Login" class="text-danger"></span>
+            </div> 
+            <div class="block">
+                <input class="loginInput" asp-for="Surname" placeholder="Введите фамилию пользователя" />
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>  
+            <div class="block">
+                <input class="loginInput" asp-for="Name" placeholder="Введите имя пользователя" />
+                <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="block">
                 <input class="loginInput" asp-for="Email" placeholder="Введите электронную почту" />

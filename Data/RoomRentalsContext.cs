@@ -7,7 +7,7 @@ using RoomRental.Models;
 
 namespace RoomRental.Data;
 
-public partial class RoomRentalsContext : IdentityDbContext<IdentityUser>
+public partial class RoomRentalsContext : IdentityDbContext<User>
 {
     public RoomRentalsContext()
     {
