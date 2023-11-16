@@ -1,8 +1,7 @@
-﻿@using Microsoft.AspNetCore.Identity;
-@inject SignInManager<User> SignInManager
+﻿@inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 
-<ul class="navbar-nav flex-grow-1">
+<ul class="navbar-nav nav-login-panel">
     @if (User.Identity.IsAuthenticated)
     {
         if (User.IsInRole("Admin"))
@@ -15,7 +14,7 @@
             </li>
         }
         <li class="nav-item">
-            <a class ="nav-link text-dark">@User.Identity.Name</a>
+            <a class="nav-link text-dark">@User.Identity.Name</a>
         </li>
         <li class="nav-item">
             <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
@@ -23,11 +22,11 @@
     }
     else
     {
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-            </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+        </li>
     }
 </ul>

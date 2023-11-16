@@ -5,71 +5,68 @@ using RoomRental.Models;
 
 namespace RoomRental.Services
 {
-    public class OrganizationService
+    public class OrganizationService : CachedService<Organization>
     {
-        private RoomRentalsContext _context;
-        private IMemoryCache _cache;
-        public OrganizationService(RoomRentalsContext context, IMemoryCache memoryCache)
+        public OrganizationService(RoomRentalsContext context, IMemoryCache memoryCache) : base(memoryCache, context, "Organizations")
         {
-            _context = context;
-            _cache = memoryCache;
+
         }
 
-        public async Task<List<Organization>?> GetOrganizations()
+/*        public async override Task<List<Organization>> GetAll()
         {
             if (!_cache.TryGetValue("Organizations", out List<Organization>? organizations))
             {
-                organizations = AddCache().Result;
+                organizations = await UpdateCache();
             }
             else
             {
                 Console.WriteLine($"Список извлечен из кэша");
             }
             return organizations;
-        }
+        }*/
 
-        public async Task<Organization> GetOrganization(int? id)
+        public async override Task<Organization> Get(int? id)
         {
-            if (!_cache.TryGetValue("Organizations", out List<Organization>? organizations))
+            /*if (!_cache.TryGetValue(_name, out List<Organization>? organizations))
             {
-                organizations = AddCache().Result;
+                organizations = await UpdateCache();
             }
             else
             {
                 Console.WriteLine($"Список извлечен из кэша");
-            }
-            return organizations.Single(e => e.OrganizationId == id);
+            }*/
+            return (await GetAll()).Single(e => e.OrganizationId == id);
         }
 
-        public async void AddOrganization(Organization organization)
+/*        public async override Task Add(Organization organization)
         {
-            _context.Add(organization);
-            _context.SaveChanges();
-            await AddCache();
+            await _context.AddAsync(organization);
+            await _context.SaveChangesAsync();
+            await UpdateCache();
         }
 
-        public async void UpdateOrganization(Organization organization)
+        public async override Task Update(Organization organization)
         {
             _context.Update(organization);
-            _context.SaveChanges();
-            await AddCache();
-        }
+            await _context.SaveChangesAsync();
+            await UpdateCache();
+        }*/
 
-        public async void DeleteOrganization(Organization organization)
+        public async override Task Delete(Organization organization)
         {
-            var rentals = _context.Rentals.Where(e => e.RentalOrganizationId == organization.OrganizationId).ToList();
-            var invoices = _context.Invoices.Where(e => e.RentalOrganizationId == organization.OrganizationId).ToList();
+            var rentals = await _context.Rentals.Where(e => e.RentalOrganizationId == organization.OrganizationId).ToListAsync();
+            var invoices = await _context.Invoices.Where(e => e.RentalOrganizationId == organization.OrganizationId).ToListAsync();
 
-            var rooms = _context.Rooms
+            var rooms = await _context.Rooms
                         .Where(r => _context.Buildings
                             .Where(b => organization.OrganizationId == b.OwnerOrganizationId)
                             .Select(b => b.BuildingId)
-                            .Contains(r.BuildingId))
+                            .Contains((int)r.BuildingId))
                         .Select(r => r.RoomId)
-                        .ToList();
+                        .ToListAsync();
 
-            rentals.AddRange(_context.Rentals.Where(r => rooms.Contains(r.RoomId)).ToList());
-            invoices.AddRange(_context.Invoices.Where(i => rooms.Contains(i.RoomId)).ToList());
+            rentals.AddRange(await _context.Rentals.Where(r => rooms.Contains(r.RoomId)).ToListAsync());
+            invoices.AddRange(await _context.Invoices.Where(i => rooms.Contains(i.RoomId)).ToListAsync());
 
             if (rentals != null)
             {
@@ -79,28 +76,27 @@ namespace RoomRental.Services
             {
                 _context.Invoices.RemoveRange(invoices);
             }
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             if (organization != null)
             {
                 _context.Organizations.Remove(organization);
             }
+            await _context.SaveChangesAsync();
 
-            _context.SaveChanges();
-
-            await AddCache();
+            await UpdateCache();
         }
 
-        public async Task<List<Organization>?> AddCache()
+        protected async override Task<List<Organization>> UpdateCache()
         {
-            _cache.Remove("Organizations");
+            //_cache.Remove("Organizations");
             // обращаемся к базе данных
-            var organizations = _context.Organizations.ToList();
+            var organizations = await _context.Organizations.ToListAsync();
             // если пользователь найден, то добавляем в кэш - время кэширования 5 минут
             if (organizations != null)
             {
                 Console.WriteLine($"Список извлечен из базы данных");
-                _cache.Set("Organizations", organizations, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
+                _cache.Set(_name, organizations, new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(5)));
             }
             return organizations;
         }

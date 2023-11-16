@@ -2,10 +2,14 @@
 {
     public class RentalFilterViewModel
     {
-        public string OrganizationNameFind { get; }
-        public DateTime? CheckInDateFind { get; }
-        public DateTime? CheckOutDateFind { get; }
+        public string OrganizationNameFind { get; set; }
+        public DateTime? CheckInDateFind { get; set; } = null;
+        public DateTime? CheckOutDateFind { get; set; } = null;
 
+        public RentalFilterViewModel()
+        {
+
+        }
         public RentalFilterViewModel(string name, DateTime? checkInDate, DateTime? checkOutDate)
         {
             OrganizationNameFind = name;

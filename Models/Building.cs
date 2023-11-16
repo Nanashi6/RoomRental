@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RoomRental.Models;
 
@@ -18,8 +20,13 @@ public partial class Building
     [Display(Name = "Описание")]
     public string Description { get; set; }
     [Display(Name = "План этажа")]
-    public byte[] FloorPlan { get; set; } = new byte[0];
-
+    [BindNever]
+    [ValidateNever]
+    public string FloorPlan { get; set; }
+    [NotMapped]
+    public IFormFile FloorPlanImage { get; set; }
+    [ValidateNever]
+    [Display(Name = "Организация-владелец")]
     public virtual Organization OwnerOrganization { get; set; }
 
     public virtual ICollection<Room> Rooms { get; set; } = new List<Room>();

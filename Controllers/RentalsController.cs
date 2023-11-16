@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using RoomRental.Data;
+using RoomRental.Attributes;
 using RoomRental.Models;
+using RoomRental.Services;
+using RoomRental.ViewModels;
 using RoomRental.ViewModels.FilterViewModels;
 using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
-using RoomRental.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using RoomRental.Services;
 
 namespace RoomRental.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize]
     public class RentalsController : Controller
     {
         private readonly RentalService _cache;
@@ -25,45 +20,58 @@ namespace RoomRental.Controllers
         private readonly RoomService _roomCache;
         private readonly int _pageSize = 10;
 
-        public RentalsController(RentalService cache, OrganizationService organizationCache, RoomService roomCache)
+        public RentalsController(RentalService cache, OrganizationService organizationCache, RoomService roomCache, IConfiguration appConfig)
         {
             _cache = cache;
             _organizationCache = organizationCache;
             _roomCache = roomCache;
+            _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
         }
 
         // GET: Rentals
-        public async Task<IActionResult> Index(int page = 1, string organizationNameFind = "", DateTime? checkInDateFind = null,
-                                                DateTime? checkOutDateFind = null, RentalSortState sortOrder = RentalSortState.OrganizationNameAsc)
+        [SetSession("Rental")]
+        public async Task<IActionResult> Index(RentalFilterViewModel filterViewModel, int page = 1, RentalSortState sortOrder = RentalSortState.OrganizationNameAsc)
         {
-            var rentalsQuery = await _cache.GetRentals();
-            var organizationsQuery = await _organizationCache.GetOrganizations();
-            var roomQuery = await _roomCache.GetRooms();
-            //Формирование осмысленных связей
-            List<RentalViewModel> rentals = new List<RentalViewModel>();
-            foreach (var item in rentalsQuery)
+            if (HttpContext.Request.Method == "GET")
             {
-                var organization = organizationsQuery.Single(e => e.OrganizationId == item.RentalOrganizationId);
-                var room = roomQuery.Single(e => e.RoomId == item.RoomId);
-                rentals.Add(new RentalViewModel(item.RentalId, room.RoomId, organization.Name, item.CheckInDate, item.CheckOutDate));
+                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Rental");
+
+                if (dict != null)
+                {
+                    filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
+
+                    DateTime checkInDateFind;
+                    if (dict.ContainsKey("CheckOutDateFind") && DateTime.TryParse(dict["CheckOutDateFind"], out checkInDateFind))
+                        filterViewModel.CheckOutDateFind = checkInDateFind;
+                    else
+                        filterViewModel.CheckOutDateFind = null;
+
+                    DateTime checkOutDateFind;
+                    if (dict.ContainsKey("CheckInDateFind") && DateTime.TryParse(dict["CheckInDateFind"], out checkOutDateFind))
+                        filterViewModel.CheckInDateFind = checkOutDateFind;
+                    else
+                        filterViewModel.CheckInDateFind = null;
+                }
             }
 
+            var rentals = await _cache.GetAll();
+
             //Фильтрация
-            if (!String.IsNullOrEmpty(organizationNameFind))
-                rentals = rentals.Where(e => e.RentalOrganization.Contains(organizationNameFind)).ToList();
-            if (checkInDateFind != null)
-                rentals = rentals.Where(e => e.CheckInDate >= checkInDateFind).ToList();
-            if (checkOutDateFind != null)
-                rentals = rentals.Where(e => e.CheckOutDate <= checkOutDateFind).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
+                rentals = rentals.Where(e => e.RentalOrganization.Name.Contains(filterViewModel.OrganizationNameFind)).ToList();
+            if (filterViewModel.CheckInDateFind != null)
+                rentals = rentals.Where(e => e.CheckInDate >= filterViewModel.CheckInDateFind).ToList();
+            if (filterViewModel.CheckOutDateFind != null)
+                rentals = rentals.Where(e => e.CheckOutDate <= filterViewModel.CheckOutDateFind).ToList();
 
             //Сортировка
             switch (sortOrder)
             {
                 case RentalSortState.OrganizationNameAsc:
-                    rentals = rentals.OrderBy(e => e.RentalOrganization).ToList();
+                    rentals = rentals.OrderBy(e => e.RentalOrganization.Name).ToList();
                     break;
                 case RentalSortState.OrganizationNameDesc:
-                    rentals = rentals.OrderByDescending(e => e.RentalOrganization).ToList();
+                    rentals = rentals.OrderByDescending(e => e.RentalOrganization.Name).ToList();
                     break;
                 case RentalSortState.CheckInDateAsc:
                     rentals = rentals.OrderBy(e => e.CheckInDate).ToList();
@@ -80,7 +88,7 @@ namespace RoomRental.Controllers
             }
 
             //Разбиение на страницы
-            int count = rentals.Count;
+            int count = rentals.Count();
             rentals = rentals.Skip((page - 1) * _pageSize).Take(_pageSize).ToList();
 
             //Формирование модели представления
@@ -88,7 +96,7 @@ namespace RoomRental.Controllers
             {
                 Rentals = rentals,
                 PageViewModel = new PageViewModel(page, count, _pageSize),
-                FilterViewModel = new RentalFilterViewModel(organizationNameFind, checkInDateFind, checkOutDateFind),
+                FilterViewModel = filterViewModel,
                 SortViewModel = new RentalSortViewModel(sortOrder)
             };
 
@@ -98,12 +106,12 @@ namespace RoomRental.Controllers
         // GET: Rentals/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _cache.GetRentals() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var rental = await _cache.GetRental(id);
+            var rental = await _cache.Get(id);
             if (rental == null)
             {
                 return NotFound();
@@ -113,10 +121,10 @@ namespace RoomRental.Controllers
         }
 
         // GET: Rentals/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["RentalOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name");
-            ViewData["RoomId"] = new SelectList(_roomCache.GetRooms().Result, "RoomId", "RoomId");
+            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name");
+            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId");
             return View();
         }
 
@@ -125,31 +133,31 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("RentalId,RoomId,RentalOrganizationId,CheckInDate,CheckOutDate")] Rental rental)
         {
-            if (/*ModelState.IsValid*/true)
+            if (ModelState.IsValid)
             {
-                _cache.AddRental(rental);
+                await _cache.Add(rental);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentalOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name", rental.RentalOrganizationId);
-            ViewData["RoomId"] = new SelectList(_roomCache.GetRooms().Result, "RoomId", "RoomId", rental.RoomId);
+            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", rental.RentalOrganizationId);
+            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId", rental.RoomId);
             return View(rental);
         }
 
         // GET: Rentals/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _cache.GetRentals() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var rental = await _cache.GetRental(id);
+            var rental = await _cache.Get(id);
             if (rental == null)
             {
                 return NotFound();
             }
-            ViewData["RentalOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name", rental.RentalOrganizationId);
-            ViewData["RoomId"] = new SelectList(_roomCache.GetRooms().Result, "RoomId", "RoomId", rental.RoomId);
+            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", rental.RentalOrganizationId);
+            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId", rental.RoomId);
             return View(rental);
         }
 
@@ -163,15 +171,15 @@ namespace RoomRental.Controllers
                 return NotFound();
             }
 
-            if (true)
+            if (ModelState.IsValid)
             {
                 try
                 {
-                    _cache.UpdateRental(rental);
+                    await _cache.Update(rental);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RentalExists(rental.RentalId))
+                    if (!(await RentalExistsAsync(rental.RentalId)))
                     {
                         return NotFound();
                     }
@@ -182,20 +190,20 @@ namespace RoomRental.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["RentalOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name", rental.RentalOrganizationId);
-            ViewData["RoomId"] = new SelectList(_roomCache.GetRooms().Result, "RoomId", "RoomId", rental.RoomId);
+            ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", rental.RentalOrganizationId);
+            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId", rental.RoomId);
             return View(rental);
         }
 
         // GET: Rentals/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _cache.GetRentals() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var rental = await _cache.GetRental(id);
+            var rental = await _cache.Get(id);
             if (rental == null)
             {
                 return NotFound();
@@ -209,17 +217,17 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_cache.GetRentals() == null)
+            if (await _cache.GetAll() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.Rentals'  is null.");
             }
-            _cache.DeleteRental(_cache.GetRental(id).Result);
+            await _cache.Delete(await _cache.Get(id));
             return RedirectToAction(nameof(Index));
         }
 
-        private bool RentalExists(int id)
+        private async Task<bool> RentalExistsAsync(int id)
         {
-            return (_cache.GetRentals().Result?.Any(e => e.RentalId == id)).GetValueOrDefault();
+            return ((await _cache.GetAll())?.Any(e => e.RentalId == id)).GetValueOrDefault();
         }
     }
 }

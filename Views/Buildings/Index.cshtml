@@ -13,18 +13,18 @@
     <a asp-action="Create">Create New</a>
 </p>
 
-<form method="get">
+<form method="post">
     <label>Название здания: </label>
-    <input name="buildingNameFind" value="@buildingNameFind" />
+    <input name="BuildingNameFind" value="@buildingNameFind" />
 
     <label>Название организации: </label>
-    <input name="organizationNameFind" value="@organizationNameFind" />
+    <input name="OrganizationNameFind" value="@organizationNameFind" />
 
     <label>Этажность: </label>
-    <input type="number" name="floorsFind" value="@floorsFind" />
+    <input type="number" name="FloorsFind" min="0" value="@floorsFind" />
 
     <label>Адрес: </label>
-    <input name="addressFind" value="@addressFind" />
+    <input name="AddressFind" value="@addressFind" />
 
     <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
     <input type="submit" value="Фильтр" />
@@ -89,7 +89,7 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.OwnerOrganization)
+                @Html.DisplayFor(modelItem => item.OwnerOrganization.Name)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PostalAddress)
@@ -101,7 +101,7 @@
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                    <img src=" data:image /jpeg;base64,@(Convert.ToBase64String(item.FloorPlan))">
+                    <img src="@item.FloorPlan" class="image">
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.BuildingId">Edit</a> |

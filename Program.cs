@@ -1,15 +1,5 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
-
-using RoomRental.Data;
 using Microsoft.AspNetCore;
+using RoomRental.Data;
 
 namespace RoomRental
 {
@@ -17,7 +7,27 @@ namespace RoomRental
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            var host = BuildWebHost(args);
+
+            using (var scope = host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<RoomRentalsContext>();
+                    DbInizializer.Inizialize(context);
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred while seeding the database.");
+                }
+            }
+
+            host.Run();
+/*
+
+            BuildWebHost(args).Run();*/
         }
 
         public static IWebHost BuildWebHost(string[] args) =>

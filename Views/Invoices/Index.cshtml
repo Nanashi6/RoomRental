@@ -13,18 +13,18 @@
     <a asp-action="Create">Create New</a>
 </p>
 
-<form method="get">
+<form method="post">
     <label>Название организации: </label>
-    <input name="organizationNameFind" value="@organizationNameFind" />
+    <input name="OrganizationNameFind" value="@organizationNameFind" />
 
     <label>Сумма: </label>
-    <input type="number" step="any" name="amountFind" value="@amountFind" />
+    <input type="number" step="any" min="0" name="AmountFind" value="@(amountFind.ToString().Replace(",", "."))" />
 
     <label>Ответственное лицо: </label>
-    <input name="personFind" value="@personFind" />
+    <input name="ResponsiblePersonFind" value="@personFind" />
 
     <label>Дата платежа: </label>
-    <input type="date" name="paymentDateFind" value="@paymentDateFind" />
+    <input type="date" name="PaymentDateFind" value="@paymentDateFind?.ToString("yyyy-MM-dd")" />
 
     <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
     <input type="submit" value="Фильтр" />
@@ -86,7 +86,7 @@
                 @Html.DisplayFor(modelItem => item.RoomId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.RentalOrganization)
+                @Html.DisplayFor(modelItem => item.RentalOrganization.Name)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Amount)
@@ -95,7 +95,7 @@
                 @Html.DisplayFor(modelItem => item.PaymentDate)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.ResponsiblePerson)
+                @item.ResponsiblePerson.Surname @item.ResponsiblePerson.Name @item.ResponsiblePerson.Lastname
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.InvoiceId">Edit</a> |

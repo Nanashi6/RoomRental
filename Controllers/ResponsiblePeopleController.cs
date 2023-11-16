@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RoomRental.Data;
+using RoomRental.Attributes;
 using RoomRental.Models;
 using RoomRental.Services;
 using RoomRental.ViewModels;
@@ -16,30 +11,43 @@ using RoomRental.ViewModels.SortViewModels;
 
 namespace RoomRental.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize]
     public class ResponsiblePeopleController : Controller
     {
         private readonly PeopleService _cache;
         private readonly int _pageSize = 10;
 
-        public ResponsiblePeopleController(PeopleService cache)
+        public ResponsiblePeopleController(PeopleService cache, IConfiguration appConfig)
         {
             _cache = cache;
+            _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
         }
 
         // GET: ResponsiblePersons
-        public async Task<IActionResult> Index(int page = 1, string surnameFind = "", string nameFind = "", string lastnameFind = "",
-                                                PersonSortState sortOrder = PersonSortState.SurnameAsc)
+        [SetSession("Person", "SurnameFind", "NameFind", "LastnameFind")]
+        //[Route("People/")]
+        public async Task<IActionResult> Index(PersonFilterViewModel filterViewModel, int page = 1, PersonSortState sortOrder = PersonSortState.SurnameAsc)
         {
-            var peopleQuery = await _cache.GetPeople();
+            if (HttpContext.Request.Method == "GET")
+            {
+                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Person");
+
+                if (dict != null)
+                {
+                    filterViewModel.SurnameFind = dict["SurnameFind"];
+                    filterViewModel.NameFind = dict["NameFind"];
+                    filterViewModel.LastnameFind = dict["LastnameFind"];
+                }
+            }
+            var peopleQuery = await _cache.GetAll();
 
             //Фильтрация
-            if (!String.IsNullOrEmpty(surnameFind))
-                peopleQuery = peopleQuery.Where(e => e.Surname.Contains(surnameFind)).ToList();
-            if (!String.IsNullOrEmpty(nameFind))
-                peopleQuery = peopleQuery.Where(e => e.Name.Contains(nameFind)).ToList();
-            if (!String.IsNullOrEmpty(lastnameFind))
-                peopleQuery = peopleQuery.Where(e => e.Lastname.Contains(lastnameFind)).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.SurnameFind))
+                peopleQuery = peopleQuery.Where(e => e.Surname.Contains(filterViewModel.SurnameFind)).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.NameFind))
+                peopleQuery = peopleQuery.Where(e => e.Name.Contains(filterViewModel.NameFind)).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.LastnameFind))
+                peopleQuery = peopleQuery.Where(e => e.Lastname.Contains(filterViewModel.LastnameFind)).ToList();
 
             //Сортировка
             switch (sortOrder)
@@ -65,7 +73,7 @@ namespace RoomRental.Controllers
             }
 
             //Разбиение на страницы
-            int count = peopleQuery.Count;
+            int count = peopleQuery.Count();
             peopleQuery = peopleQuery.Skip((page - 1) * _pageSize).Take(_pageSize).ToList();
 
             //Модель отображения
@@ -73,7 +81,7 @@ namespace RoomRental.Controllers
             {
                 People = peopleQuery,
                 PageViewModel = new PageViewModel(page, count, _pageSize),
-                FilterViewModel = new PersonFilterViewModel(surnameFind, nameFind, lastnameFind),
+                FilterViewModel = filterViewModel,
                 SortViewModel = new PersonSortViewModel(sortOrder)
             };
 
@@ -83,12 +91,12 @@ namespace RoomRental.Controllers
         // GET: ResponsiblePersons/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _cache.GetPeople() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var responsiblePerson = await _cache.GetPerson(id);
+            var responsiblePerson = await _cache.Get(id);
             if (responsiblePerson == null)
             {
                 return NotFound();
@@ -110,7 +118,7 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                _cache.AddPerson(responsiblePerson);
+                await _cache.Add(responsiblePerson);
                 return RedirectToAction(nameof(Index));
             }
             return View(responsiblePerson);
@@ -119,12 +127,12 @@ namespace RoomRental.Controllers
         // GET: ResponsiblePersons/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _cache.GetPeople() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var responsiblePerson = await _cache.GetPerson(id);
+            var responsiblePerson = await _cache.Get(id);
             if (responsiblePerson == null)
             {
                 return NotFound();
@@ -146,11 +154,11 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    _cache.UpdatePerson(responsiblePerson);
+                    await _cache.Update(responsiblePerson);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ResponsiblePersonExists(responsiblePerson.PersonId))
+                    if (!(await ResponsiblePersonExistsAsync(responsiblePerson.PersonId)))
                     {
                         return NotFound();
                     }
@@ -167,12 +175,12 @@ namespace RoomRental.Controllers
         // GET: ResponsiblePersons/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _cache.GetPeople() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var responsiblePerson = await _cache.GetPerson(id);
+            var responsiblePerson = await _cache.Get(id);
             if (responsiblePerson == null)
             {
                 return NotFound();
@@ -186,17 +194,17 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_cache.GetPeople() == null)
+            if (await _cache.GetAll() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.ResponsiblePeople'  is null.");
             }
-            _cache.DeletePerson(_cache.GetPerson(id).Result);
+            await _cache.Delete(await _cache.Get(id));
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ResponsiblePersonExists(int id)
+        private async Task<bool> ResponsiblePersonExistsAsync(int id)
         {
-            return (_cache.GetPeople().Result?.Any(e => e.PersonId == id)).GetValueOrDefault();
+            return ((await _cache.GetAll())?.Any(e => e.PersonId == id)).GetValueOrDefault();
         }
     }
 }

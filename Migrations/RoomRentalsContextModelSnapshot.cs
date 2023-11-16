@@ -18,6 +18,9 @@ namespace RoomRental.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.13")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -171,9 +174,10 @@ namespace RoomRental.Migrations
                         .HasColumnType("varchar(255)")
                         .HasColumnName("description");
 
-                    b.Property<byte[]>("FloorPlan")
+                    b.Property<string>("FloorPlan")
                         .IsRequired()
-                        .HasColumnType("image")
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)")
                         .HasColumnName("floorPlan");
 
                     b.Property<int>("Floors")
@@ -199,7 +203,7 @@ namespace RoomRental.Migrations
                         .HasColumnName("postalAddress");
 
                     b.HasKey("BuildingId")
-                        .HasName("PK__Building__979FD1CD67568AE3");
+                        .HasName("PK__Building__979FD1CD3DCCFF84");
 
                     b.HasIndex("OwnerOrganizationId");
 
@@ -223,24 +227,24 @@ namespace RoomRental.Migrations
                         .HasColumnType("date")
                         .HasColumnName("paymentDate");
 
-                    b.Property<int?>("RentalOrganizationId")
+                    b.Property<int>("RentalOrganizationId")
                         .HasColumnType("int")
                         .HasColumnName("rentalOrganizationId");
 
-                    b.Property<int>("ResponsiblePerson")
+                    b.Property<int>("ResponsiblePersonId")
                         .HasColumnType("int")
-                        .HasColumnName("responsiblePerson");
+                        .HasColumnName("responsiblePersonId");
 
                     b.Property<int>("RoomId")
                         .HasColumnType("int")
                         .HasColumnName("roomId");
 
                     b.HasKey("InvoiceId")
-                        .HasName("PK__Invoices__1252416CB6BF50FA");
+                        .HasName("PK__Invoices__DDA6423A7D292366");
 
                     b.HasIndex("RentalOrganizationId");
 
-                    b.HasIndex("ResponsiblePerson");
+                    b.HasIndex("ResponsiblePersonId");
 
                     b.HasIndex("RoomId");
 
@@ -271,7 +275,7 @@ namespace RoomRental.Migrations
                         .HasColumnName("postalAddress");
 
                     b.HasKey("OrganizationId")
-                        .HasName("PK__Organiza__29747D592CC83A43");
+                        .HasName("PK__Organiza__29747D5940E6BB82");
 
                     b.ToTable("Organizations");
                 });
@@ -302,7 +306,7 @@ namespace RoomRental.Migrations
                         .HasColumnName("roomId");
 
                     b.HasKey("RentalId")
-                        .HasName("PK__Rentals__0164732E677AD17B");
+                        .HasName("PK__Rentals__1D4A79C91609EF5D");
 
                     b.HasIndex("RentalOrganizationId");
 
@@ -342,7 +346,7 @@ namespace RoomRental.Migrations
                         .HasColumnName("surname");
 
                     b.HasKey("PersonId")
-                        .HasName("PK__Responsi__EC7D7D4DDE04AF9B");
+                        .HasName("PK__Responsi__EC7D7D4D5E9ADA9C");
 
                     b.ToTable("ResponsiblePeople");
                 });
@@ -371,17 +375,39 @@ namespace RoomRental.Migrations
                         .HasColumnType("varchar(255)")
                         .HasColumnName("description");
 
-                    b.Property<byte[]>("Photo")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)")
-                        .HasColumnName("photo");
-
                     b.HasKey("RoomId")
-                        .HasName("PK__Rooms__6C3BF5BE42D59D2F");
+                        .HasName("PK__Rooms__6C3BF5BEA3A3945D");
 
                     b.HasIndex("BuildingId");
 
                     b.ToTable("Rooms");
+                });
+
+            modelBuilder.Entity("RoomRental.Models.RoomImage", b =>
+                {
+                    b.Property<int>("ImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("imageId");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ImageId"));
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(max)")
+                        .HasColumnName("imagePath");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int")
+                        .HasColumnName("roomId");
+
+                    b.HasKey("ImageId")
+                        .HasName("PK__RoomImag__336E9B55CAABD719");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("RoomImages");
                 });
 
             modelBuilder.Entity("RoomRental.Models.User", b =>
@@ -409,6 +435,10 @@ namespace RoomRental.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -429,15 +459,16 @@ namespace RoomRental.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Surname")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -510,7 +541,7 @@ namespace RoomRental.Migrations
                         .HasForeignKey("OwnerOrganizationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK__Buildings__owner__398D8EEE");
+                        .HasConstraintName("FK__Buildings__owner__37703C52");
 
                     b.Navigation("OwnerOrganization");
                 });
@@ -520,24 +551,27 @@ namespace RoomRental.Migrations
                     b.HasOne("RoomRental.Models.Organization", "RentalOrganization")
                         .WithMany("Invoices")
                         .HasForeignKey("RentalOrganizationId")
-                        .HasConstraintName("FK__Invoices__rental__44FF419A");
-
-                    b.HasOne("RoomRental.Models.ResponsiblePerson", "ResponsiblePersonNavigation")
-                        .WithMany("Invoices")
-                        .HasForeignKey("ResponsiblePerson")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK__Invoices__respon__46E78A0C");
+                        .HasConstraintName("FK__Invoices__rental__42E1EEFE");
+
+                    b.HasOne("RoomRental.Models.ResponsiblePerson", "ResponsiblePerson")
+                        .WithMany("Invoices")
+                        .HasForeignKey("ResponsiblePersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK__Invoices__respon__44CA3770");
 
                     b.HasOne("RoomRental.Models.Room", "Room")
                         .WithMany("Invoices")
                         .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK__Invoices__roomId__45F365D3");
+                        .HasConstraintName("FK__Invoices__roomId__43D61337");
 
                     b.Navigation("RentalOrganization");
 
-                    b.Navigation("ResponsiblePersonNavigation");
+                    b.Navigation("ResponsiblePerson");
 
                     b.Navigation("Room");
                 });
@@ -547,14 +581,16 @@ namespace RoomRental.Migrations
                     b.HasOne("RoomRental.Models.Organization", "RentalOrganization")
                         .WithMany("Rentals")
                         .HasForeignKey("RentalOrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK__Rentals__rentalO__403A8C7D");
+                        .HasConstraintName("FK__Rentals__rentalO__3E1D39E1");
 
                     b.HasOne("RoomRental.Models.Room", "Room")
                         .WithMany("Rentals")
                         .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK__Rentals__roomId__3F466844");
+                        .HasConstraintName("FK__Rentals__roomId__3D2915A8");
 
                     b.Navigation("RentalOrganization");
 
@@ -568,9 +604,21 @@ namespace RoomRental.Migrations
                         .HasForeignKey("BuildingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK__Rooms__buildingI__3C69FB99");
+                        .HasConstraintName("FK__Rooms__buildingI__3A4CA8FD");
 
                     b.Navigation("Building");
+                });
+
+            modelBuilder.Entity("RoomRental.Models.RoomImage", b =>
+                {
+                    b.HasOne("RoomRental.Models.Room", "Room")
+                        .WithMany("RoomImages")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK__RoomImage__roomI__47A6A41B");
+
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("RoomRental.Models.Building", b =>
@@ -597,6 +645,8 @@ namespace RoomRental.Migrations
                     b.Navigation("Invoices");
 
                     b.Navigation("Rentals");
+
+                    b.Navigation("RoomImages");
                 });
 #pragma warning restore 612, 618
         }

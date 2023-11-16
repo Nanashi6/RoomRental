@@ -25,7 +25,7 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = new User { Email = model.Email, UserName = model.Email, Year = model.Year };
+                User user = new User { Email = model.Email, UserName = model.UserName, Surname = model.Surname, Name = model.Name };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -49,7 +49,7 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-            EditUserViewModel model = new EditUserViewModel { Id = user.Id, Email = user.Email, Year = user.Year };
+            EditUserViewModel model = new EditUserViewModel { Id = user.Id, UserName = user.UserName, Email = user.Email, Surname = user.Surname, Name = user.Name };
             return View(model);
         }
 
@@ -63,7 +63,9 @@ namespace RoomRental.Controllers
                 {
                     user.Email = model.Email;
                     user.UserName = model.Email;
-                    user.Year = model.Year;
+                    user.UserName = model.UserName;
+                    user.Surname = model.Surname;
+                    user.Name = model.UserName;
 
                     var result = await _userManager.UpdateAsync(user);
                     if (result.Succeeded)

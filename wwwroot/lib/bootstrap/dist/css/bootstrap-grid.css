@@ -52,8 +52,8 @@
   margin-right: calc(var(--bs-gutter-x) * -.5);
   margin-left: calc(var(--bs-gutter-x) * -.5);
 }
-.row > * {
-  box-sizing: border-box;
+.row > * {/*
+  box-sizing: border-box;*/
   flex-shrink: 0;
   width: 100%;
   max-width: 100%;

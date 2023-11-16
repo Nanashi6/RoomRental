@@ -11,12 +11,12 @@
     <a asp-action="Create">Create New</a>
 </p>
 
-<form method="get">
+<form method="post">
     <label>Название здания: </label>
-    <input name="buildingNameFind" value="@buildingNameFind" />
+    <input name="BuildingNameFind" value="@buildingNameFind" />
 
     <label>Площадь: </label>
-    <input type="number" step="any" name="areaFind" value="@areaFind" />
+    <input type="number" step="any" min="0" name="AreaFind" value="@(areaFind.ToString().Replace(",", "."))" />
 
     <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
     <input type="submit" value="Фильтр" />
@@ -45,7 +45,7 @@
                 @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().Photo)
+                @Html.DisplayNameFor(model => model.Rooms.SingleOrDefault().RoomImages)
             </th>
             <th></th>
         </tr>
@@ -54,7 +54,7 @@
 @foreach (var item in Model.Rooms) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Building)
+                @Html.DisplayFor(modelItem => item.Building.Name)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Area)
@@ -63,7 +63,7 @@
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                    <img src=" data:image /jpeg;base64,@(Convert.ToBase64String(item.Photo))">
+                <img src="@item.RoomImages.First().ImagePath" class="image">
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.RoomId">Edit</a> |

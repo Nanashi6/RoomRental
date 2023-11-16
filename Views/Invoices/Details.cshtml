@@ -23,16 +23,16 @@
             @Html.DisplayFor(model => model.PaymentDate)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RentalOrganizationId)
+            @Html.DisplayNameFor(model => model.RentalOrganization)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.RentalOrganizationId)
+            @Html.DisplayFor(model => model.RentalOrganization.Name)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.ResponsiblePerson)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ResponsiblePerson)
+            @Model.ResponsiblePerson.Surname @Model.ResponsiblePerson.Name @Model.ResponsiblePerson.Lastname
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.RoomId)

@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using RoomRental.Data;
+using RoomRental.Attributes;
 using RoomRental.Models;
 using RoomRental.Services;
 using RoomRental.ViewModels;
@@ -17,39 +10,59 @@ using RoomRental.ViewModels.SortViewModels;
 
 namespace RoomRental.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize]
     public class OrganizationsController : Controller
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         private readonly OrganizationService _cache;
         private readonly int _pageSize = 10;
 
-        public OrganizationsController(RoomRentalsContext context, OrganizationService cache)
+        public OrganizationsController(OrganizationService cache, IHttpContextAccessor httpContextAccessor, IConfiguration appConfig)
         {
             _cache = cache;
+            _httpContextAccessor = httpContextAccessor;
+            _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
         }
 
-        // GET: Organizations
-        public async Task<IActionResult> Index(int page = 1, string organizationNameFind = "", OrganizationSortState sortOrder = OrganizationSortState.NameAsc)
+        // GET/POST: Organizations
+        [HttpGet]
+        [HttpPost]
+        [SetSession("Organization")]
+        public async Task<IActionResult> Index(string organizationNameFind = "", int page = 1, OrganizationSortState sortOrder = OrganizationSortState.NameAsc)
         {
-            var organizationsQuery = await _cache.GetOrganizations();
+            if (HttpContext.Request.Method == "GET")
+            {
+                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Organization");
+
+                if (dict != null)
+                {
+                    organizationNameFind = dict["organizationNameFind"];
+                }
+            }
+
+            var organizationsQuery = await _cache.GetAll();
+
             //Фильтрация
             if (!String.IsNullOrEmpty(organizationNameFind))
+            {
                 organizationsQuery = organizationsQuery.Where(e => e.Name.Contains(organizationNameFind)).ToList();
+            }
 
             //Сортировка
             switch (sortOrder)
             {
-                case OrganizationSortState.NameAsc:
-                    organizationsQuery = organizationsQuery.OrderBy(e => e.Name).ToList();
-                    break;
                 case OrganizationSortState.NameDesc:
                     organizationsQuery = organizationsQuery.OrderByDescending(e => e.Name).ToList();
                     break;
                 case OrganizationSortState.AddressAsc:
                     organizationsQuery = organizationsQuery.OrderBy(e => e.PostalAddress).ToList();
                     break;
-                default:
+                case OrganizationSortState.AddressDesc:
                     organizationsQuery = organizationsQuery.OrderByDescending(e => e.PostalAddress).ToList();
+                    break;
+                default:
+                    organizationsQuery = organizationsQuery.OrderBy(e => e.Name).ToList();
                     break;
             }
 
@@ -72,12 +85,12 @@ namespace RoomRental.Controllers
         // GET: Organizations/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _cache.GetOrganizations() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var organization = _cache.GetOrganization(id).Result;
+            var organization = await _cache.Get(id);
             if (organization == null)
             {
                 return NotFound();
@@ -99,7 +112,7 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                _cache.AddOrganization(organization);
+                await _cache.Add(organization);
                 return RedirectToAction(nameof(Index));
             }
             return View(organization);
@@ -108,12 +121,12 @@ namespace RoomRental.Controllers
         // GET: Organizations/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _cache.GetOrganizations() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var organization = await _cache.GetOrganization(id);
+            var organization = await _cache.Get(id);
             if (organization == null)
             {
                 return NotFound();
@@ -135,11 +148,11 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    _cache.UpdateOrganization(organization);
+                    await _cache.Update(organization);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!OrganizationExists(organization.OrganizationId))
+                    if (!(await OrganizationExists(organization.OrganizationId)))
                     {
                         return NotFound();
                     }
@@ -156,12 +169,12 @@ namespace RoomRental.Controllers
         // GET: Organizations/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _cache.GetOrganizations() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var organization = await _cache.GetOrganization(id);
+            var organization = await _cache.Get(id);
             if (organization == null)
             {
                 return NotFound();
@@ -175,19 +188,19 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_cache.GetOrganizations() == null)
+            if (await _cache.GetAll() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.Organizations' is null.");
             }
 
-            _cache.DeleteOrganization(_cache.GetOrganization(id).Result);
+            await _cache.Delete(await _cache.Get(id));
 
             return RedirectToAction(nameof(Index));
         }
 
-        private bool OrganizationExists(int id)
+        private async Task<bool> OrganizationExists(int id)
         {
-            return (_cache.GetOrganizations().Result?.Any(e => e.OrganizationId == id)).GetValueOrDefault();
+            return ((await _cache.GetAll())?.Any(e => e.OrganizationId == id)).GetValueOrDefault();
         }
     }
 }

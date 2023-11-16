@@ -25,13 +25,13 @@ namespace RoomRental.Controllers
         {
             if (ModelState.IsValid)
             {
-                User user = new User { Email = model.Email, UserName = model.Email, Year = model.Year };
+                User user = new User { Email = model.Email, UserName = model.Login, Surname = model.Surname, Name = model.Name };
                 // добавляем пользователя
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    // установка куки
                     await _userManager.AddToRolesAsync(user, new List<string>() { "User" });
+                    // установка куки
                     await _signInManager.SignInAsync(user, false);
                     return RedirectToAction("Index", "Home");
                 }
@@ -58,7 +58,7 @@ namespace RoomRental.Controllers
             if (ModelState.IsValid)
             {
                 var result =
-                    await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                    await _signInManager.PasswordSignInAsync(model.Login, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
                     // проверяем, принадлежит ли URL приложению
@@ -79,7 +79,6 @@ namespace RoomRental.Controllers
             return View(model);
         }
 
-        [HttpGet]
         public async Task<IActionResult> Logout()
         {
             // удаляем аутентификационные куки

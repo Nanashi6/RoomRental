@@ -1,16 +1,16 @@
 ﻿@model RegisterViewModel
-<h2>Регистрация нового пользователя</h2>
+@* <h2>Регистрация нового пользователя</h2>
 <form method="post" asp-controller="Account" asp-action="Register">
     <div asp-validation-summary="ModelOnly"></div>
+    <div>
+        <label asp-for="Login"></label><br />
+        <input asp-for="Login" />
+        <span asp-validation-for="Login"></span>
+    </div>
     <div>
         <label asp-for="Email"></label><br />
         <input asp-for="Email" />
         <span asp-validation-for="Email"></span>
-    </div>
-    <div>
-        <label asp-for="Year"></label><br />
-        <input asp-for="Year" />
-        <span asp-validation-for="Year"></span>
     </div>
     <div>
         <label asp-for="Password"></label><br />
@@ -25,4 +25,44 @@
     <div>
         <input type="submit" value="Регистрация" />
     </div>
-</form>
+</form> *@
+
+<div class="parent">
+    <div class="loginContainer">
+        <h1 class="loginHeader">Регистрация</h1>
+        <form class="loginForm" method="post" asp-controller="Account" asp-action="Register">
+            <div class="block text-danger" asp-validation-summary="ModelOnly"></div>
+            <div class="block">
+                <input class="loginInput" asp-for="Login" placeholder="Введите логин" />
+                <span asp-validation-for="Login" class="text-danger"></span>
+            </div> 
+            <div class="block">
+                <input class="loginInput" asp-for="Surname" placeholder="Введите фамилию пользователя" />
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>  
+            <div class="block">
+                <input class="loginInput" asp-for="Name" placeholder="Введите имя пользователя" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="block">
+                <input class="loginInput" asp-for="Email" placeholder="Введите электронную почту" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="block">
+                <input class="loginInput" asp-for="Password" placeholder="Введите пароль" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="block">
+                <input class="loginInput" asp-for="PasswordConfirm" placeholder="Подтвердите пароль" />
+                <span asp-validation-for="PasswordConfirm" class="text-danger"></span>
+            </div>
+            <div class="block">
+                <input class="submitButton" type="submit" value="Регистрация" />
+            </div>
+            <div class="block">
+                <label>Уже есть аккаунт?</label>
+                <a asp-area="" asp-controller="Account" asp-action="Login">Войти</a>
+            </div>
+        </form>
+    </div>
+</div>

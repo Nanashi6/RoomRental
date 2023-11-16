@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using RoomRental.Data;
 using RoomRental.Models;
 using RoomRental.Services;
-using System.Security.Principal;
 
 namespace RoomRental
 {
@@ -22,10 +20,11 @@ namespace RoomRental
         public void ConfigureServices(IServiceCollection services)
         {
             string connection = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<RoomRentalsContext>(options => options.UseSqlServer(connection));
+            services.AddDbContext<RoomRentalsContext>(options => options.UseSqlServer(connection), ServiceLifetime.Scoped);
 
             //Добавление классов авторизации
-            services.AddIdentity<User, IdentityRole>(opts => {
+            services.AddIdentity<User, IdentityRole>(opts =>
+            {
                 opts.User.RequireUniqueEmail = true;    // уникальный email
                 opts.Password.RequiredLength = 6;   // минимальная длина
                 opts.Password.RequireNonAlphanumeric = false;   // требуются ли не алфавитно-цифровые символы
@@ -35,30 +34,47 @@ namespace RoomRental
             })
                 .AddEntityFrameworkStores<RoomRentalsContext>();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
-                    options.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
-                });
+            /*            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                            .AddCookie(options =>
+                            {
+                                options.LoginPath = new PathString("/Account/Login");
+                                options.AccessDeniedPath = new PathString("/Account/Login");
+                            });*/
 
-            // добавление кэширования
-            services.AddMemoryCache();
             // внедрение зависимости CachedService
             services.AddScoped<OrganizationService>();
             services.AddScoped<BuildingService>();
             services.AddScoped<RoomService>();
+            services.AddScoped<RoomImageService>();
             services.AddScoped<RentalService>();
             services.AddScoped<InvoiceService>();
             services.AddScoped<PeopleService>();
 
-            services.AddMvc();
-            services.AddControllersWithViews(mvcOtions =>
+            // добавление кэширования
+            services.AddMemoryCache();
+
+            //Добавление сессий
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
             {
-                mvcOtions.EnableEndpointRouting = false;
+                options.Cookie.Name = ".RoomRental.Session";
+                //options.IdleTimeout = System.TimeSpan.FromSeconds(2*10+240);
+                options.Cookie.IsEssential = true;
+            });
+
+            services.AddHttpContextAccessor();
+
+            services.AddRazorPages().AddRazorRuntimeCompilation();
+            services.AddMvc();
+
+            //Отключение конечных точек
+            services.AddControllersWithViews(mvcOptions =>
+            {
+                mvcOptions.EnableEndpointRouting = false;
             });
         }
 
+        [Obsolete]
         public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
             if (env.IsDevelopment())
@@ -69,8 +85,11 @@ namespace RoomRental
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.UseSession();
 
             app.UseAuthentication();    // аутентификация
             app.UseAuthorization();     // авторизация

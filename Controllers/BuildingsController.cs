@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using RoomRental.Data;
+using RoomRental.Attributes;
 using RoomRental.Models;
 using RoomRental.Services;
 using RoomRental.ViewModels;
@@ -12,42 +12,55 @@ using RoomRental.ViewModels.SortViewModels;
 
 namespace RoomRental.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize]
     public class BuildingsController : Controller
     {
         private readonly BuildingService _cache;
         private readonly OrganizationService _organizationCache;
         private readonly int _pageSize = 10;
+        private readonly IWebHostEnvironment _appEnvironment;
 
-        public BuildingsController(BuildingService cache, OrganizationService organizationCache)
+        public BuildingsController(BuildingService cache, OrganizationService organizationCache, IWebHostEnvironment appEnvironment, IConfiguration appConfig)
         {
             _cache = cache;
             _organizationCache = organizationCache;
+            _appEnvironment = appEnvironment;
+            _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
         }
 
         // GET: Buildings
-        public async Task<IActionResult> Index(int page = 1, string buildingNameFind = "", string organizationNameFind = "", string addressFind = "",
-                                                int? floorsFind = null, BuildingSortState sortOrder = BuildingSortState.NameAsc)
+        [SetSession("Building")]
+        public async Task<IActionResult> Index(BuildingFilterViewModel filterViewModel, int page = 1, BuildingSortState sortOrder = BuildingSortState.NameAsc)
         {
-            var buildingsQuery = await _cache.GetBuildings();
-            var organizationsQuery = await _organizationCache.GetOrganizations();
-            //Формирование осмысленных связей
-            var buildings = new List<BuildingViewModel>();
-            foreach (var item in buildingsQuery)
+            if (HttpContext.Request.Method == "GET")
             {
-                var organization = organizationsQuery.Single(e => e.OrganizationId == item.OwnerOrganizationId);
-                buildings.Add(new BuildingViewModel(item.BuildingId, item.Name, organization.Name, item.PostalAddress, item.Floors, item.Description, item.FloorPlan));
+                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Building");
+
+                if (dict != null)
+                {
+                    filterViewModel.AddressFind = dict["AddressFind"];
+                    filterViewModel.BuildingNameFind = dict["BuildingNameFind"];
+                    filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
+
+                    int floorsFind;
+                    if (dict.ContainsKey("FloorsFind") && int.TryParse(dict["FloorsFind"], out floorsFind))
+                        filterViewModel.FloorsFind = floorsFind;
+                    else
+                        filterViewModel.FloorsFind = null;
+                }
             }
 
+            var buildings = await _cache.GetAll();
+
             //Фильтрация
-            if (!String.IsNullOrEmpty(buildingNameFind))
-                buildings = buildings.Where(e => e.Name.Contains(buildingNameFind)).ToList();
-            if (!String.IsNullOrEmpty(addressFind))
-                buildings = buildings.Where(e => e.PostalAddress.Contains(addressFind)).ToList();
-            if (!String.IsNullOrEmpty(organizationNameFind))
-                buildings = buildings.Where(e => e.OwnerOrganization.Contains(organizationNameFind)).ToList();
-            if (floorsFind != null)
-                buildings = buildings.Where(e => e.Floors == floorsFind).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.BuildingNameFind))
+                buildings = buildings.Where(e => e.Name.Contains(filterViewModel.BuildingNameFind)).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.AddressFind))
+                buildings = buildings.Where(e => e.PostalAddress.Contains(filterViewModel.AddressFind)).ToList();
+            if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
+                buildings = buildings.Where(e => e.OwnerOrganization.Name.Contains(filterViewModel.OrganizationNameFind)).ToList();
+            if (filterViewModel.FloorsFind != null)
+                buildings = buildings.Where(e => e.Floors == filterViewModel.FloorsFind).ToList();
 
             //Сортировка
             switch (sortOrder)
@@ -65,10 +78,10 @@ namespace RoomRental.Controllers
                     buildings = buildings.OrderByDescending(e => e.PostalAddress).ToList();
                     break;
                 case BuildingSortState.OrganizationNameAsc:
-                    buildings = buildings.OrderBy(e => e.OwnerOrganization).ToList();
+                    buildings = buildings.OrderBy(e => e.OwnerOrganization.Name).ToList();
                     break;
                 case BuildingSortState.OrganizationNameDesc:
-                    buildings = buildings.OrderByDescending(e => e.OwnerOrganization).ToList();
+                    buildings = buildings.OrderByDescending(e => e.OwnerOrganization.Name).ToList();
                     break;
                 case BuildingSortState.FloorsAsc:
                     buildings = buildings.OrderBy(e => e.Floors).ToList();
@@ -87,7 +100,7 @@ namespace RoomRental.Controllers
             {
                 Buildings = buildings,
                 PageViewModel = new PageViewModel(page, count, _pageSize),
-                FilterViewModel = new BuildingFilterViewModel(buildingNameFind, organizationNameFind, addressFind, floorsFind),
+                FilterViewModel = filterViewModel,
                 SortViewModel = new RoomSortrViewModel(sortOrder)
             };
 
@@ -97,71 +110,71 @@ namespace RoomRental.Controllers
         // GET: Buildings/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _cache.GetBuildings() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var building = _cache.GetBuilding(id).Result;
+            var building = await _cache.Get(id);
             if (building == null)
             {
                 return NotFound();
             }
-
+            
             return View(building);
         }
 
         // GET: Buildings/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["OwnerOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name");
+            ViewData["OwnerOrganizationId"] = new SelectList((await _organizationCache.GetAll()), "OrganizationId", "Name");
             return View();
         }
 
         // POST: Buildings/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlan")] BuildingBindModel building/*int BuildingId, string Name, int OwnerOrganizationId, string PostalAddress, int Floors, string Description, IFormFile FloorPlan*/)
+        public async Task<IActionResult> Create([Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlanImage")] Building building)
         {
             if (ModelState.IsValid)
             {
-                _cache.AddBuilding(new Building()
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(building.FloorPlanImage.FileName);
+
+                using (var fileStream = new FileStream(_appEnvironment.WebRootPath + Path.Combine("\\images\\FloorPlans\\", fileName), FileMode.Create))
                 {
-                    BuildingId = building.BuildingId,
-                    Name = building.Name,
-                    OwnerOrganizationId = building.OwnerOrganizationId,
-                    PostalAddress = building.PostalAddress,
-                    Floors = building.Floors,
-                    Description = building.Description,
-                    FloorPlan = ConvertIFormFileToByteArray(building.FloorPlan)
-                });
+                    await building.FloorPlanImage.CopyToAsync(fileStream);
+                }
+
+                building.FloorPlan = Path.Combine("\\images\\FloorPlans\\", fileName);
+                await _cache.Add(building);
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["OwnerOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name", building.OwnerOrganizationId);
+            ViewData["OwnerOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", building.OwnerOrganizationId);
             return View(building);
         }
 
         // GET: Buildings/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _cache.GetBuildings() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var building = await _cache.GetBuilding(id);
+            var building = await _cache.Get(id);
             if (building == null)
             {
                 return NotFound();
             }
-            ViewData["OwnerOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name", building.OwnerOrganizationId);
+            ViewData["OwnerOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", building.OwnerOrganizationId);
             return View(building);
         }
 
         // POST: Buildings/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlan")] BuildingBindModel building)
+        public async Task<IActionResult> Edit(int id, [Bind("BuildingId,Name,OwnerOrganizationId,PostalAddress,Floors,Description,FloorPlanImage")] Building building)
         {
             if (id != building.BuildingId)
             {
@@ -172,20 +185,19 @@ namespace RoomRental.Controllers
             {
                 try
                 {
-                    _cache.UpdateBuilding(new Building()
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(building.FloorPlanImage.FileName);
+
+                    using (var fileStream = new FileStream(_appEnvironment.WebRootPath + Path.Combine("\\images\\FloorPlans\\", fileName), FileMode.Create))
                     {
-                        BuildingId = building.BuildingId,
-                        Name = building.Name,
-                        OwnerOrganizationId = building.OwnerOrganizationId,
-                        PostalAddress = building.PostalAddress,
-                        Floors = building.Floors,
-                        Description = building.Description,
-                        FloorPlan = ConvertIFormFileToByteArray(building.FloorPlan)
-                    });
+                        await building.FloorPlanImage.CopyToAsync(fileStream);
+                    }
+
+                    building.FloorPlan = Path.Combine("\\images\\FloorPlans\\", fileName);
+                    await _cache.Update(building);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BuildingExists(building.BuildingId))
+                    if (!(await BuildingExists(building.BuildingId)))
                     {
                         return NotFound();
                     }
@@ -196,19 +208,19 @@ namespace RoomRental.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["OwnerOrganizationId"] = new SelectList(_organizationCache.GetOrganizations().Result, "OrganizationId", "Name", building.OwnerOrganizationId);
+            ViewData["OwnerOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", building.OwnerOrganizationId);
             return View(building);
         }
 
         // GET: Buildings/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _cache.GetBuildings() == null)
+            if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
             }
 
-            var building = await _cache.GetBuilding(id);
+            var building = await _cache.Get(id);
             if (building == null)
             {
                 return NotFound();
@@ -222,27 +234,19 @@ namespace RoomRental.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_cache.GetBuildings() == null)
+            if (await _cache.GetAll() == null)
             {
                 return Problem("Entity set 'RoomRentalsContext.Buildings'  is null.");
             }
 
-            _cache.DeleteBuilding(_cache.GetBuilding(id).Result);
+            await _cache.Delete(await _cache.Get(id));
 
             return RedirectToAction(nameof(Index));
         }
 
-        private bool BuildingExists(int id)
+        private async Task<bool> BuildingExists(int id)
         {
-            return (_cache.GetBuildings().Result?.Any(e => e.BuildingId == id)).GetValueOrDefault();
-        }
-        public byte[] ConvertIFormFileToByteArray(IFormFile file)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                file.CopyTo(memoryStream);
-                return memoryStream.ToArray();
-            }
+            return ((await _cache.GetAll())?.Any(e => e.BuildingId == id)).GetValueOrDefault();
         }
     }
 }
