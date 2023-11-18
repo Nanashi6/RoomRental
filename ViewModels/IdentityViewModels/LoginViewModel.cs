@@ -4,11 +4,11 @@ namespace RoomRental.ViewModels.IdentityViewModels
 {
     public class LoginViewModel
     {
-        [Required]
-        [Display(Name = "Login")]
+        [Required(ErrorMessage = "Необходимо указать логин")]
+        [Display(Name = "Логин")]
         public string Login { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Необходимо указать пароль")]
         [DataType(DataType.Password)]
         [Display(Name = "Пароль")]
         public string Password { get; set; }

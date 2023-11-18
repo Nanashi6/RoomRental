@@ -18,7 +18,7 @@ html, body {
 }
 
 .wrapper {
-    min-height:100%;
+    min-height: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -64,18 +64,18 @@ main, .container {
     margin-top: 10px;
 }
 
-.block a {
-    color: #e84545;
-    transition: linear 0.2s;
-}
+    .block a {
+        color: #e84545;
+        transition: linear 0.2s;
+    }
 
-.block a:hover {
-    color: #e52e2e;
-}
+        .block a:hover {
+            color: #e52e2e;
+        }
 
-.block ul {
-    padding: 0;
-}
+    .block ul {
+        padding: 0;
+    }
 
 .parent {
     background: #3a3e64;
@@ -113,23 +113,23 @@ main, .container {
     transition: linear 0.3s;
 }
 
-.submitButton:hover {
-    cursor: pointer;
-    background: #e52e2e;
-}
+    .submitButton:hover {
+        cursor: pointer;
+        background: #e52e2e;
+    }
 
 /*ѕанель навигации*/
-/*header {
+header {
     border-bottom: 2px solid black;
     background: #3a3e64;
 }
 
-header > div {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 15px 0;
-}
+    header > div {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 15px 0;
+    }
 
 nav {
     display: inline-flex;
@@ -138,18 +138,18 @@ nav {
     width: 100%;
 }
 
-nav > div > a {
-    color: rgba(255, 255, 255, 0.75);
-    font-size: 13px;
-    font-weight: 700;
-    margin-left: 10px;
-    text-transform: uppercase;
-    transition: 0.2s;
-}
+    nav > div > a {
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 13px;
+        font-weight: 700;
+        margin-left: 10px;
+        text-transform: uppercase;
+        transition: 0.2s;
+    }
 
-nav > div > a:hover {
-    color: #fff;
-}
+        nav > div > a:hover {
+            color: #fff;
+        }
 
 .logo > a {
     color: rgba(255, 255, 255, 0.582);
@@ -160,9 +160,9 @@ nav > div > a:hover {
     transition: 0.2s;
 }
 
-.logo > a:hover {
-    color: #fff;
-}
+    .logo > a:hover {
+        color: #fff;
+    }
 
 .nav-log-elements:last-child {
     margin-right: 40px;
@@ -170,38 +170,93 @@ nav > div > a:hover {
 
 .nav-tables:first-child {
     margin-left: 40px;
-}*/
+}
+
+.user-ref {
+    color: white;
+}
+
+    .user-ref:hover {
+        color: #e84545;
+    }
 /*ѕанель навигации*/
 
 /*Home/Privacy*/
-/*.text-center {
+.text-center {
     text-align: center;
-}*/
+}
 /*Home/Privacy*/
 
 /*Index*/
-/*.index-container {
+.index-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex: 1 1 auto;
 }
 
 .form-container {
+    background: #3a3e64;
+    width: 30%;
+    margin: 5px 0;
+    border-radius: 0px 3px 3px 0px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tabs {
     position: relative;
-    background: #53354a;
-    border-radius: 2px 0 0 2px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+    .tabs h3 {
+        width: 50%;
+        padding: 5px;
+        color: white;
+    }
+
+    .tabs div {
+        width: 100%;
+        position: relative;
+        display: flex;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+        .tabs div a {
+            background-color: #e84545;
+            /*            border-top: 2px solid #e84545;
+            border-right: 2px solid #e84545;
+            border-bottom: 2px solid inherit;
+            border-left: 2px solid inherit;*/
+            border-radius: 0px 3px 0px 15px;
+            display: block;
+            padding: 7px 5px 5px 5px; /*7px 7px*/
+            width: 100%;
+            color: white;
+            transition: linear 0.3s;
+        }
+
+            .tabs div a:hover {
+                background-color: #e52e2e;
+/*                padding: 7px 5px 5px 5px;
+                border: 2px solid #e52e2e;*/
+            }
+
+.form-container_two {
+    padding-top: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-.form-container > form {
-    display: flex;
-    flex-direction: column;
-    width: 90%;
-    position: relative;
-}
+    .form-container_two > form {
+        display: flex;
+        flex-direction: column;
+        width: 90%;
+    }
 
 .submitButton-index {
     text-decoration: none;
@@ -216,12 +271,13 @@ nav > div > a:hover {
     color: white;
     background: #e84545;
     transition: linear 0.3s;
+    width: 100%;
 }
 
-.submitButton-index:hover {
-    cursor: pointer;
-    background: #e52e2e;
-}
+    .submitButton-index:hover {
+        cursor: pointer;
+        background: #e52e2e;
+    }
 
 .filter-input {
     margin-top: 10px;
@@ -235,6 +291,7 @@ nav > div > a:hover {
 
 .table-container {
     padding: 0 5%;
+    width: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -245,8 +302,8 @@ nav > div > a:hover {
 
 .element {
     padding: 10px 15px;
-    text-align: center;*/ /*ћб убрать выравнивание внутри €чеек*/
-/*}
+    text-align: center; /*ћб убрать выравнивание внутри €чеек*/
+}
 
 .table-container > h1 {
     text-align: center;
@@ -263,10 +320,9 @@ nav > div > a:hover {
     border-collapse: collapse;
 }
 
-.table > thead{
-    border-bottom: 2px solid black;
-}
-
+    .table > thead {
+        border-bottom: 2px solid black;
+    }
 .pagination {
     display: flex;
 }
@@ -277,32 +333,125 @@ nav > div > a:hover {
 
 .page-item {
     padding: 6px 8px;
-    border-color: rgba(87, 87, 87, 0.7);;
+    border-color: rgba(87, 87, 87, 0.7);
 }
 
 .active {
     background: rgba(13,108,253,1);
 }
 
-.active > .page-link {
-    color: white;
-}
+    .active > .page-link {
+        color: white;
+    }
 
 a {
     color: rgba(13,108,253,1);
-}*/
+}
+
+.btn {
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 2px;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn-danger {
+    color: #fff;
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+    .btn-danger:hover {
+        color: #fff;
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+    }
+
+.btn-primary {
+    color: #fff;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+    .btn-primary:hover {
+        color: #fff;
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+    }
+
+.btn-secondary {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+    .btn-secondary:hover {
+        color: #fff;
+        background-color: #5c636a;
+        border-color: #565e64;
+    }
 /*Index*/
 
+/*Create / Edit*/
+.create-form-container {
+    position: relative;
+    width: fit-content;
+    margin: 0 auto;
+    width: 26%;
+}
+    .create-form-container form {
+        display: flex;
+        flex-direction: column;
+    }
+
+.container {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    justify-items: center;
+}
+.container h1 {
+    display: inline;
+    margin: 0 auto;
+    border-bottom: 1px solid black;
+}
+
+.buttons{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+/*Create / Edit*/
+
+/*Details / Delete*/
+.det-container {
+    margin-top: 10px;
+}
+    .det-container div {
+        margin-top: 5px;
+    }
+/*Details / Delete*/
+
+
 /*FOOTER*/
-/*footer {
+footer {
     background-color: #3a3e64;
-}*/
+}
+
 footer {
     border-top: 1px solid rgba(87,87,87,0.4);
 }
 
 .footer_copyright {
-    /*background-color: #313454;*/
+    background-color: #313454;
     padding: 20px 0;
 }
 
@@ -313,17 +462,26 @@ footer {
     text-align: center;
 }
 
-.copyright_text span a {
-    color: mediumblue;
-    transition: linear 0.2s;
-}
+    .copyright_text span a {
+        color: white;
+        transition: linear 0.2s;
+    }
 
-.copyright_text span a:hover {
-    color: #e52e2e;
-}
+        .copyright_text span a:hover {
+            color: #e52e2e;
+        }
 /*Image*/
 
 .image {
     width: 200px;
     height: 200px;
+}
+
+input,
+input::placeholder {
+    font-size: 16px;
+}
+
+.text-danger {
+    color: red;
 }

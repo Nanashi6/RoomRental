@@ -4,7 +4,7 @@
     ViewData["Title"] = "Delete";
 }
 
-<h1>Delete</h1>
+@* <h1>Delete</h1>
 
 <h3>Are you sure you want to delete this?</h3>
 <div>
@@ -30,4 +30,27 @@
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
+</div> *@
+
+<div class="container">
+    <h1>Удаление организации</h1>
+
+    <h3>Вы действительно хотите удалить эту запись?</h3>
+    <div class="det-container">
+        <div>
+            @Html.DisplayNameFor(model => model.Name):
+            @Html.DisplayFor(model => model.Name)
+        </div>
+        <div>
+            @Html.DisplayNameFor(model => model.PostalAddress):
+            @Html.DisplayFor(model => model.PostalAddress)
+        </div>
+    </div>
+    <div class="det-container">
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="OrganizationId" />
+            <input type="submit" value="Удалить" class="btn btn-danger" /> |
+            <a asp-action="Index" class="btn btn-primary">Возврат к списку</a>
+        </form>
+    </div>
 </div>

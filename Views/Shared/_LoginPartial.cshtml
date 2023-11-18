@@ -1,32 +1,21 @@
-﻿@inject SignInManager<User> SignInManager
+﻿@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 
-<ul class="navbar-nav nav-login-panel">
+<div class="nav-log-elements">
     @if (User.Identity.IsAuthenticated)
     {
         if (User.IsInRole("Admin"))
         {
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Roles" asp-action="Index">Roles</a>
-            </li>
+            <a asp-area="" asp-controller="Users" asp-action="Index">Пользователи</a>
+            <a asp-area="" asp-controller="Roles" asp-action="Index">Роли</a>
         }
-        <li class="nav-item">
-            <a class="nav-link text-dark">@User.Identity.Name</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
-        </li>
+        <a class="user-ref">@User.Identity.Name</a>
+        <a asp-area="" asp-controller="Account" asp-action="Logout">Выход</a>
     }
     else
     {
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-        </li>
+        <a asp-area="" asp-controller="Account" asp-action="Register">Регистрация</a>
+        <a asp-area="" asp-controller="Account" asp-action="Login">Вход</a>
     }
-</ul>
+</div>

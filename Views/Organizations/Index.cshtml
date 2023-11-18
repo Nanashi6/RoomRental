@@ -4,6 +4,82 @@
     string organizationNameFind = Model.OrganizationNameFind;
 }
 
+<div class="index-container">
+    <div class="form-container">
+        <div class="tabs">
+            <h3>Фильтрация</h3>
+            <div><a asp-action="Create">Создать</a></div>
+        </div>
+        <div class="form-container_two">
+            <form method="post">
+                <input class="filter-input" name="organizationNameFind" value="@organizationNameFind" placeholder="Название организации" />
+                <input class="filter-input" type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
+                <input class="submitButton-index" type="submit" value="Искать" />
+            </form>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h1>Организации</h1>
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.NameSort)"
+                               asp-route-organizationNameFind="@organizationNameFind">
+                                @Html.DisplayNameFor(model => model.Organizations.SingleOrDefault().Name)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.AddressSort)"
+                               asp-route-organizationNameFind="@organizationNameFind">
+                                @Html.DisplayNameFor(model => model.Organizations.SingleOrDefault().PostalAddress)
+                            </a>
+                        </th>
+                        <th class="element"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Organizations)
+                    {
+                        <tr class="row">
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.PostalAddress)
+                            </td>
+                            <td class="element">
+                                <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.OrganizationId">Изменить</a> |
+                                <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.OrganizationId">Подробнее</a> |
+                                <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.OrganizationId">Удалить</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <page-link page-model="Model.PageViewModel" page-action="Index"
+                   page-url-sortOrder="@(Model.SortViewModel.Current)"
+                   page-url-organizationNameFind="@organizationNameFind"></page-link>
+    </div>
+</div>
+
+
+
+
+@*
+
+@model RoomRental.ViewModels.OrganizationsViewModel
+@{
+    ViewData["Title"] = "Organizations";
+    string organizationNameFind = Model.OrganizationNameFind;
+}
+
 <h1>Organizations</h1>
 
 <form method="post">
@@ -59,3 +135,5 @@
 <page-link page-model="Model.PageViewModel" page-action="Index"
            page-url-sortOrder="@(Model.SortViewModel.Current)"
            page-url-organizationNameFind="@organizationNameFind"></page-link>
+
+*@

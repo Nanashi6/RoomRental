@@ -1,27 +1,5 @@
 ﻿@model LoginViewModel
 
-@* <h2>Вход в приложение</h2>
-<div>
-    <form method="post" asp-controller="Account" asp-action="Login"
-          asp-route-returnUrl="@Model.ReturnUrl">
-        <div asp-validation-summary="ModelOnly"></div>
-        <div>
-            <label asp-for="Login"></label><br />
-            <input asp-for="Login" />
-            <span asp-validation-for="Login"></span>
-        </div>
-        <div>
-            <label asp-for="Password"></label><br />
-            <input asp-for="Password" />
-            <span asp-validation-for="Password"></span>
-        </div>
-        <div>
-            <input type="submit" value="Войти" />
-        </div>
-    </form>
-</div> *@
-
-
 <div class="parent">
     <div class="loginContainer">
         <h1 class="loginHeader">Вход</h1>

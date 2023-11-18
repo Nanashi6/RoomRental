@@ -8,17 +8,26 @@ public partial class Room
 {
     [Display(Name = "Идентификатор")]
     public int RoomId { get; set; }
+
+    [Required(ErrorMessage = "Не указано здание")]
     [Display(Name = "Здание")]
     public int BuildingId { get; set; }
+
+    [Required(ErrorMessage = "Не указана площадь")]
     [Display(Name = "Площадь")]
     public decimal Area { get; set; }
+
+    [Required(ErrorMessage = "Не указано описание")]
     [Display(Name = "Описание")]
     public string Description { get; set; }
+    [Required(ErrorMessage = "Не указано фото")]
     [NotMapped]
     public List<IFormFile> Photos { get; set; }
+
     [Display(Name = "Здание")]
     [ValidateNever]
     public virtual Building Building { get; set; }
+
     [Display(Name = "Фото")]
     public virtual ICollection<RoomImage> RoomImages { get; set; } = new List<RoomImage>();
 

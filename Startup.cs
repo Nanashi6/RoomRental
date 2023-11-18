@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RoomRental.Data;
+using RoomRental.ErrorDescribers;
 using RoomRental.Models;
 using RoomRental.Services;
 
@@ -32,14 +33,9 @@ namespace RoomRental
                 opts.Password.RequireUppercase = false; // требуются ли символы в верхнем регистре
                 opts.Password.RequireDigit = false; // требуются ли цифры
             })
-                .AddEntityFrameworkStores<RoomRentalsContext>();
-
-            /*            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                            .AddCookie(options =>
-                            {
-                                options.LoginPath = new PathString("/Account/Login");
-                                options.AccessDeniedPath = new PathString("/Account/Login");
-                            });*/
+                .AddErrorDescriber<RussianIdentityErrorDescriber>()
+                .AddEntityFrameworkStores<RoomRentalsContext>()
+                .AddDefaultTokenProviders();
 
             // внедрение зависимости CachedService
             services.AddScoped<OrganizationService>();
@@ -74,7 +70,6 @@ namespace RoomRental
             });
         }
 
-        [Obsolete]
         public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
             if (env.IsDevelopment())

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+@* <h1>Edit</h1>
 
 <h4>Organization</h4>
 <hr />
@@ -32,7 +32,27 @@
 
 <div>
     <a asp-action="Index">Back to List</a>
+</div> *@
+
+
+<div class="container">
+    <h1>Редактирование организации</h1>
+    <div class="create-form-container">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input class="filter-input" type="hidden" asp-for="OrganizationId" />
+            <input class="filter-input" asp-for="Name" class="form-control" placeholder="Название организации" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+            <input class="filter-input" asp-for="PostalAddress" class="form-control" placeholder="Почтовый адрес" />
+            <span asp-validation-for="PostalAddress" class="text-danger"></span>
+            <div class="buttons">
+                <button class="submitButton-index btn-primary" asp-action="Index">Возврат к списку</button>
+                <input class="submitButton-index" type="submit" value="Сохранить" />
+            </div>
+        </form>
+    </div>
 </div>
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

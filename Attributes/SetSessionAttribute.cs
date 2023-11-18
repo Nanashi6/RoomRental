@@ -20,15 +20,18 @@ namespace RoomRental.Attributes
         // Выполняется после выполнения метода контроллера
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            Dictionary<string, string> dict = new Dictionary<string, string>();
-            // считывание данных из ModelState и запись в сессию
-            if (context.ModelState.Count > 0)
+            if(context.HttpContext.Request.Method == "POST")
             {
-                foreach (var item in context.ModelState)
+                Dictionary<string, string> dict = new Dictionary<string, string>();
+                // считывание данных из ModelState и запись в сессию
+                if (context.ModelState.Count > 0)
                 {
-                    dict.Add(item.Key, item.Value.AttemptedValue);
+                    foreach (var item in context.ModelState)
+                    {
+                        dict.Add(item.Key, item.Value.AttemptedValue);
+                    }
+                    Infrastructure.SessionExtensions.Set(context.HttpContext.Session, _name, dict);
                 }
-                Infrastructure.SessionExtensions.Set(context.HttpContext.Session, _name, dict);
             }
         }
     }
