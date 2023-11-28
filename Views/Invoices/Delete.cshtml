@@ -4,7 +4,42 @@
     ViewData["Title"] = "Delete";
 }
 
-<h1>Delete</h1>
+<div class="container">
+    <h1>Удаление организации</h1>
+
+    <h3>Вы действительно хотите удалить эту запись?</h3>
+    <div class="det-container">
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Amount):</label>
+            @Html.DisplayFor(model => model.Amount)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.PaymentDate):</label>
+            @Html.DisplayFor(model => model.PaymentDate)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.RentalOrganization):</label>
+            @Html.DisplayFor(model => model.RentalOrganization.Name)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.ResponsiblePerson):</label>
+            @Model.ResponsiblePerson.Surname @Model.ResponsiblePerson.Name @Model.ResponsiblePerson.Lastname
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Room):</label>
+            @(Model.Room.Building.Name), № @(Model.Room.RoomNumber)
+        </div>
+    </div>
+    <div class="det-container">
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="InvoiceId" />
+            <input type="submit" value="Удалить" class="btn btn-danger" /> |
+            <a asp-action="Index" class="btn btn-primary">Возврат к списку</a>
+        </form>
+    </div>
+</div>
+
+@* <h1>Delete</h1>
 
 <h3>Are you sure you want to delete this?</h3>
 <div>
@@ -48,4 +83,4 @@
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
-</div>
+</div> *@

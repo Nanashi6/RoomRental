@@ -6,6 +6,97 @@
     string lastnameFind = Model.FilterViewModel.LastnameFind;
 }
 
+
+<div class="index-container">
+    <div class="form-container">
+        <div class="tabs">
+            <h3>Фильтрация</h3>
+            <div><a asp-action="Create">Создать</a></div>
+        </div>
+        <div class="form-container_two">
+            <form method="post">
+
+                <input class="filter-input" name="SurnameFind" value="@surnameFind" placeholder="Фамилия" />
+
+                <input class="filter-input" name="NameFind" value="@nameFind" placeholder="Имя" />
+
+                <input class="filter-input" name="LastnameFind" value="@lastnameFind" placeholder="Отчество" />
+
+                <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
+                <input class="submitButton-index" type="submit" value="Искать" />
+            </form>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h1>Оформляющие</h1>
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.SurnameSort)"
+                               asp-route-surnameFind="@surnameFind"
+                               asp-route-nameFind="@nameFind"
+                               asp-route-lastnameFind="@lastnameFind">
+                                @Html.DisplayNameFor(model => model.People.SingleOrDefault().Surname)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.NameSort)"
+                               asp-route-surnameFind="@surnameFind"
+                               asp-route-nameFind="@nameFind"
+                               asp-route-lastnameFind="@lastnameFind">
+                                @Html.DisplayNameFor(model => model.People.SingleOrDefault().Name)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.LastnameSort)"
+                               asp-route-surnameFind="@surnameFind"
+                               asp-route-nameFind="@nameFind"
+                               asp-route-lastnameFind="@lastnameFind">
+                                @Html.DisplayNameFor(model => model.People.SingleOrDefault().Lastname)
+                            </a>
+                        </th>
+                        <th class="element"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.People)
+                    {
+                        <tr class="row">
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.Surname)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.Lastname)
+                            </td>
+                            <td class="element">
+                                <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.PersonId">Изменить</a> |
+                                <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.PersonId">Подробнее</a> |
+                                <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.PersonId">Удалить</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <page-link page-model="Model.PageViewModel" page-action="Index"
+                   page-url-sortOrder="@(Model.SortViewModel.Current)"
+                   page-url-surnameFind="@surnameFind"
+                   page-url-nameFind="@nameFind"
+                   page-url-lastnameFind="@lastnameFind"></page-link>
+    </div>
+</div>
+
+@* 
 <h1>People</h1>
 
 <p>
@@ -85,4 +176,4 @@
            page-url-sortOrder="@(Model.SortViewModel.Current)"
            page-url-surnameFind="@surnameFind"
            page-url-nameFind="@nameFind"
-           page-url-lastnameFind="@lastnameFind"></page-link>
+           page-url-lastnameFind="@lastnameFind"></page-link> *@

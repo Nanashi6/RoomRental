@@ -6,6 +6,101 @@
     DateTime? checkOutDateFind = Model.FilterViewModel.CheckOutDateFind;
 }
 
+
+<div class="index-container">
+    <div class="form-container">
+        <div class="tabs">
+            <h3>Фильтрация</h3>
+            <div><a asp-action="Create">Создать</a></div>
+        </div>
+        <div class="form-container_two">
+            <form method="post">
+                <input class="filter-input" name="OrganizationNameFind" value="@organizationNameFind"  placeholder="Название организации"/>
+
+                <input class="filter-input" type="date" name="CheckInDateFind" value="@checkInDateFind?.ToString("yyyy-MM-dd")"  placeholder="Дата въезда"/>
+
+                <input class="filter-input" type="date" name="CheckOutDateFind" value="@checkOutDateFind?.ToString("yyyy-MM-dd")"  placeholder="Дата выезда"/>
+
+                <input class="filter-input" type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
+                <input class="submitButton-index" type="submit" value="Искать" />
+            </form>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h1>Организации</h1>
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="element">
+                            @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RoomId)
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.OrganizationNameSort)"
+                               asp-route-organizationNameFind="@organizationNameFind"
+                               asp-route-checkInDateFind="@checkInDateFind"
+                               asp-route-checkOutDateFind="@checkOutDateFind">
+                                @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RentalOrganization)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.CheckInDateSort)"
+                               asp-route-organizationNameFind="@organizationNameFind"
+                               asp-route-checkInDateFind="@checkInDateFind"
+                               asp-route-checkOutDateFind="@checkOutDateFind">
+                                @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().CheckInDate)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.CheckOutDateSort)"
+                               asp-route-organizationNameFind="@organizationNameFind"
+                               asp-route-checkInDateFind="@checkInDateFind"
+                               asp-route-checkOutDateFind="@checkOutDateFind">
+                                @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().CheckOutDate)
+                            </a>
+                        </th>
+                        <th class="element"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Rentals)
+                    {
+                        <tr class="row">
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.Room.Building.Name), №@Html.DisplayFor(modelItem => item.Room.RoomNumber)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.RentalOrganization.Name)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.CheckInDate)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.CheckOutDate)
+                            </td>
+                            <td class="element">
+                                <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.RentalId">Edit</a> |
+                                <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.RentalId">Details</a> |
+                                <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.RentalId">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <page-link page-model="Model.PageViewModel" page-action="Index"
+                   page-url-sortOrder="@(Model.SortViewModel.Current)"
+                   page-url-organizationNameFind="@organizationNameFind"
+                   page-url-checkInDateFind="@checkInDateFind"
+                   page-url-checkOutDateFind="@checkOutDateFind"></page-link>
+    </div>
+</div>
+@* 
 <h1>Rentals</h1>
 
 <p>
@@ -67,7 +162,7 @@
 @foreach (var item in Model.Rentals) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.RoomId)
+                    @Html.DisplayFor(modelItem => item.Room.Building.Name), №@Html.DisplayFor(modelItem => item.Room.RoomNumber)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.RentalOrganization.Name)
@@ -92,4 +187,4 @@
            page-url-sortOrder="@(Model.SortViewModel.Current)"
            page-url-organizationNameFind="@organizationNameFind"
            page-url-checkInDateFind="@checkInDateFind"
-           page-url-checkOutDateFind="@checkOutDateFind"></page-link>
+           page-url-checkOutDateFind="@checkOutDateFind"></page-link> *@

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.ComponentModel.DataAnnotations;
 
 namespace RoomRental.Models;
@@ -18,6 +19,7 @@ public partial class Invoice
 
     [Required(ErrorMessage = "Не указана сумма оплаты")]
     [Display(Name = "Сумма оплаты")]
+    [Range(0, double.MaxValue, ErrorMessage = "Значение не может быть меньше нуля")]
     public decimal Amount { get; set; }
 
     [Required(ErrorMessage = "Не указана дата оплаты")]

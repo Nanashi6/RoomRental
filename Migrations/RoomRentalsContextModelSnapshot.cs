@@ -207,7 +207,7 @@ namespace RoomRental.Migrations
 
                     b.HasIndex("OwnerOrganizationId");
 
-                    b.ToTable("Buildings");
+                    b.ToTable("Buildings", (string)null);
                 });
 
             modelBuilder.Entity("RoomRental.Models.Invoice", b =>
@@ -248,7 +248,7 @@ namespace RoomRental.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("Invoices");
+                    b.ToTable("Invoices", (string)null);
                 });
 
             modelBuilder.Entity("RoomRental.Models.Organization", b =>
@@ -277,7 +277,7 @@ namespace RoomRental.Migrations
                     b.HasKey("OrganizationId")
                         .HasName("PK__Organiza__29747D5940E6BB82");
 
-                    b.ToTable("Organizations");
+                    b.ToTable("Organizations", (string)null);
                 });
 
             modelBuilder.Entity("RoomRental.Models.Rental", b =>
@@ -312,7 +312,7 @@ namespace RoomRental.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("Rentals");
+                    b.ToTable("Rentals", (string)null);
                 });
 
             modelBuilder.Entity("RoomRental.Models.ResponsiblePerson", b =>
@@ -348,7 +348,7 @@ namespace RoomRental.Migrations
                     b.HasKey("PersonId")
                         .HasName("PK__Responsi__EC7D7D4D5E9ADA9C");
 
-                    b.ToTable("ResponsiblePeople");
+                    b.ToTable("ResponsiblePeople", (string)null);
                 });
 
             modelBuilder.Entity("RoomRental.Models.Room", b =>
@@ -380,7 +380,7 @@ namespace RoomRental.Migrations
 
                     b.HasIndex("BuildingId");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Rooms", (string)null);
                 });
 
             modelBuilder.Entity("RoomRental.Models.RoomImage", b =>
@@ -407,7 +407,7 @@ namespace RoomRental.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("RoomImages");
+                    b.ToTable("RoomImages", (string)null);
                 });
 
             modelBuilder.Entity("RoomRental.Models.User", b =>

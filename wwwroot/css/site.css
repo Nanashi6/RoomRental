@@ -13,6 +13,11 @@
     font-family: sans-serif;
 }
 
+select {
+    font-family: sans-serif;
+    font-size: 16px;
+}
+
 html, body {
     height: 100%;
 }
@@ -196,7 +201,7 @@ nav {
 
 .form-container {
     background: #3a3e64;
-    width: 30%;
+    width: 25%;
     margin: 5px 0;
     border-radius: 0px 3px 3px 0px;
     display: flex;
@@ -301,7 +306,7 @@ nav {
 }
 
 .element {
-    padding: 10px 15px;
+    padding: 10px 10px;
     text-align: center; /*ћб убрать выравнивание внутри €чеек*/
 }
 
@@ -358,6 +363,7 @@ a {
     cursor: pointer;
     padding: 0.375rem 0.75rem;
     font-size: 1rem;
+    border: 1px solid transparent;
     border-radius: 2px;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
@@ -413,6 +419,7 @@ a {
 
 .container {
     display: flex;
+    margin: 20px 0px;
     flex-direction: column;
     text-align: center;
     justify-items: center;
@@ -438,6 +445,9 @@ a {
     .det-container div {
         margin-top: 5px;
     }
+.det-container div label {
+    font-weight: bold;
+}
 /*Details / Delete*/
 
 
@@ -482,6 +492,22 @@ input::placeholder {
     font-size: 16px;
 }
 
+/* Validation error */
 .text-danger {
     color: red;
+}
+
+/* —тили дл€ пол€ поиска и выпадающего списка Select2 */
+.select2-container * {
+    margin-top: 10px;
+    display: block;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    border-bottom: 1px solid black;
+    position: relative;
+}
+
+[type=button]:not(:disabled), [type=reset]:not(:disabled), [type=submit]:not(:disabled), button:not(:disabled) {
+    cursor: pointer;
 }

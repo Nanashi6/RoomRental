@@ -124,7 +124,8 @@ namespace RoomRental.Controllers
         public async Task<IActionResult> Create()
         {
             ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name");
-            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId");
+            var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Name = $"{e.Building.Name}, №{e.RoomNumber}" });
+            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Name");
             return View();
         }
 
@@ -139,7 +140,8 @@ namespace RoomRental.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", rental.RentalOrganizationId);
-            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId", rental.RoomId);
+            var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Name = $"{e.Building.Name}, №{e.RoomNumber}" });
+            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Name", rental.RoomId);
             return View(rental);
         }
 
@@ -157,7 +159,8 @@ namespace RoomRental.Controllers
                 return NotFound();
             }
             ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", rental.RentalOrganizationId);
-            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId", rental.RoomId);
+            var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Name = $"{e.Building.Name}, №{e.RoomNumber}" });
+            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Name");
             return View(rental);
         }
 
@@ -191,7 +194,8 @@ namespace RoomRental.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["RentalOrganizationId"] = new SelectList(await _organizationCache.GetAll(), "OrganizationId", "Name", rental.RentalOrganizationId);
-            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId", rental.RoomId);
+            var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Name = $"{e.Building.Name}, №{e.RoomNumber}" });
+            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Name", rental.RoomId);
             return View(rental);
         }
 

@@ -139,7 +139,9 @@ namespace RoomRental.Controllers
             var people = (await _peopleCache.GetAll()).Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
 
             ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL");
-            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId");
+            var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Info = e.Building.PostalAddress + ", №" + e.RoomNumber }).ToList();
+
+            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Info");
             return View();
         }
 
@@ -158,8 +160,11 @@ namespace RoomRental.Controllers
 
             var people = (await _peopleCache.GetAll()).Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
 
-            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "PersonId", invoice.ResponsiblePersonId);
-            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId", invoice.RoomId);
+            ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL", invoice.ResponsiblePersonId);
+
+            var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Info = e.Building.PostalAddress + ", №" + e.RoomNumber }).ToList();
+
+            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Info", invoice.RoomId);
             return View(invoice);
         }
 
@@ -181,7 +186,10 @@ namespace RoomRental.Controllers
             var people = (await _peopleCache.GetAll()).Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
 
             ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL", invoice.ResponsiblePersonId);
-            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId", invoice.RoomId);
+
+            var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Info = e.Building.PostalAddress + ", №" + e.RoomNumber }).ToList();
+
+            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Info", invoice.RoomId);
             return View(invoice);
         }
 
@@ -219,7 +227,9 @@ namespace RoomRental.Controllers
             var people = (await _peopleCache.GetAll()).Select(e => new { PersonId = e.PersonId, SNL = e.Surname + " " + e.Name + " " + e.Lastname }).ToList();
 
             ViewData["ResponsiblePerson"] = new SelectList(people, "PersonId", "SNL", invoice.ResponsiblePersonId);
-            ViewData["RoomId"] = new SelectList(await _roomCache.GetAll(), "RoomId", "RoomId", invoice.RoomId);
+            var rooms = (await _roomCache.GetAll()).Select(e => new { RoomId = e.RoomId, Info = e.Building.PostalAddress + ", №" + e.RoomNumber }).ToList();
+
+            ViewData["RoomId"] = new SelectList(rooms, "RoomId", "Info", invoice.RoomId);
             return View(invoice);
         }
 

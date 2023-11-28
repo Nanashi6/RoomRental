@@ -12,5 +12,14 @@ namespace RoomRental.ErrorDescribers
                 Description = "Такой логин уже занят"
             };
         }
-    }
+
+		public override IdentityError DuplicateEmail(string email)
+		{
+            return new IdentityError
+            {
+                Code = nameof(DuplicateEmail),
+                Description = "Такой email уже занят"
+            };                
+		}
+	}
 }

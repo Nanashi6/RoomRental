@@ -4,7 +4,36 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<div class="container">
+    <h1>Создание аренды</h1>
+    <div class="create-form-container">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @*             <label asp-for="RoomId" class="control-label"></label> *@
+            <select class="filter-input" asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId"></select>
+            <span asp-validation-for="RoomId" class="text-danger"></span>
+
+            @*             <label asp-for="RentalOrganizationId" class="control-label"></label> *@
+            <select class="filter-input" asp-for="RentalOrganizationId" class="form-control" asp-items="ViewBag.RentalOrganizationId"></select>
+            <span asp-validation-for="RentalOrganizationId" class="text-danger"></span>
+
+            @*             <label asp-for="CheckInDate" class="control-label"></label> *@
+            <input class="filter-input" asp-for="CheckInDate" class="form-control" />
+            <span asp-validation-for="CheckInDate" class="text-danger"></span>
+
+            @*             <label asp-for="CheckOutDate" class="control-label"></label> *@
+            <input class="filter-input" asp-for="CheckOutDate" class="form-control" />
+            <span asp-validation-for="CheckOutDate" class="text-danger"></span>
+            <div class="buttons">
+                <a class="submitButton-index btn-primary" asp-action="Index">Возврат к списку</a>
+                <input class="submitButton-index" type="submit" value="Создать" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@* <h1>Create</h1>
 
 <h4>Rental</h4>
 <hr />
@@ -39,7 +68,7 @@
 
 <div>
     <a asp-action="Index">Back to List</a>
-</div>
+</div> *@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

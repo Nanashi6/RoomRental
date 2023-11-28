@@ -4,7 +4,7 @@
     ViewData["Title"] = "Delete";
 }
 
-<h1>Delete</h1>
+@* <h1>Delete</h1>
 
 <h3>Are you sure you want to delete this?</h3>
 <div>
@@ -54,4 +54,42 @@
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
+</div> *@
+
+
+<div class="container">
+    <h1>Здание</h1>
+    <div class="det-container">
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Name):</label>
+            @Html.DisplayFor(model => model.Name)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.PostalAddress):</label>
+            @Html.DisplayFor(model => model.PostalAddress)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Floors):</label>
+            @Html.DisplayFor(model => model.Floors)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Description):</label>
+            @Html.DisplayFor(model => model.Description)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.FloorPlan):</label>
+            <img src="@Model.FloorPlan" />
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.OwnerOrganization):</label>
+            @Html.DisplayFor(model => model.OwnerOrganization.Name)
+        </div>
+    </div>
+    <div class="det-container">
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="BuildingId" />
+            <input type="submit" value="Удалить" class="btn btn-danger" /> |
+            <a class="btn-primary btn" asp-action="Index">Возврат к списку</a>
+        </form>
+    </div>
 </div>

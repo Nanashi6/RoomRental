@@ -4,6 +4,33 @@
     ViewData["Title"] = "Create";
 }
 
+<div class="container">
+    <h1>Оплата аренды</h1>
+
+    <div class="create-form-container">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+@*             <label asp-for="RentalOrganizationId" class="control-label"></label> *@
+            <select class="filter-input" asp-for="RentalOrganizationId" class="form-control" asp-items="ViewBag.RentalOrganizationId"></select>
+@*             <label asp-for="RoomId" class="control-label"></label> *@
+            <select class="filter-input" asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId"></select>
+@*             <label asp-for="Amount" class="control-label"></label> *@
+            <input class="filter-input" asp-for="Amount" type="text" step="any" data-val="false" placeholder="Сумма оплаты" class="form-control" oninput="this.value = this.value.replace(/[^0-9,]/g, '')" />
+            <span asp-validation-for="Amount" class="text-danger"></span>
+@*             <label asp-for="PaymentDate" class="control-label"></label> *@
+            <input class="filter-input" asp-for="PaymentDate" class="form-control" placeholder="Дата оплаты" />
+            <span asp-validation-for="PaymentDate" class="text-danger"></span>
+@*             <label asp-for="ResponsiblePersonId" class="control-label"></label> *@
+            <select class="filter-input" asp-for="ResponsiblePersonId" class="form-control" asp-items="ViewBag.ResponsiblePerson"></select>
+            <div class="buttons">
+                <a class="btn-primary submitButton-index" asp-action="Index">Возврат к списку</a>
+                <input class="submitButton-index" type="submit" value="Создать" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@* 
 <h1>Create</h1>
 
 <h4>Invoice</h4>
@@ -22,7 +49,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Amount" class="control-label"></label>
-                <input asp-for="Amount" min="0" class="form-control" />
+                <input asp-for="Amount" type="text" step="any" data-val="false" placeholder="0,00" class="form-control" oninput="this.value = this.value.replace(/[^0-9,]/g, '')" />
                 <span asp-validation-for="Amount" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -43,7 +70,7 @@
 
 <div>
     <a asp-action="Index">Back to List</a>
-</div>
+</div> *@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

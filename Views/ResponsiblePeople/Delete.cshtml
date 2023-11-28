@@ -4,6 +4,34 @@
     ViewData["Title"] = "Delete";
 }
 
+<div class="container">
+    <h1>Удаление данных о оформляющем</h1>
+
+    <h3>Вы действительно хотите удалить эту запись?</h3>
+    <div class="det-container">
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Surname):</label>
+            @Html.DisplayFor(model => model.Surname)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Name):</label>
+            @Html.DisplayFor(model => model.Name)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Lastname):</label>
+            @Html.DisplayFor(model => model.Lastname)
+        </div>
+    </div>
+    <div class="det-container">
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="PersonId" />
+            <input type="submit" value="Удалить" class="btn btn-danger" /> |
+            <a asp-action="Index" class="btn btn-primary">Возврат к списку</a>
+        </form>
+    </div>
+</div>
+
+@* 
 <h1>Delete</h1>
 
 <h3>Are you sure you want to delete this?</h3>
@@ -37,3 +65,4 @@
         <a asp-action="Index">Back to List</a>
     </form>
 </div>
+ *@

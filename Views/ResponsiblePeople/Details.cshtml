@@ -4,7 +4,30 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<div class="container">
+    <h1>JОормляющий</h1>
+
+    <div class="det-container">
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Surname):</label>
+            @Html.DisplayFor(model => model.Surname)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Name):</label>
+            @Html.DisplayFor(model => model.Name)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Lastname):</label>
+            @Html.DisplayFor(model => model.Lastname)
+        </div>
+    </div>
+    <div class="det-container">
+        <a class="btn-primary btn" asp-action="Edit" asp-route-id="@Model?.PersonId">Изменить</a> |
+        <a class="btn-primary btn" asp-action="Index">Возврат к списку</a>
+    </div>
+</div>
+
+@* <h1>Details</h1>
 
 <div>
     <h4>ResponsiblePerson</h4>
@@ -33,4 +56,4 @@
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.PersonId">Edit</a> |
     <a asp-action="Index">Back to List</a>
-</div>
+</div> *@

@@ -1,4 +1,5 @@
 ﻿@model RoomRental.ViewModels.BuildingsViewModel
+@inject RoomRental.Services.BuildingService cache
 @{
     ViewData["Title"] = "Buildings";
     string buildingNameFind = Model.FilterViewModel.BuildingNameFind;
@@ -7,7 +8,7 @@
     string addressFind = Model.FilterViewModel.AddressFind;
 }
 
-<h1>Buildings</h1>
+@* <h1>Buildings</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -118,4 +119,124 @@
            page-url-buildingNameFind="@buildingNameFind"
            page-url-organizationNameFind="@organizationNameFind"
            page-url-floorsFind="@floorsFind"
-           page-url-addressFind="@addressFind"></page-link>
+           page-url-addressFind="@addressFind"></page-link> *@
+
+<div class="index-container">
+    <div class="form-container">
+        <div class="tabs">
+            <h3>Фильтрация</h3>
+            <div><a asp-action="Create">Создать</a></div>
+        </div>
+        <div class="form-container_two">
+
+            <form method="post">
+                <input class="filter-input" name="BuildingNameFind" value="@buildingNameFind" placeholder="Название здания" />
+
+                <input class="filter-input" name="OrganizationNameFind" value="@organizationNameFind" placeholder="Название организации" />
+
+                <input class="filter-input" type="number" name="FloorsFind" min="0" value="@floorsFind" placeholder="Этажность" />
+
+                <input class="filter-input" name="AddressFind" value="@addressFind" placeholder="Адрес" />
+
+                <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
+                <input class="submitButton-index" type="submit" value="Фильтр" />
+            </form>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h1>Здания</h1>
+        <div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.NameSort)"
+                               asp-route-buildingNameFind="@buildingNameFind"
+                               asp-route-organizationNameFind="@organizationNameFind"
+                               asp-route-floorsFind="@floorsFind"
+                               asp-route-addressFind="@addressFind">
+                                @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().Name)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.OrganizationNameSort)"
+                               asp-route-buildingNameFind="@buildingNameFind"
+                               asp-route-organizationNameFind="@organizationNameFind"
+                               asp-route-floorsFind="@floorsFind"
+                               asp-route-addressFind="@addressFind">
+                                @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().OwnerOrganization)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.AddressSort)"
+                               asp-route-buildingNameFind="@buildingNameFind"
+                               asp-route-organizationNameFind="@organizationNameFind"
+                               asp-route-floorsFind="@floorsFind"
+                               asp-route-addressFind="@addressFind">
+                                @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().PostalAddress)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.FloorsSort)"
+                               asp-route-buildingNameFind="@buildingNameFind"
+                               asp-route-organizationNameFind="@organizationNameFind"
+                               asp-route-floorsFind="@floorsFind"
+                               asp-route-addressFind="@addressFind">
+                                @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().Floors)
+                            </a>
+                        </th>
+                        <th class="element">
+                            @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().Description)
+                        </th>
+                        <th class="element">
+                            @Html.DisplayNameFor(model => model.Buildings.SingleOrDefault().FloorPlan)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Buildings)
+                    {
+                        <tr>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.OwnerOrganization.Name)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.PostalAddress)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.Floors)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td class="element">
+                                <img src="@item.FloorPlan" class="image">
+                            </td>
+                            <td class="element">
+                                <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.BuildingId">Изменить</a> |
+                                <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.BuildingId">Подробнее</a> |
+                                <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.BuildingId">Удалить</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <page-link page-model="Model.PageViewModel" page-action="Index"
+                   page-url-sortOrder="@(Model.SortViewModel.Current)"
+                   page-url-buildingNameFind="@buildingNameFind"
+                   page-url-organizationNameFind="@organizationNameFind"
+                   page-url-floorsFind="@floorsFind"
+                   page-url-addressFind="@addressFind"></page-link>
+    </div>
+</div>

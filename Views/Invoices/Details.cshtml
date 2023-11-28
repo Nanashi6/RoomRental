@@ -4,6 +4,36 @@
     ViewData["Title"] = "Details";
 }
 
+<div class="container">
+    <h1>Организация</h1>
+    <div class="det-container">
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Amount):</label>
+            @Html.DisplayFor(model => model.Amount)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.PaymentDate):</label>
+            @Html.DisplayFor(model => model.PaymentDate)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.RentalOrganization):</label>
+            @Html.DisplayFor(model => model.RentalOrganization.Name)
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.ResponsiblePerson):</label>
+            @Model.ResponsiblePerson.Surname @Model.ResponsiblePerson.Name @Model.ResponsiblePerson.Lastname
+        </div>
+        <div>
+            <label>@Html.DisplayNameFor(model => model.Room):</label>
+            @(Model.Room.Building.Name), № @(Model.Room.RoomNumber)
+        </div>
+    </div>
+    <div class="det-container">
+        <a class="btn-primary btn" asp-action="Edit" asp-route-id="@Model?.InvoiceId">Изменить</a> |
+        <a class="btn-primary btn" asp-action="Index">Возврат к списку</a>
+    </div>
+</div>
+@* 
 <h1>Details</h1>
 
 <div>
@@ -45,4 +75,4 @@
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.InvoiceId">Edit</a> |
     <a asp-action="Index">Back to List</a>
-</div>
+</div> *@

@@ -82,7 +82,7 @@ namespace RoomRental.Services
 
         protected override async Task<List<RoomImage>> UpdateCache()
         {
-            var images = await _context.RoomImages.Include(r => r.Room).ToListAsync();
+            var images = await _context.RoomImages/*.Include(r => r.Room)*/.ToListAsync();
 
             if (images != null)
             {

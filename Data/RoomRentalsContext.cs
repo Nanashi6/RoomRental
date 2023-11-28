@@ -16,6 +16,7 @@ public partial class RoomRentalsContext : IdentityDbContext<User>
     public RoomRentalsContext(DbContextOptions<RoomRentalsContext> options)
         : base(options)
     {
+        Database.EnsureCreated();
     }
 
     public virtual DbSet<Building> Buildings { get; set; }
@@ -158,7 +159,10 @@ public partial class RoomRentalsContext : IdentityDbContext<User>
             entity.HasKey(e => e.RoomId).HasName("PK__Rooms__6C3BF5BEA3A3945D");
 
             entity.Property(e => e.RoomId).HasColumnName("roomId");
-            entity.Property(e => e.Area)
+			entity.Property(e => e.RoomNumber)
+				.HasColumnType("int)")
+				.HasColumnName("roomNumber");
+			entity.Property(e => e.Area)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("area");
             entity.Property(e => e.BuildingId).HasColumnName("buildingId");

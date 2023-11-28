@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -13,11 +14,16 @@ public partial class Room
     [Display(Name = "Здание")]
     public int BuildingId { get; set; }
 
-    [Required(ErrorMessage = "Не указана площадь")]
+	[Required(ErrorMessage = "Не указан номер помещения")]
+	[Display(Name = "Номер помещения")]
+	public int RoomNumber { get; set; }
+
+	[Required(ErrorMessage = "Не указана площадь")]
     [Display(Name = "Площадь")]
+    [Range(0, double.MaxValue, ErrorMessage = "Значение не может быть меньше нуля")]
     public decimal Area { get; set; }
 
-    [Required(ErrorMessage = "Не указано описание")]
+	[Required(ErrorMessage = "Не указано описание")]
     [Display(Name = "Описание")]
     public string Description { get; set; }
     [Required(ErrorMessage = "Не указано фото")]

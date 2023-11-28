@@ -4,7 +4,7 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+@* <h1>Edit</h1>
 
 <h4>Building</h4>
 <hr />
@@ -52,6 +52,31 @@
 
 <div>
     <a asp-action="Index">Back to List</a>
+</div> *@
+
+<div class="container">
+    <h1>Изменение здания</h1>
+
+    <div class="create-form-container">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="Name" class="filter-input" placeholder="Название" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+            <select id="select" asp-for="OwnerOrganizationId" class="filter-input" asp-items="ViewBag.OwnerOrganizationId"></select>
+            <input asp-for="PostalAddress" class="filter-input" placeholder="Почтовый адрес" />
+            <span asp-validation-for="PostalAddress" class="text-danger"></span>
+            <input asp-for="Floors" min="0" class="filter-input" placeholder="Этажность" />
+            <span asp-validation-for="Floors" class="text-danger"></span>
+            <input asp-for="Description" class="filter-input" placeholder="Описание" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+            <input type="file" asp-for="FloorPlanImage" class="filter-input" accept="image/*" placeholder="Фото помещения" />
+            <span asp-validation-for="FloorPlanImage" class="text-danger"></span>
+            <div class="buttons">
+                <a class="btn-primary submitButton-index" asp-action="Index">Возврат к списку</a>
+                <input class="submitButton-index" type="submit" value="Создать" />
+            </div>
+        </form>
+    </div>
 </div>
 
 @section Scripts {

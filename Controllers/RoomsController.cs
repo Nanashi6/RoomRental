@@ -118,7 +118,7 @@ namespace RoomRental.Controllers
         // POST: Rooms/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("RoomId,BuildingId,Area,Description,Photos")] Room room)
+        public async Task<IActionResult> Create([Bind("RoomId,BuildingId,RoomNumber,Area,Description,Photos")] Room room)
         {
             if (ModelState.IsValid)
             {
@@ -168,7 +168,7 @@ namespace RoomRental.Controllers
         // POST: Rooms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("RoomId,BuildingId,Area,Description,Photos")] Room room)
+        public async Task<IActionResult> Edit(int id, [Bind("RoomId,BuildingId,RoomNumber,Area,Description,Photos")] Room room)
         {
             if (id != room.RoomId)
             {

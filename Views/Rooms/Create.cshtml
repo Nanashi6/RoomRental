@@ -4,7 +4,35 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<div class="container">
+    <h1>Создание помещения</h1>
+
+    <div class="create-form-container">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <select class="filter-input" asp-for="BuildingId" class="form-control" asp-items="ViewBag.BuildingId"></select>
+
+            <input class="filter-input" type="number" min="1" asp-for="RoomNumber" class="form-control" placeholder="Номер комнаты" />
+            <span asp-validation-for="RoomNumber" class="text-danger"></span>
+
+            <input class="filter-input" type="text" step="any" data-val="false" asp-for="Area" class="form-control" placeholder="Площадь" oninput="this.value = this.value.replace(/[^0-9,]/g, '')" />
+            <span asp-validation-for="Area" class="text-danger"></span>
+
+            <input class="filter-input" asp-for="Description" class="form-control" placeholder="Описание" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+
+            <input class="filter-input" type="file" asp-for="Photos" class="form-control" accept="image/*" multiple placeholder="Фото" />
+            <span asp-validation-for="Photos" class="text-danger"></span>
+            <div class="buttons">
+                <a class="btn-primary submitButton-index" asp-action="Index">Возврат к списку</a>
+                <input class="submitButton-index" type="submit" value="Создать" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@* <h1>Create</h1>
 
 <h4>Room</h4>
 <hr />
@@ -15,6 +43,11 @@
             <div class="form-group">
                 <label asp-for="BuildingId" class="control-label"></label>
                 <select asp-for="BuildingId" class ="form-control" asp-items="ViewBag.BuildingId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="RoomNumber" class="control-label"></label>
+                <input type="number" min="1" asp-for="RoomNumber" class="form-control" />
+                <span asp-validation-for="RoomNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Area" class="control-label"></label>
@@ -40,7 +73,7 @@
 
 <div>
     <a asp-action="Index">Back to List</a>
-</div>
+</div> *@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

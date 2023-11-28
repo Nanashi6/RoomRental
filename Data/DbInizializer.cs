@@ -18,32 +18,37 @@ namespace RoomRental.Data
                 context.SaveChanges();
             }
 
+            var organizations = context.Organizations.ToArray();
             if (!context.Buildings.Any())
             {
                 for (int i = 0; i < 500; i++)
                 {
-                    int ownerId = rnd.Next(context.Organizations.Count()) + 1;
-                    context.Buildings.Add(new Building() { Name = $"Building {i + 1}", PostalAddress = $"Address {i + 1}", Floors = rnd.Next(11), Description = $"Description {i + 1}", OwnerOrganizationId = ownerId, FloorPlan = $"\\Images\\FloorPlans\\1.jpg", OwnerOrganization = context.Organizations.ToArray()[ownerId-1] });
+                    int ownerId = rnd.Next(organizations.Count()) + 1;
+                    context.Buildings.Add(new Building() { Name = $"Building {i + 1}", PostalAddress = $"Address {i + 1}", Floors = rnd.Next(11), Description = $"Description {i + 1}", OwnerOrganizationId = ownerId, FloorPlan = $"\\Images\\FloorPlans\\1.jpg", OwnerOrganization = organizations[ownerId-1] });
                 }
                 context.SaveChanges();
             }
 
+            var buildings = context.Buildings.ToArray();
             if (!context.Rooms.Any())
             {
-                for (int i = 0; i < 10000; i++)
+
+                for (int i = 1; i <= buildings.Length; i++)
                 {
-                    int buildingId = rnd.Next(context.Buildings.Count()) + 1;
-                    context.Add(new Room() { Area = rnd.Next(100), BuildingId = buildingId, Description = $"Description {i + 1}", Building = context.Buildings.ToArray()[buildingId-1] });
+                    for (int j = 0; j < 20; j++)
+                        context.Add(new Room() { Area = rnd.Next(50,100), BuildingId = i, RoomNumber = j+1, Description = $"Description {(i-1) * 10 + (j + 1)}", Building = context.Buildings.ToArray()[i-1] });
                 }
+
                 context.SaveChanges();
             }
 
+            var rooms = context.Rooms.ToArray();
             if (!context.RoomImages.Any())
             {
                 for (int i = 0; i < 10000; i++)
                 {
                     int roomId = i + 1;
-                    context.Add(new RoomImage() { RoomId = roomId, ImagePath = "\\Images\\Rooms\\1.jpg", Room = context.Rooms.ToArray()[roomId-1] });
+                    context.Add(new RoomImage() { RoomId = roomId, ImagePath = "\\Images\\Rooms\\1.jpg", Room = rooms[roomId-1] });
                 }
                 context.SaveChanges();
             }
@@ -61,26 +66,27 @@ namespace RoomRental.Data
             {
                 for (int i = 0; i < 10000; i++)
                 {
-                    int roomId = rnd.Next(context.Rooms.Count()) + 1;
-                    int rentalOrgId = rnd.Next(context.Organizations.Count()) + 1;
+                    int roomId = rnd.Next(rooms.Count()) + 1;
+                    int rentalOrgId = rnd.Next(organizations.Count()) + 1;
                     DateTime checkInDate = GenerateRandomDate();
                     DateTime checkOutDate = GenerateRandomDate(checkInDate);
 
-                    context.Add(new Rental() { RoomId = roomId, RentalOrganizationId = rentalOrgId, CheckInDate = checkInDate, CheckOutDate = checkOutDate, Room = context.Rooms.ToArray()[roomId-1], RentalOrganization = context.Organizations.ToArray()[rentalOrgId-1] });
+                    context.Add(new Rental() { RoomId = roomId, RentalOrganizationId = rentalOrgId, CheckInDate = checkInDate, CheckOutDate = checkOutDate, Room = rooms[roomId-1], RentalOrganization = organizations[rentalOrgId-1] });
                 }
                 context.SaveChanges();
             }
 
+            var people = context.ResponsiblePeople.ToArray();
             if (!context.Invoices.Any())
             {
                 for (int i = 0; i < 10000; i++)
                 {
-                    int roomId = rnd.Next(context.Rooms.Count()) + 1;
-                    int rentalOrgId = rnd.Next(context.Organizations.Count()) + 1;
-                    int responsiblePersonId = rnd.Next(context.ResponsiblePeople.Count()) + 1;
+                    int roomId = rnd.Next(rooms.Count()) + 1;
+                    int rentalOrgId = rnd.Next(organizations.Count()) + 1;
+                    int responsiblePersonId = rnd.Next(people.Count()) + 1;
                     DateTime paymentDate = GenerateRandomDate();
 
-                    context.Add(new Invoice() { RoomId = roomId, RentalOrganizationId = rentalOrgId, Amount = rnd.Next(10000), ResponsiblePersonId = responsiblePersonId, PaymentDate = paymentDate, Room = context.Rooms.ToArray()[roomId - 1], RentalOrganization = context.Organizations.ToArray()[rentalOrgId - 1], ResponsiblePerson = context.ResponsiblePeople.ToArray()[responsiblePersonId-1] });
+                    context.Add(new Invoice() { RoomId = roomId, RentalOrganizationId = rentalOrgId, Amount = rnd.Next(10000), ResponsiblePersonId = responsiblePersonId, PaymentDate = paymentDate, Room = rooms[roomId - 1], RentalOrganization = organizations[rentalOrgId - 1], ResponsiblePerson = people[responsiblePersonId-1] });
                 }
                 context.SaveChanges();
             }
