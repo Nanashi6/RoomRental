@@ -1,4 +1,6 @@
 ﻿@model RoomRental.ViewModels.RentalsViewModel
+@inject RoomRental.Services.RoomService rooms
+
 @{
     ViewData["Title"] = "Rentals";
     string organizationNameFind = Model.FilterViewModel.OrganizationNameFind;
@@ -28,7 +30,7 @@
     </div>
 
     <div class="table-container">
-        <h1>Организации</h1>
+        <h1>Аренды</h1>
         <div>
             <table class="table">
                 <thead>
@@ -69,9 +71,9 @@
                 <tbody>
                     @foreach (var item in Model.Rentals)
                     {
-                        <tr class="row">
+                        <tr class="row" onclick="location.href='@Url.Action("Details", "Rentals", new { id = item.RentalId })'">
                             <td class="element">
-                                @Html.DisplayFor(modelItem => item.Room.Building.Name), №@Html.DisplayFor(modelItem => item.Room.RoomNumber)
+                                @((await rooms.Get(item.RoomId)).Building.Name), № @(item.Room.RoomNumber)
                             </td>
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.RentalOrganization.Name)
@@ -83,9 +85,9 @@
                                 @Html.DisplayFor(modelItem => item.CheckOutDate)
                             </td>
                             <td class="element">
-                                <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.RentalId">Edit</a> |
-                                <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.RentalId">Details</a> |
-                                <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.RentalId">Delete</a>
+                                <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.RentalId">Изменить</a> |
+                                @* <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.RentalId">Подробнее</a> | *@
+                                <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.RentalId">Удалить</a>
                             </td>
                         </tr>
                     }

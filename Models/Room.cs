@@ -20,7 +20,7 @@ public partial class Room
 
 	[Required(ErrorMessage = "Не указана площадь")]
     [Display(Name = "Площадь")]
-    [Range(0, double.MaxValue, ErrorMessage = "Значение не может быть меньше нуля")]
+    [Range(50, double.MaxValue, ErrorMessage = "Значение не может быть меньше 50")]
     public decimal Area { get; set; }
 
 	[Required(ErrorMessage = "Не указано описание")]

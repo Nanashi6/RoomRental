@@ -1,4 +1,5 @@
 ﻿@model RoomRental.ViewModels.InvoicesViewModel
+@inject RoomRental.Services.RoomService rooms
 @{
     ViewData["Title"] = "Invoices";
     string organizationNameFind = Model.FilterViewModel.OrganizationNameFind;
@@ -84,9 +85,9 @@
                 <tbody>
                     @foreach (var item in Model.Invoices)
                     {
-                        <tr>
+                        <tr class="row" onclick="location.href='@Url.Action("Details", "Invoices", new { id = item.InvoiceId })'">
                             <td class="element">
-                                @(item.Room.Building.Name), № @(item.Room.RoomNumber)
+                                @((await rooms.Get(item.RoomId)).Building.Name), № @(item.Room.RoomNumber)
                             </td>
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.RentalOrganization.Name)
@@ -101,9 +102,9 @@
                                 @item.ResponsiblePerson.Surname @item.ResponsiblePerson.Name @item.ResponsiblePerson.Lastname
                             </td>
                             <td class="element">
-                                <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.InvoiceId">Edit</a> |
-                                <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.InvoiceId">Details</a> |
-                                <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.InvoiceId">Delete</a>
+                                <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.InvoiceId">Изменить</a> |
+                                @* <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.InvoiceId">Подробнее</a> | *@
+                                <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.InvoiceId">Удалить</a>
                             </td>
                         </tr>
                     }

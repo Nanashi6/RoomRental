@@ -5,7 +5,7 @@
 }
 
 <div class="container">
-    <h1>Редактирование организации</h1>
+    <h1>Редактирование оплаты</h1>
     <div class="create-form-container">
         <form asp-action="Edit">
             <input type="hidden" asp-for="InvoiceId" />
@@ -16,7 +16,7 @@
             <select class="filter-input" asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId"></select>
             <span asp-validation-for="RoomId" class="text-danger"></span>
 @*             <label asp-for="Amount" class="control-label"></label> *@
-            <input class="filter-input" asp-for="Amount" type="text" step="any" data-val="false" class="form-control" oninput="this.value = this.value.replace(/[^0-9,]/g, '')" placeholder="Сумма оплаты" />
+            <input class="filter-input" asp-for="Amount" class="form-control" placeholder="Сумма оплаты" />
             <span asp-validation-for="Amount" class="text-danger"></span>
 @*             <label asp-for="PaymentDate" class="control-label"></label> *@
             <input class="filter-input" asp-for="PaymentDate" class="form-control" />
@@ -26,7 +26,7 @@
             <span asp-validation-for="ResponsiblePersonId" class="text-danger"></span>
             <div class="buttons">
                 <a class="submitButton-index btn-primary" asp-action="Index">Возврат к списку</a>
-                <input class="submitButton-index" type="submit" value="Сохранить" />
+                <input class="submitButton-index" type="submit" value="Изменить" />
             </div>
         </form>
     </div>

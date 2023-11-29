@@ -58,8 +58,10 @@
     <h1>Изменение здания</h1>
 
     <div class="create-form-container">
-        <form asp-action="Create" enctype="multipart/form-data">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input class="filter-input" type="hidden" asp-for="BuildingId" />
+
             <input asp-for="Name" class="filter-input" placeholder="Название" />
             <span asp-validation-for="Name" class="text-danger"></span>
             <select id="select" asp-for="OwnerOrganizationId" class="filter-input" asp-items="ViewBag.OwnerOrganizationId"></select>
@@ -73,7 +75,7 @@
             <span asp-validation-for="FloorPlanImage" class="text-danger"></span>
             <div class="buttons">
                 <a class="btn-primary submitButton-index" asp-action="Index">Возврат к списку</a>
-                <input class="submitButton-index" type="submit" value="Создать" />
+                <input class="submitButton-index" type="submit" value="Изменить" />
             </div>
         </form>
     </div>

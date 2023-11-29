@@ -1,11 +1,13 @@
 ﻿@model RoomRental.Models.Invoice
+@inject RoomRental.Services.RoomService rooms
+
 
 @{
     ViewData["Title"] = "Delete";
 }
 
 <div class="container">
-    <h1>Удаление организации</h1>
+    <h1>Удаление оплаты</h1>
 
     <h3>Вы действительно хотите удалить эту запись?</h3>
     <div class="det-container">
@@ -27,7 +29,7 @@
         </div>
         <div>
             <label>@Html.DisplayNameFor(model => model.Room):</label>
-            @(Model.Room.Building.Name), № @(Model.Room.RoomNumber)
+            @((await rooms.Get(Model.RoomId)).Building.Name), № @(Model.Room.RoomNumber)
         </div>
     </div>
     <div class="det-container">

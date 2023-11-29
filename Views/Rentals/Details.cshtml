@@ -1,11 +1,12 @@
 ﻿@model RoomRental.Models.Rental
+@inject RoomRental.Services.RoomService rooms
 
 @{
     ViewData["Title"] = "Details";
 }
 
 <div class="container">
-    <h1>Организация</h1>
+    <h1>Информация о аренде</h1>
     <div class="det-container">
         <div>
             <label>@Html.DisplayNameFor(model => model.CheckInDate):</label>
@@ -21,7 +22,7 @@
         </div>
         <div>
             <label>@Html.DisplayNameFor(model => model.Room):</label>
-            @(Model.Room.Building.Name), № @(Model.Room.RoomNumber)
+            @((await rooms.Get(Model.RoomId)).Building.Name), № @(Model.Room.RoomNumber)
         </div>
     </div>
     <div class="det-container">

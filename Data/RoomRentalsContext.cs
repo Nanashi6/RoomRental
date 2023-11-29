@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using RoomRental.Models;
 
 namespace RoomRental.Data;
@@ -35,7 +36,10 @@ public partial class RoomRentalsContext : IdentityDbContext<User>
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.UseLazyLoadingProxies();
+    {
+        optionsBuilder.UseLazyLoadingProxies();
+        //optionsBuilder.ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.LazyLoadOnDisposedContextWarning));
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -45,7 +45,7 @@
                 <tbody>
                     @foreach (var item in Model.Organizations)
                     {
-                        <tr class="row">
+                        <tr class="row" onclick="location.href='@Url.Action("Details", "Organizations", new { id = item.OrganizationId })'">
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.Name)
                             </td>
@@ -54,7 +54,7 @@
                             </td>
                             <td class="element">
                                 <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.OrganizationId">Изменить</a> |
-                                <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.OrganizationId">Подробнее</a> |
+                                @* <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.OrganizationId">Подробнее</a> | *@
                                 <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.OrganizationId">Удалить</a>
                             </td>
                         </tr>

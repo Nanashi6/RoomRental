@@ -295,7 +295,7 @@ nav {
 }
 
 .table-container {
-    padding: 0 5%;
+    margin: 0 auto;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -303,11 +303,18 @@ nav {
 
 .row {
     border-bottom: 1px solid rgba(87, 87, 87, 0.7);
+    transition: 0.3s linear;
+}
+.row:hover {
+    background-color: lightgray;
 }
 
 .element {
     padding: 10px 10px;
     text-align: center; /*ћб убрать выравнивание внутри €чеек*/
+}
+.element:only-child {
+    margin: 0 auto;
 }
 
 .table-container > h1 {

@@ -202,11 +202,11 @@
                 <tbody>
                     @foreach (var item in Model.Buildings)
                     {
-                        <tr>
+                        <tr class="row" onclick="location.href='@Url.Action("Details", "Buildings", new { id = item.BuildingId })'">
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.Name)
                             </td>
-                            <td>
+                            <td class="element">
                                 @Html.DisplayFor(modelItem => item.OwnerOrganization.Name)
                             </td>
                             <td class="element">
@@ -223,7 +223,7 @@
                             </td>
                             <td class="element">
                                 <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.BuildingId">Изменить</a> |
-                                <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.BuildingId">Подробнее</a> |
+                                @* <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.BuildingId">Подробнее</a> | *@
                                 <a class="btn-danger btn" asp-action="Delete" asp-route-id="@item.BuildingId">Удалить</a>
                             </td>
                         </tr>

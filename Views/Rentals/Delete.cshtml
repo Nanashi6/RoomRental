@@ -1,4 +1,5 @@
 ﻿@model RoomRental.Models.Rental
+@inject RoomRental.Services.RoomService rooms
 
 @{
     ViewData["Title"] = "Delete";
@@ -23,7 +24,7 @@
         </div>
         <div>
             <label>@Html.DisplayNameFor(model => model.Room):</label>
-            @(Model.Room.Building.Name), № @(Model.Room.RoomNumber)
+            @((await rooms.Get(Model.RoomId)).Building.Name), № @(Model.Room.RoomNumber)
         </div>
     </div>
     <div class="det-container">

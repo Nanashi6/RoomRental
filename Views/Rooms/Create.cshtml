@@ -16,7 +16,7 @@
             <input class="filter-input" type="number" min="1" asp-for="RoomNumber" class="form-control" placeholder="Номер комнаты" />
             <span asp-validation-for="RoomNumber" class="text-danger"></span>
 
-            <input class="filter-input" type="text" step="any" data-val="false" asp-for="Area" class="form-control" placeholder="Площадь" oninput="this.value = this.value.replace(/[^0-9,]/g, '')" />
+            <input class="filter-input" asp-for="Area" class="form-control" placeholder="Площадь" />
             <span asp-validation-for="Area" class="text-danger"></span>
 
             <input class="filter-input" asp-for="Description" class="form-control" placeholder="Описание" />

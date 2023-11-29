@@ -15,7 +15,7 @@
 @*             <label asp-for="RoomId" class="control-label"></label> *@
             <select class="filter-input" asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId"></select>
 @*             <label asp-for="Amount" class="control-label"></label> *@
-            <input class="filter-input" asp-for="Amount" type="text" step="any" data-val="false" placeholder="Сумма оплаты" class="form-control" oninput="this.value = this.value.replace(/[^0-9,]/g, '')" />
+            <input class="filter-input" asp-for="Amount" placeholder="Сумма оплаты" class="form-control" />
             <span asp-validation-for="Amount" class="text-danger"></span>
 @*             <label asp-for="PaymentDate" class="control-label"></label> *@
             <input class="filter-input" asp-for="PaymentDate" class="form-control" placeholder="Дата оплаты" />

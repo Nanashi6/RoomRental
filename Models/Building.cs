@@ -24,6 +24,7 @@ public partial class Building
 
     [Required(ErrorMessage = "Не указана этажность")]
     [Display(Name = "Этажность")]
+    [Range(0, 500, ErrorMessage = "Значение не может быть меньше 0")]
     public int Floors { get; set; }
 
     [Required(ErrorMessage = "Не указано описание")]

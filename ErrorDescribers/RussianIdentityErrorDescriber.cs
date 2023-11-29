@@ -21,5 +21,15 @@ namespace RoomRental.ErrorDescribers
                 Description = "Такой email уже занят"
             };                
 		}
-	}
+
+        public override IdentityError PasswordTooShort(int length)
+        {
+            return new IdentityError
+            {
+                Code = nameof(PasswordTooShort),
+                Description = "Пароль слишком короткий"
+            };
+        }
+
+    }
 }
