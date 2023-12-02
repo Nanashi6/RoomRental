@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace RoomRental.Models;
 
@@ -32,12 +33,14 @@ public partial class Room
 
     [Display(Name = "Здание")]
     [ValidateNever]
+    [JsonIgnore]
     public virtual Building Building { get; set; }
 
     [Display(Name = "Фото")]
+    [JsonIgnore]
     public virtual ICollection<RoomImage> RoomImages { get; set; } = new List<RoomImage>();
-
+    [JsonIgnore]
     public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
-
+    [JsonIgnore]
     public virtual ICollection<Rental> Rentals { get; set; } = new List<Rental>();
 }

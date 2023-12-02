@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Details";
+    var percentages = ViewBag.Percentage;
 }
 
 @* <h1>Details</h1>
@@ -87,3 +88,124 @@
         <a class="btn-primary btn" asp-action="Index">Возврат к списку</a>
     </div>
 </div>
+<div>
+    <form method="get">
+        <input class="filter-input" type="date" name="startDate" value=@(ViewBag.StartDate.ToString("yyyy-MM-dd")) placeholder="Дата въезда" />
+
+        <input class="filter-input" type="date" name="endDate" value=@(ViewBag.EndDate.ToString("yyyy-MM-dd")) placeholder="Дата выезда" />
+
+        <input class="submitButton-index" type="submit" value="Искать" />
+    </form>
+    <canvas id="myChart"></canvas>
+    <div id="tableContainer" class="table-container"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var daysData = @Html.Raw(Json.Serialize(ViewBag.DaysRentals));
+    var labels = daysData.map(function (day) { return day.date; });
+    var percentages = daysData.map(function (day) { return day.percentage; });
+
+    var chartData = {
+        labels: labels,
+        datasets: [{
+            label: "Аренда",
+            data: percentages,
+            backgroundColor: "rgba(54, 162, 235, 0.5)",
+            borderColor: "rgba(54, 162, 235, 1)",
+            borderWidth: 1
+        }]
+    };
+
+    // Создание и отображение графика
+    var ctx = document.getElementById("myChart").getContext("2d");
+    var myChart = new Chart(ctx, {
+        type: "line",
+        data: chartData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            var label = "";
+                            if (label) {
+                                label += ": ";
+                            }
+                            label += context.parsed.y; // Добавление надписи "Привет" в конец
+                            return label;
+                        },
+                    },
+                },
+            },
+            onClick: function (e, elements) {
+                if (elements.length > 0) {
+                    var index = elements[0].index;
+                    var selectedData = daysData[index];
+                    var date = selectedData.date;
+
+                    // Выполнение AJAX-запроса
+                    $.ajax({
+                        url: '/Buildings/GetRentedRooms?buildingId=' + @(Model.BuildingId) +"&currentDate=" + date,
+                        type: 'GET',
+                        data: { date: date },
+                        success: function (data) {
+                            // Очистка существующей таблицы (если есть)
+                            $('#tableContainer').empty();
+
+                            // Создание таблицы
+                            var table = $('<table>').addClass('table');
+
+                            // Создание заголовка таблицы
+                            var thead = $('<thead>');
+                            var headerRow = $('<tr>');
+                            headerRow.append($('<th>').addClass('element').text('Помещение'));
+                            headerRow.append($('<th>').addClass('element').text('Организация-арендатор'));
+                            headerRow.append($('<th>').addClass('element').text('Дата въезда'));
+                            headerRow.append($('<th>').addClass('element').text('Дата выезда'));
+                            thead.append(headerRow);
+                            table.append(thead);
+
+                            // Создание тела таблицы
+                            var tbody = $('<tbody>');
+                            data.forEach(function (item) {
+                                var row = $('<tr>').addClass('row');
+                                var roomNumberCell = $('<td>').addClass('element');
+                                var organizationCell = $('<td>').addClass('element');
+
+                                var roomNumberLink = $('<a>').attr('href', '/Rooms/Details/' + item.room.roomId).text("№ " + item.room.roomNumber);
+                                roomNumberCell.append(roomNumberLink);
+
+                                var organizationLink = $('<a>').attr('href', '/Organizations/Details/' + item.rentalOrganization.organizationId).text(item.rentalOrganization.name);
+                                organizationCell.append(organizationLink);
+
+                                row.append(roomNumberCell);
+                                row.append(organizationCell);
+                                row.append($('<td>').addClass('element').text(new Date(item.checkInDate).toLocaleDateString()));
+                                row.append($('<td>').addClass('element').text(new Date(item.checkOutDate).toLocaleDateString()));
+                                tbody.append(row);
+                            });
+                            table.append(tbody);
+
+                            var h1 = $("<h1>").text(date);
+                            $("#tableContainer").append(h1);
+                            // Добавление таблицы в контейнер
+                            $('#tableContainer').append(table);
+                        },
+                        error: function (xhr, status, error) {
+                            // Обработка ошибки при выполнении запроса
+                            console.log(error);
+                        }
+                    });
+                }
+            }
+        }
+    });
+
+</script>

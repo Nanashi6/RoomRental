@@ -9,6 +9,8 @@ using RoomRental.ViewModels;
 using RoomRental.ViewModels.FilterViewModels;
 using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace RoomRental.Controllers
 {
@@ -17,13 +19,17 @@ namespace RoomRental.Controllers
     {
         private readonly BuildingService _cache;
         private readonly OrganizationService _organizationCache;
+        private readonly RoomService _roomCache;
+        private readonly RentalService _rentalCache;
         private readonly int _pageSize = 10;
         private readonly IWebHostEnvironment _appEnvironment;
 
-        public BuildingsController(BuildingService cache, OrganizationService organizationCache, IWebHostEnvironment appEnvironment, IConfiguration appConfig)
+        public BuildingsController(BuildingService cache, OrganizationService organizationCache, RoomService roomCache, RentalService rentalCache, IWebHostEnvironment appEnvironment, IConfiguration appConfig)
         {
             _cache = cache;
             _organizationCache = organizationCache;
+            _roomCache = roomCache;
+            _rentalCache = rentalCache;
             _appEnvironment = appEnvironment;
             _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
         }
@@ -108,8 +114,28 @@ namespace RoomRental.Controllers
         }
 
         // GET: Buildings/Details/5
-        public async Task<IActionResult> Details(int? id)
+        /*[SetSession("BuildingDetails")]*/
+        public async Task<IActionResult> Details(int? id, DateTime? startDate = null, DateTime? endDate = null)
         {
+            /*if (HttpContext.Request.Method == "GET")
+            {
+                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "BuildingDetails");
+
+                if (dict != null)
+                {
+                    DateTime date;
+                    if (dict.ContainsKey("startDate") && DateTime.TryParse(dict["startDate"], out date))
+                        startDate = date;
+                    else
+                        startDate = null;
+
+                    if (dict.ContainsKey("endDate") && DateTime.TryParse(dict["endDate"], out date))
+                        endDate = date;
+                    else
+                        endDate = null;
+                }
+            }*/
+
             if (id == null || await _cache.GetAll() == null)
             {
                 return NotFound();
@@ -120,8 +146,58 @@ namespace RoomRental.Controllers
             {
                 return NotFound();
             }
-            
+
+            //Общая площадь здания
+            decimal buildingArea = (await _roomCache.GetAll())
+                .Where(r => r.BuildingId == id)
+                .Sum(r => r.Area);
+
+            //Арендованные за промежуток времени здания
+            var rooms = (await _rentalCache.GetAll())
+                .Where(r => r.Room.BuildingId == id)
+                .Select(r => new { Room = r.Room, CheckInDate = r.CheckInDate, CheckOutDate = r.CheckOutDate })
+                .ToList();
+
+            if (startDate == null)
+                startDate = rooms.Min(e => e.CheckInDate);
+            if (endDate == null)
+                endDate = rooms.Max(e => e.CheckOutDate);
+
+            List<DateTime> days = new();
+
+            List<DaysRentals> daysRentals = new();
+
+            DateTime currentDate = startDate.Value;
+            while (currentDate <= endDate.Value)
+            {
+                //Подсчёт процента аренды здания на число currentDate
+                daysRentals.Add(new DaysRentals()
+                {
+                    Date = DateOnly.FromDateTime(currentDate),
+                    Percentage = rooms
+                                    .Where(r => currentDate >= r.CheckInDate && r.CheckOutDate >= currentDate)
+                                    .Sum(r => r.Room.Area) * 100 / buildingArea
+                });
+
+                // Увеличение даты на один день
+                currentDate = currentDate.AddDays(1);
+            }
+
+            ViewBag.DaysRentals = daysRentals;
+            //Формирование графика с арендой помещений
+            ViewBag.StartDate = startDate.Value;
+            ViewBag.EndDate = endDate.Value;
+
             return View(building);
+        }
+
+        // GET: Buildings/GetRentedRooms
+        public async Task<IActionResult> GetRentedRooms(int buildingId, DateTime? currentDate = null)
+        {
+            var rentals = (await _rentalCache.GetAll())
+                                    .Where(r => (currentDate >= r.CheckInDate && r.CheckOutDate >= currentDate) && r.Room.BuildingId == buildingId)
+                                    .ToArray();
+            return Json(rentals);
         }
 
         // GET: Buildings/Create

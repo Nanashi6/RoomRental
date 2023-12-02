@@ -4,8 +4,11 @@
 @{
     ViewData["Title"] = "Rentals";
     string organizationNameFind = Model.FilterViewModel.OrganizationNameFind;
-    DateTime? checkInDateFind = Model.FilterViewModel.CheckInDateFind;
-    DateTime? checkOutDateFind = Model.FilterViewModel.CheckOutDateFind;
+    DateTime? checkInDateStartFind = Model.FilterViewModel.CheckInDateStartFind;
+    DateTime? checkInDateEndFind = Model.FilterViewModel.CheckInDateEndFind;
+    DateTime? checkOutDateStartFind = Model.FilterViewModel.CheckOutDateStartFind;
+    DateTime? checkOutDateEndFind = Model.FilterViewModel.CheckOutDateEndFind;
+    int? BuildingIdFind = Model.FilterViewModel.BuildingIdFind;
 }
 
 
@@ -19,9 +22,13 @@
             <form method="post">
                 <input class="filter-input" name="OrganizationNameFind" value="@organizationNameFind"  placeholder="Название организации"/>
 
-                <input class="filter-input" type="date" name="CheckInDateFind" value="@checkInDateFind?.ToString("yyyy-MM-dd")"  placeholder="Дата въезда"/>
+                <select class="filter-input" name="BuildingIdFind" asp-items="ViewBag.BuildingId"></select>
 
-                <input class="filter-input" type="date" name="CheckOutDateFind" value="@checkOutDateFind?.ToString("yyyy-MM-dd")"  placeholder="Дата выезда"/>
+                <input class="filter-input" type="date" name="CheckInDateStartFind" value="@checkInDateStartFind?.ToString("yyyy-MM-dd")" placeholder="Дата въезда" />
+                <input class="filter-input" type="date" name="CheckInDateEndFind" value="@checkInDateEndFind?.ToString("yyyy-MM-dd")" placeholder="Дата въезда" />
+
+                <input class="filter-input" type="date" name="CheckOutDateStartFind" value="@checkOutDateStartFind?.ToString("yyyy-MM-dd")" placeholder="Дата выезда" />
+                <input class="filter-input" type="date" name="CheckOutDateEndFind" value="@checkOutDateEndFind?.ToString("yyyy-MM-dd")" placeholder="Дата выезда" />
 
                 <input class="filter-input" type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
                 <input class="submitButton-index" type="submit" value="Искать" />
@@ -42,8 +49,10 @@
                             <a asp-action="Index"
                                asp-route-sortOrder="@(Model.SortViewModel.OrganizationNameSort)"
                                asp-route-organizationNameFind="@organizationNameFind"
-                               asp-route-checkInDateFind="@checkInDateFind"
-                               asp-route-checkOutDateFind="@checkOutDateFind">
+                               asp-route-checkInDateStartFind="@checkInDateStartFind"
+                               asp-route-checkInDateEndFind="@checkInDateEndFind"
+                               asp-route-checkOutDateStartFind="@checkOutDateStartFind"
+                               asp-route-checkOutDateEndFind="@checkOutDateEndFind">
                                 @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RentalOrganization)
                             </a>
                         </th>
@@ -51,8 +60,10 @@
                             <a asp-action="Index"
                                asp-route-sortOrder="@(Model.SortViewModel.CheckInDateSort)"
                                asp-route-organizationNameFind="@organizationNameFind"
-                               asp-route-checkInDateFind="@checkInDateFind"
-                               asp-route-checkOutDateFind="@checkOutDateFind">
+                               asp-route-checkInDateStartFind="@checkInDateStartFind"
+                               asp-route-checkInDateEndFind="@checkInDateEndFind"
+                               asp-route-checkOutDateStartFind="@checkOutDateStartFind"
+                               asp-route-checkOutDateEndFind="@checkOutDateEndFind">
                                 @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().CheckInDate)
                             </a>
                         </th>
@@ -60,8 +71,10 @@
                             <a asp-action="Index"
                                asp-route-sortOrder="@(Model.SortViewModel.CheckOutDateSort)"
                                asp-route-organizationNameFind="@organizationNameFind"
-                               asp-route-checkInDateFind="@checkInDateFind"
-                               asp-route-checkOutDateFind="@checkOutDateFind">
+                               asp-route-checkInDateStartFind="@checkInDateStartFind"
+                               asp-route-checkInDateEndFind="@checkInDateEndFind"
+                               asp-route-checkOutDateStartFind="@checkOutDateStartFind"
+                               asp-route-checkOutDateEndFind="@checkOutDateEndFind">
                                 @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().CheckOutDate)
                             </a>
                         </th>
@@ -76,7 +89,7 @@
                                 @((await rooms.Get(item.RoomId)).Building.Name), № @(item.Room.RoomNumber)
                             </td>
                             <td class="element">
-                                @Html.DisplayFor(modelItem => item.RentalOrganization.Name)
+                                <a asp-controller="Organizations" asp-action="Details" asp-route-id="@item.RentalOrganizationId" >@Html.DisplayFor(modelItem => item.RentalOrganization.Name) </a>
                             </td>
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.CheckInDate)
@@ -98,8 +111,10 @@
         <page-link page-model="Model.PageViewModel" page-action="Index"
                    page-url-sortOrder="@(Model.SortViewModel.Current)"
                    page-url-organizationNameFind="@organizationNameFind"
-                   page-url-checkInDateFind="@checkInDateFind"
-                   page-url-checkOutDateFind="@checkOutDateFind"></page-link>
+                   page-url-checkInDateStartFind="@checkInDateStartFind"
+                   page-url-checkInDateEndFind="@checkInDateEndFind"
+                   page-url-checkOutDateStartFind="@checkOutDateStartFind"
+                   page-url-checkOutDateEndFind="@checkOutDateEndFind"></page-link>
     </div>
 </div>
 @* 

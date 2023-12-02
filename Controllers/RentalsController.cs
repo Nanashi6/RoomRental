@@ -16,13 +16,15 @@ namespace RoomRental.Controllers
     public class RentalsController : Controller
     {
         private readonly RentalService _cache;
+        private readonly BuildingService _buildingCache;
         private readonly OrganizationService _organizationCache;
         private readonly RoomService _roomCache;
         private readonly int _pageSize = 10;
 
-        public RentalsController(RentalService cache, OrganizationService organizationCache, RoomService roomCache, IConfiguration appConfig)
+        public RentalsController(RentalService cache, OrganizationService organizationCache, RoomService roomCache, BuildingService buildingCache, IConfiguration appConfig)
         {
             _cache = cache;
+            _buildingCache = buildingCache;
             _organizationCache = organizationCache;
             _roomCache = roomCache;
             _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
@@ -39,18 +41,19 @@ namespace RoomRental.Controllers
                 if (dict != null)
                 {
                     filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
+                    filterViewModel.BuildingIdFind = Int32.Parse(dict["BuildingIdFind"]);
 
-                    DateTime checkInDateFind;
-                    if (dict.ContainsKey("CheckOutDateFind") && DateTime.TryParse(dict["CheckOutDateFind"], out checkInDateFind))
-                        filterViewModel.CheckOutDateFind = checkInDateFind;
+                    DateTime CheckInDateStartFind;
+                    if (dict.ContainsKey("CheckInDateStartFind") && DateTime.TryParse(dict["CheckInDateStartFind"], out CheckInDateStartFind))
+                        filterViewModel.CheckInDateStartFind = CheckInDateStartFind;
                     else
-                        filterViewModel.CheckOutDateFind = null;
+                        filterViewModel.CheckInDateStartFind = null;
 
-                    DateTime checkOutDateFind;
-                    if (dict.ContainsKey("CheckInDateFind") && DateTime.TryParse(dict["CheckInDateFind"], out checkOutDateFind))
-                        filterViewModel.CheckInDateFind = checkOutDateFind;
+                    DateTime CheckOutDateEndFind;
+                    if (dict.ContainsKey("CheckOutDateEndFind") && DateTime.TryParse(dict["CheckOutDateEndFind"], out CheckOutDateEndFind))
+                        filterViewModel.CheckOutDateEndFind = CheckOutDateEndFind;
                     else
-                        filterViewModel.CheckInDateFind = null;
+                        filterViewModel.CheckOutDateEndFind = null;
                 }
             }
 
@@ -59,10 +62,25 @@ namespace RoomRental.Controllers
             //Фильтрация
             if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
                 rentals = rentals.Where(e => e.RentalOrganization.Name.Contains(filterViewModel.OrganizationNameFind)).ToList();
-            if (filterViewModel.CheckInDateFind != null)
-                rentals = rentals.Where(e => e.CheckInDate >= filterViewModel.CheckInDateFind).ToList();
-            if (filterViewModel.CheckOutDateFind != null)
-                rentals = rentals.Where(e => e.CheckOutDate <= filterViewModel.CheckOutDateFind).ToList();
+            if (filterViewModel.BuildingIdFind != null && filterViewModel.BuildingIdFind != 0)
+                rentals = rentals.Where(e => e.Room.BuildingId == filterViewModel.BuildingIdFind).ToList();
+
+            if (filterViewModel.CheckInDateStartFind != null && filterViewModel.CheckOutDateEndFind != null)
+                rentals = rentals.Where(e => (e.CheckOutDate >= filterViewModel.CheckInDateStartFind && e.CheckOutDate <= filterViewModel.CheckOutDateEndFind) || (e.CheckInDate <= filterViewModel.CheckOutDateEndFind && e.CheckInDate >= filterViewModel.CheckInDateStartFind) || (e.CheckInDate <= filterViewModel.CheckInDateStartFind && e.CheckOutDate >= filterViewModel.CheckOutDateEndFind)).ToList();
+            else if (filterViewModel.CheckInDateStartFind != null)
+                rentals = rentals.Where(e => e.CheckInDate >= filterViewModel.CheckInDateStartFind).ToList();
+            else if (filterViewModel.CheckOutDateEndFind != null)
+                rentals = rentals.Where(e => e.CheckOutDate <= filterViewModel.CheckOutDateEndFind).ToList();
+
+            if (filterViewModel.CheckInDateStartFind != null && filterViewModel.CheckInDateEndFind != null)
+                rentals = rentals.Where(e => e.CheckInDate <= filterViewModel.CheckInDateEndFind && e.CheckInDate >= filterViewModel.CheckInDateStartFind).ToList();
+            else if (filterViewModel.CheckInDateEndFind != null)
+                rentals = rentals.Where(e => e.CheckInDate <= filterViewModel.CheckInDateEndFind).ToList();
+
+            if (filterViewModel.CheckOutDateStartFind != null && filterViewModel.CheckOutDateEndFind != null)
+                rentals = rentals.Where(e => e.CheckOutDate >= filterViewModel.CheckOutDateStartFind && e.CheckOutDate <= filterViewModel.CheckOutDateEndFind).ToList();
+            else if (filterViewModel.CheckOutDateStartFind != null)
+                rentals = rentals.Where(e => e.CheckOutDate >= filterViewModel.CheckOutDateStartFind).ToList();
 
             //Сортировка
             switch (sortOrder)
@@ -100,6 +118,12 @@ namespace RoomRental.Controllers
                 SortViewModel = new RentalSortViewModel(sortOrder)
             };
 
+            var buildings = (await _buildingCache.GetAll()).ToList();
+            buildings.Insert(0, new Building() { BuildingId = 0, Name = "Все здания" });
+            if (filterViewModel.BuildingIdFind != null)
+                ViewData["BuildingId"] = new SelectList(buildings, "BuildingId", "Name", filterViewModel.BuildingIdFind);
+            else
+                ViewData["BuildingId"] = new SelectList(buildings, "BuildingId", "Name");
             return View(rentalsViewModel);
         }
 
