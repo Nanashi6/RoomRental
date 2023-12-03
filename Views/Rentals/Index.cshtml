@@ -1,8 +1,11 @@
 ﻿@model RoomRental.ViewModels.RentalsViewModel
-@inject RoomRental.Services.RoomService rooms
+@inject RoomRental.Services.RoomService roomCache
 
 @{
     ViewData["Title"] = "Rentals";
+
+    var rooms = await roomCache.GetAll();
+
     string organizationNameFind = Model.FilterViewModel.OrganizationNameFind;
     DateTime? checkInDateStartFind = Model.FilterViewModel.CheckInDateStartFind;
     DateTime? checkInDateEndFind = Model.FilterViewModel.CheckInDateEndFind;
@@ -86,7 +89,7 @@
                     {
                         <tr class="row" onclick="location.href='@Url.Action("Details", "Rentals", new { id = item.RentalId })'">
                             <td class="element">
-                                @((await rooms.Get(item.RoomId)).Building.Name), № @(item.Room.RoomNumber)
+                                @(rooms.Single(e => e.RoomId == item.RoomId).Building.Name), № @(item.Room.RoomNumber)
                             </td>
                             <td class="element">
                                 <a asp-controller="Organizations" asp-action="Details" asp-route-id="@item.RentalOrganizationId" >@Html.DisplayFor(modelItem => item.RentalOrganization.Name) </a>
@@ -96,7 +99,7 @@
                             </td>
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.CheckOutDate)
-                            </td>
+                            </td> 
                             <td class="element">
                                 <a class="btn-primary btn" asp-action="Edit" asp-route-id="@item.RentalId">Изменить</a> |
                                 @* <a class="btn-secondary btn" asp-action="Details" asp-route-id="@item.RentalId">Подробнее</a> | *@

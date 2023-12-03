@@ -1,7 +1,10 @@
 ﻿@model RoomRental.ViewModels.InvoicesViewModel
-@inject RoomRental.Services.RoomService rooms
+@inject RoomRental.Services.RoomService roomCache
 @{
     ViewData["Title"] = "Invoices";
+
+    var rooms = await roomCache.GetAll();
+
     string organizationNameFind = Model.FilterViewModel.OrganizationNameFind;
     decimal? amountFind = Model.FilterViewModel.AmountFind;
     string personFind = Model.FilterViewModel.ResponsiblePersonFind;
@@ -87,7 +90,7 @@
                     {
                         <tr class="row" onclick="location.href='@Url.Action("Details", "Invoices", new { id = item.InvoiceId })'">
                             <td class="element">
-                                @((await rooms.Get(item.RoomId)).Building.Name), № @(item.Room.RoomNumber)
+                                @(rooms.Single(e => e.RoomId == item.RoomId).Building.Name), № @(item.Room.RoomNumber)
                             </td>
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.RentalOrganization.Name)

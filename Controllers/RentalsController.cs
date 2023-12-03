@@ -43,15 +43,22 @@ namespace RoomRental.Controllers
                     filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
                     filterViewModel.BuildingIdFind = Int32.Parse(dict["BuildingIdFind"]);
 
-                    DateTime CheckInDateStartFind;
-                    if (dict.ContainsKey("CheckInDateStartFind") && DateTime.TryParse(dict["CheckInDateStartFind"], out CheckInDateStartFind))
-                        filterViewModel.CheckInDateStartFind = CheckInDateStartFind;
+                    DateTime data;
+                    if (dict.ContainsKey("CheckInDateStartFind") && DateTime.TryParse(dict["CheckInDateStartFind"], out data))
+                        filterViewModel.CheckInDateStartFind = data;
                     else
                         filterViewModel.CheckInDateStartFind = null;
+                    if (dict.ContainsKey("CheckInDateEndFind") && DateTime.TryParse(dict["CheckInDateEndFind"], out data))
+                        filterViewModel.CheckInDateEndFind = data;
+                    else
+                        filterViewModel.CheckInDateEndFind = null;
 
-                    DateTime CheckOutDateEndFind;
-                    if (dict.ContainsKey("CheckOutDateEndFind") && DateTime.TryParse(dict["CheckOutDateEndFind"], out CheckOutDateEndFind))
-                        filterViewModel.CheckOutDateEndFind = CheckOutDateEndFind;
+                    if (dict.ContainsKey("CheckOutDateStartFind") && DateTime.TryParse(dict["CheckOutDateStartFind"], out data))
+                        filterViewModel.CheckOutDateStartFind = data;
+                    else
+                        filterViewModel.CheckOutDateStartFind = null;
+                    if (dict.ContainsKey("CheckOutDateEndFind") && DateTime.TryParse(dict["CheckOutDateEndFind"], out data))
+                        filterViewModel.CheckOutDateEndFind = data;
                     else
                         filterViewModel.CheckOutDateEndFind = null;
                 }
