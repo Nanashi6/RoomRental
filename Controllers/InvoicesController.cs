@@ -55,6 +55,11 @@ namespace RoomRental.Controllers
                     else
                         filterViewModel.ConclusionDateFind = null;
 
+                    if (dict.ContainsKey("PermissionDateFind") && DateTime.TryParse(dict["PermissionDateFind"], out date))
+                        filterViewModel.PermissionDateFind = date;
+                    else
+                        filterViewModel.PermissionDateFind = null;
+
                     Decimal amountFind;
                     if (dict.ContainsKey("AmountFind") && Decimal.TryParse(dict["AmountFind"], out amountFind))
                         filterViewModel.AmountFind = amountFind;
@@ -76,6 +81,8 @@ namespace RoomRental.Controllers
                 invoices = invoices.Where(e => e.ConclusionDate == filterViewModel.ConclusionDateFind).ToList();
             if (filterViewModel.PaymentDateFind != null)
                 invoices = invoices.Where(e => e.PaymentDate == filterViewModel.PaymentDateFind).ToList();
+            if (filterViewModel.PermissionDateFind != null)
+                invoices = invoices.Where(e => e.PaymentDate > filterViewModel.PermissionDateFind && e.ConclusionDate <= filterViewModel.PermissionDateFind).ToList();
 
             //Сортировка
             switch (sortOrder)
@@ -91,6 +98,12 @@ namespace RoomRental.Controllers
                     break;
                 case InvoiceSortState.PaymentDateDesc:
                     invoices = invoices.OrderByDescending(e => e.PaymentDate).ToList();
+                    break;
+                case InvoiceSortState.ConclusionDateAsc:
+                    invoices = invoices.OrderBy(e => e.ConclusionDate).ToList();
+                    break;
+                case InvoiceSortState.ConclusionDateDesc:
+                    invoices = invoices.OrderByDescending(e => e.ConclusionDate).ToList();
                     break;
                 case InvoiceSortState.AmountAsc:
                     invoices = invoices.OrderBy(e => e.Amount).ToList();

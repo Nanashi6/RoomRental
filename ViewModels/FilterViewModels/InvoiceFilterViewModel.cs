@@ -7,5 +7,6 @@
         public decimal? AmountFind { get; set; } = null;
         public DateTime? PaymentDateFind { get; set; } = null;
         public DateTime? ConclusionDateFind { get; set; } = null;
+        public DateTime? PermissionDateFind { get; set; } = null;
     }
 }

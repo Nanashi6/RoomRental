@@ -10,6 +10,7 @@
     string personFind = Model.FilterViewModel.ResponsiblePersonFind;
     DateTime? paymentDateFind = Model.FilterViewModel.PaymentDateFind;
     DateTime? conclusionDateFind = Model.FilterViewModel.ConclusionDateFind;
+    DateTime? permissionDateFind = Model.FilterViewModel.PermissionDateFind;
 }
 
 <div class="index-container">
@@ -26,8 +27,9 @@
 
                 <input class="filter-input" name="ResponsiblePersonFind" value="@personFind" placeholder="Ответственное лицо" />
 
-                <input class="filter-input" type="date" name="ConclusionDateFind" value="@conclusionDateFind?.ToString("yyyy-MM-dd")" placeholder="Дата платежа" />
+                <input class="filter-input" type="date" name="ConclusionDateFind" value="@conclusionDateFind?.ToString("yyyy-MM-dd")" placeholder="Дата оформления" />
                 <input class="filter-input" type="date" name="PaymentDateFind" value="@paymentDateFind?.ToString("yyyy-MM-dd")" placeholder="Дата платежа" />
+                <input class="filter-input" type="date" name="PermissionDateFind" value="@permissionDateFind?.ToString("yyyy-MM-dd")" placeholder="Дата для поиска задолников" />
 
                 <input class="filter-input" type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
                 <input class="submitButton-index" type="submit" value="Искать" />
@@ -51,6 +53,7 @@
                                asp-route-organizationNameFind="@organizationNameFind"
                                asp-route-personFind="@personFind"
                                asp-route-paymentDateFind="@conclusionDateFind"
+                               asp-route-paymentDateFind="@permissionDateFind"
                                asp-route-paymentDateFind="@paymentDateFind">
                                 @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().RentalOrganization)
                             </a>
@@ -62,6 +65,7 @@
                                asp-route-organizationNameFind="@organizationNameFind"
                                asp-route-personFind="@personFind"
                                asp-route-paymentDateFind="@conclusionDateFind"
+                               asp-route-paymentDateFind="@permissionDateFind"
                                asp-route-paymentDateFind="@paymentDateFind">
                                 @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().Amount)
                             </a>
@@ -73,6 +77,7 @@
                                asp-route-organizationNameFind="@organizationNameFind"
                                asp-route-personFind="@personFind"
                                asp-route-paymentDateFind="@conclusionDateFind"
+                               asp-route-paymentDateFind="@permissionDateFind"
                                asp-route-paymentDateFind="@paymentDateFind">
                                 @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().ConclusionDate)
                             </a>
@@ -84,6 +89,7 @@
                                asp-route-organizationNameFind="@organizationNameFind"
                                asp-route-personFind="@personFind"
                                asp-route-paymentDateFind="@conclusionDateFind"
+                               asp-route-paymentDateFind="@permissionDateFind"
                                asp-route-paymentDateFind="@paymentDateFind">
                                 @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().PaymentDate)
                             </a>
@@ -95,6 +101,7 @@
                                asp-route-organizationNameFind="@organizationNameFind"
                                asp-route-personFind="@personFind"
                                asp-route-paymentDateFind="@conclusionDateFind"
+                               asp-route-paymentDateFind="@permissionDateFind"
                                asp-route-paymentDateFind="@paymentDateFind">
                                 @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().ResponsiblePerson)
                             </a>
@@ -141,6 +148,7 @@
                    page-url-organizationNameFind="@organizationNameFind"
                    page-url-personFind="@personFind"
                    page-url-paymentDateFind="@conclusionDateFind"
+                   page-url-paymentDateFind="@permissionDateFind"
                    page-url-paymentDateFind="@paymentDateFind"></page-link>
     </div>
 </div>
