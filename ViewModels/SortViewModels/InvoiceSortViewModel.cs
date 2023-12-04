@@ -6,6 +6,7 @@ namespace RoomRental.ViewModels.SortViewModels
     {
         public InvoiceSortState OrganizationNameSort { get; set; }
         public InvoiceSortState PaymentDateSort { get; set; }
+        public InvoiceSortState ConclusionDateSort { get; set; }
         public InvoiceSortState AmountSort { get; set; }
         public InvoiceSortState ResponsiblePersonSort { get; set; }
         public InvoiceSortState Current { get; set; }
@@ -13,6 +14,7 @@ namespace RoomRental.ViewModels.SortViewModels
         {
             OrganizationNameSort = sortOrder == InvoiceSortState.OrganizationNameAsc ? InvoiceSortState.OrganizationNameDesc : InvoiceSortState.OrganizationNameAsc;
             PaymentDateSort = sortOrder == InvoiceSortState.PaymentDateAsc ? InvoiceSortState.PaymentDateDesc : InvoiceSortState.PaymentDateAsc;
+            ConclusionDateSort = sortOrder == InvoiceSortState.ConclusionDateAsc ? InvoiceSortState.ConclusionDateDesc : InvoiceSortState.ConclusionDateAsc;
             AmountSort = sortOrder == InvoiceSortState.AmountAsc ? InvoiceSortState.AmountDesc : InvoiceSortState.AmountAsc;
             ResponsiblePersonSort = sortOrder == InvoiceSortState.ResponsiblePersonAsc ? InvoiceSortState.ResponsiblePersonDesc : InvoiceSortState.ResponsiblePersonAsc;
             Current = sortOrder;

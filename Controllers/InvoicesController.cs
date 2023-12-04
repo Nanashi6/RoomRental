@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using RoomRental.Attributes;
 using RoomRental.Models;
@@ -43,11 +44,16 @@ namespace RoomRental.Controllers
                     filterViewModel.ResponsiblePersonFind = dict["ResponsiblePersonFind"];
                     filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
 
-                    DateTime paymentDateFind;
-                    if (dict.ContainsKey("PaymentDateFind") && DateTime.TryParse(dict["PaymentDateFind"], out paymentDateFind))
-                        filterViewModel.PaymentDateFind = paymentDateFind;
+                    DateTime date;
+                    if (dict.ContainsKey("PaymentDateFind") && DateTime.TryParse(dict["PaymentDateFind"], out date))
+                        filterViewModel.PaymentDateFind = date;
                     else
                         filterViewModel.PaymentDateFind = null;
+
+                    if (dict.ContainsKey("ConclusionDateFind") && DateTime.TryParse(dict["ConclusionDateFind"], out date))
+                        filterViewModel.ConclusionDateFind = date;
+                    else
+                        filterViewModel.ConclusionDateFind = null;
 
                     Decimal amountFind;
                     if (dict.ContainsKey("AmountFind") && Decimal.TryParse(dict["AmountFind"], out amountFind))
@@ -66,6 +72,8 @@ namespace RoomRental.Controllers
                 invoices = invoices.Where(e => $"{e.ResponsiblePerson.Surname} {e.ResponsiblePerson.Name} {e.ResponsiblePerson.Lastname}".Contains(filterViewModel.ResponsiblePersonFind)).ToList();
             if (filterViewModel.AmountFind != null)
                 invoices = invoices.Where(e => e.Amount == filterViewModel.AmountFind).ToList();
+            if (filterViewModel.ConclusionDateFind != null)
+                invoices = invoices.Where(e => e.ConclusionDate == filterViewModel.ConclusionDateFind).ToList();
             if (filterViewModel.PaymentDateFind != null)
                 invoices = invoices.Where(e => e.PaymentDate == filterViewModel.PaymentDateFind).ToList();
 

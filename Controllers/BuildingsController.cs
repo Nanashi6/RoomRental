@@ -187,6 +187,7 @@ namespace RoomRental.Controllers
             //Формирование графика с арендой помещений
             ViewBag.StartDate = startDate.Value;
             ViewBag.EndDate = endDate.Value;
+            ViewBag.Area = buildingArea;
 
             return View(building);
         }

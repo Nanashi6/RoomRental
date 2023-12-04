@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.ComponentModel.DataAnnotations;
+using RoomRental.Attributes;
 
 namespace RoomRental.Models;
 
@@ -22,9 +23,15 @@ public partial class Invoice
     [Range(0, double.MaxValue, ErrorMessage = "Значение не может быть меньше нуля")]
     public decimal Amount { get; set; }
 
+    [Required(ErrorMessage = "Не указана дата заключения договора")]
+    [Display(Name = "Дата заключения договора")]
+    [DataType(DataType.Date)]
+    public DateTime ConclusionDate { get; set; }
+
     [Required(ErrorMessage = "Не указана дата оплаты")]
     [Display(Name = "Дата оплаты")]
     [DataType(DataType.Date)]
+    [CheckOutDate("ConclusionDate")]
     public DateTime PaymentDate { get; set; }
 
     [Required(ErrorMessage = "Не указан оформляющий")]

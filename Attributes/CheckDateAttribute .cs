@@ -24,11 +24,11 @@ namespace RoomRental.Attributes
 
             if (endDateValue < startDateValue)
             {
-                return new ValidationResult("Дата окончания аренды не может быть меньше даты начала аренды.");
+                return new ValidationResult($"Дата окончания аренды не может быть меньше {startDateValue}");
             }
             else if (endDateValue == startDateValue)
             {
-                return new ValidationResult("Дата окончания аренды не может быть равна дате начала аренды.");
+                return new ValidationResult($"Дата окончания аренды не может быть равна {startDateValue}");
             }
 
             return ValidationResult.Success;

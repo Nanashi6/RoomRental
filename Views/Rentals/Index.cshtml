@@ -89,7 +89,7 @@
                     {
                         <tr class="row" onclick="location.href='@Url.Action("Details", "Rentals", new { id = item.RentalId })'">
                             <td class="element">
-                                @(rooms.Single(e => e.RoomId == item.RoomId).Building.Name), № @(item.Room.RoomNumber)
+                                @(rooms.Single(e => e.RoomId == item.RoomId).Building.Name),<br /> № @(item.Room.RoomNumber)
                             </td>
                             <td class="element">
                                 <a asp-controller="Organizations" asp-action="Details" asp-route-id="@item.RentalOrganizationId" >@Html.DisplayFor(modelItem => item.RentalOrganization.Name) </a>

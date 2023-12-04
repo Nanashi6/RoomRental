@@ -9,6 +9,7 @@
     decimal? amountFind = Model.FilterViewModel.AmountFind;
     string personFind = Model.FilterViewModel.ResponsiblePersonFind;
     DateTime? paymentDateFind = Model.FilterViewModel.PaymentDateFind;
+    DateTime? conclusionDateFind = Model.FilterViewModel.ConclusionDateFind;
 }
 
 <div class="index-container">
@@ -25,6 +26,7 @@
 
                 <input class="filter-input" name="ResponsiblePersonFind" value="@personFind" placeholder="Ответственное лицо" />
 
+                <input class="filter-input" type="date" name="ConclusionDateFind" value="@conclusionDateFind?.ToString("yyyy-MM-dd")" placeholder="Дата платежа" />
                 <input class="filter-input" type="date" name="PaymentDateFind" value="@paymentDateFind?.ToString("yyyy-MM-dd")" placeholder="Дата платежа" />
 
                 <input class="filter-input" type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
@@ -48,6 +50,7 @@
                                asp-route-amountFind="@amountFind"
                                asp-route-organizationNameFind="@organizationNameFind"
                                asp-route-personFind="@personFind"
+                               asp-route-paymentDateFind="@conclusionDateFind"
                                asp-route-paymentDateFind="@paymentDateFind">
                                 @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().RentalOrganization)
                             </a>
@@ -58,8 +61,20 @@
                                asp-route-amountFind="@amountFind"
                                asp-route-organizationNameFind="@organizationNameFind"
                                asp-route-personFind="@personFind"
+                               asp-route-paymentDateFind="@conclusionDateFind"
                                asp-route-paymentDateFind="@paymentDateFind">
                                 @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().Amount)
+                            </a>
+                        </th>
+                        <th class="element">
+                            <a asp-action="Index"
+                               asp-route-sortOrder="@(Model.SortViewModel.ConclusionDateSort)"
+                               asp-route-amountFind="@amountFind"
+                               asp-route-organizationNameFind="@organizationNameFind"
+                               asp-route-personFind="@personFind"
+                               asp-route-paymentDateFind="@conclusionDateFind"
+                               asp-route-paymentDateFind="@paymentDateFind">
+                                @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().ConclusionDate)
                             </a>
                         </th>
                         <th class="element">
@@ -68,6 +83,7 @@
                                asp-route-amountFind="@amountFind"
                                asp-route-organizationNameFind="@organizationNameFind"
                                asp-route-personFind="@personFind"
+                               asp-route-paymentDateFind="@conclusionDateFind"
                                asp-route-paymentDateFind="@paymentDateFind">
                                 @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().PaymentDate)
                             </a>
@@ -78,6 +94,7 @@
                                asp-route-amountFind="@amountFind"
                                asp-route-organizationNameFind="@organizationNameFind"
                                asp-route-personFind="@personFind"
+                               asp-route-paymentDateFind="@conclusionDateFind"
                                asp-route-paymentDateFind="@paymentDateFind">
                                 @Html.DisplayNameFor(model => model.Invoices.SingleOrDefault().ResponsiblePerson)
                             </a>
@@ -90,13 +107,16 @@
                     {
                         <tr class="row" onclick="location.href='@Url.Action("Details", "Invoices", new { id = item.InvoiceId })'">
                             <td class="element">
-                                @(rooms.Single(e => e.RoomId == item.RoomId).Building.Name), № @(item.Room.RoomNumber)
+                                @(rooms.Single(e => e.RoomId == item.RoomId).Building.Name),<br /> № @(item.Room.RoomNumber)
                             </td>
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.RentalOrganization.Name)
                             </td>
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.Amount)
+                            </td>
+                            <td class="element">
+                                @Html.DisplayFor(modelItem => item.ConclusionDate)
                             </td>
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.PaymentDate)
@@ -120,6 +140,7 @@
                    page-url-amountFind="@amountFind"
                    page-url-organizationNameFind="@organizationNameFind"
                    page-url-personFind="@personFind"
+                   page-url-paymentDateFind="@conclusionDateFind"
                    page-url-paymentDateFind="@paymentDateFind"></page-link>
     </div>
 </div>

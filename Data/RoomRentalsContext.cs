@@ -81,6 +81,9 @@ public partial class RoomRentalsContext : IdentityDbContext<User>
             entity.Property(e => e.Amount)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("amount");
+            entity.Property(e => e.ConclusionDate)
+                .HasColumnType("date")
+                .HasColumnName("conclusionDate");
             entity.Property(e => e.PaymentDate)
                 .HasColumnType("date")
                 .HasColumnName("paymentDate");

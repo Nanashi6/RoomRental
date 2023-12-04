@@ -35,7 +35,7 @@ namespace RoomRental.Data
 
                 for (int i = 1; i <= buildings.Length; i++)
                 {
-                    for (int j = 0; j < 20; j++)
+                    for (int j = 0; j < 10; j++)
                         context.Add(new Room() { Area = rnd.Next(50,100), BuildingId = i, RoomNumber = j+1, Description = $"Description {(i-1) * 10 + (j + 1)}", Building = context.Buildings.ToArray()[i-1] });
                 }
 
@@ -45,7 +45,7 @@ namespace RoomRental.Data
             var rooms = context.Rooms.ToArray();
             if (!context.RoomImages.Any())
             {
-                for (int i = 0; i < 10000; i++)
+                for (int i = 0; i < 5000; i++)
                 {
                     int roomId = i + 1;
                     context.Add(new RoomImage() { RoomId = roomId, ImagePath = "\\Images\\Rooms\\1.jpg", Room = rooms[roomId-1] });
@@ -62,6 +62,7 @@ namespace RoomRental.Data
                 context.SaveChanges();
             }
 
+            var people = context.ResponsiblePeople.ToArray();
             if (!context.Rentals.Any())
             {
                 for (int i = 0; i < 10000; i++)
@@ -69,24 +70,12 @@ namespace RoomRental.Data
                     int roomId = rnd.Next(rooms.Count()) + 1;
                     int rentalOrgId = rnd.Next(organizations.Count()) + 1;
                     DateTime checkInDate = GenerateRandomDate();
-                    DateTime checkOutDate = GenerateRandomDate(checkInDate);
+                    DateTime checkOutDate = GenerateRandomDate(checkInDate, checkInDate.AddMonths(1));
+                    int responsiblePersonId = rnd.Next(people.Count()) + 1;
+                    DateTime paymentDate = GenerateRandomDate(checkInDate, checkInDate.AddDays(7));
 
                     context.Add(new Rental() { RoomId = roomId, RentalOrganizationId = rentalOrgId, CheckInDate = checkInDate, CheckOutDate = checkOutDate, Room = rooms[roomId-1], RentalOrganization = organizations[rentalOrgId-1] });
-                }
-                context.SaveChanges();
-            }
-
-            var people = context.ResponsiblePeople.ToArray();
-            if (!context.Invoices.Any())
-            {
-                for (int i = 0; i < 10000; i++)
-                {
-                    int roomId = rnd.Next(rooms.Count()) + 1;
-                    int rentalOrgId = rnd.Next(organizations.Count()) + 1;
-                    int responsiblePersonId = rnd.Next(people.Count()) + 1;
-                    DateTime paymentDate = GenerateRandomDate();
-
-                    context.Add(new Invoice() { RoomId = roomId, RentalOrganizationId = rentalOrgId, Amount = rnd.Next(10000), ResponsiblePersonId = responsiblePersonId, PaymentDate = paymentDate, Room = rooms[roomId - 1], RentalOrganization = organizations[rentalOrgId - 1], ResponsiblePerson = people[responsiblePersonId-1] });
+                    context.Add(new Invoice() { RoomId = roomId, RentalOrganizationId = rentalOrgId, ConclusionDate = checkInDate, Amount = rnd.Next(3000,5000), ResponsiblePersonId = responsiblePersonId, PaymentDate = paymentDate, Room = rooms[roomId - 1], RentalOrganization = organizations[rentalOrgId - 1], ResponsiblePerson = people[responsiblePersonId - 1] });
                 }
                 context.SaveChanges();
             }
@@ -94,8 +83,8 @@ namespace RoomRental.Data
         private static DateTime GenerateRandomDate(DateTime? minDate = null, DateTime? maxDate = null)
         {
             Random random = new(Guid.NewGuid().GetHashCode());
-            DateTime startDate = minDate ?? new DateTime(2020, 1, 1);
-            DateTime endDate = maxDate ?? new DateTime(2024, 12, 31);
+            DateTime startDate = minDate ?? new DateTime(2021, 1, 1);
+            DateTime endDate = maxDate ?? new DateTime(2023, 12, 31);
 
             TimeSpan timeSpan = endDate - startDate;
             TimeSpan randomSpan = new TimeSpan((long)(random.NextDouble() * timeSpan.Ticks));

@@ -6,6 +6,8 @@
         OrganizationNameDesc,
         PaymentDateAsc,
         PaymentDateDesc,
+        ConclusionDateAsc,
+        ConclusionDateDesc,
         AmountAsc,
         AmountDesc,
         ResponsiblePersonAsc,
