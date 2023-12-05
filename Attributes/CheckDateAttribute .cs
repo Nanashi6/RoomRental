@@ -16,7 +16,7 @@ namespace RoomRental.Attributes
             var startDateProperty = validationContext.ObjectType.GetProperty(_startDatePropertyName);
             if (startDateProperty == null)
             {
-                return new ValidationResult($"Unknown property: {_startDatePropertyName}");
+                return new ValidationResult($"Неизвестное значение: {_startDatePropertyName}");
             }
 
             var startDateValue = (DateTime?)startDateProperty.GetValue(validationContext.ObjectInstance);
@@ -24,11 +24,11 @@ namespace RoomRental.Attributes
 
             if (endDateValue < startDateValue)
             {
-                return new ValidationResult($"Дата окончания аренды не может быть меньше {startDateValue}");
+                return new ValidationResult($"Дата не может быть меньше {startDateValue}");
             }
             else if (endDateValue == startDateValue)
             {
-                return new ValidationResult($"Дата окончания аренды не может быть равна {startDateValue}");
+                return new ValidationResult($"Дата не может быть равна {startDateValue}");
             }
 
             return ValidationResult.Success;

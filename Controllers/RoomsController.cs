@@ -31,23 +31,19 @@ namespace RoomRental.Controllers
         }
 
         // GET: Rooms
-        [SetSession("Room")]
         public async Task<IActionResult> Index(RoomFilterViewModel filterViewModel, int page = 1, RoomSortState sortOrder = RoomSortState.BuildingNameAsc)
         {
-            if (HttpContext.Request.Method == "GET")
+            var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Room");
+
+            if (dict != null)
             {
-                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Room");
+                filterViewModel.BuildingNameFind = dict["BuildingNameFind"];
 
-                if (dict != null)
-                {
-                    filterViewModel.BuildingNameFind = dict["BuildingNameFind"];
-
-                    Decimal areaFind;
-                    if (dict.ContainsKey("AreaFind") && Decimal.TryParse(dict["AreaFind"], out areaFind))
-                        filterViewModel.AreaFind = areaFind;
-                    else
-                        filterViewModel.AreaFind = null;
-                }
+                Decimal areaFind;
+                if (dict.ContainsKey("AreaFind") && Decimal.TryParse(dict["AreaFind"], out areaFind))
+                    filterViewModel.AreaFind = areaFind;
+                else
+                    filterViewModel.AreaFind = null;
             }
 
             var rooms = await _cache.GetAll();
@@ -89,6 +85,20 @@ namespace RoomRental.Controllers
             };
 
             return View(roomsViewModel);
+        }
+
+        // GET: Rooms/Filter
+        [HttpGet]
+        [SetSession("Room")]
+        public async Task<IActionResult> Filter(RoomFilterViewModel filterViewModel, RoomSortState sortOrder = RoomSortState.BuildingNameAsc)
+        {
+            var routeValues = new RouteValueDictionary
+            {
+                { "filterViewModel", filterViewModel },
+                { "sortOrder", sortOrder }
+            };
+
+            return RedirectToAction(nameof(Index), routeValues);
         }
 
         // GET: Rooms/Details/5

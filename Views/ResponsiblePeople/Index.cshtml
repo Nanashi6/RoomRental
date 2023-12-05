@@ -14,7 +14,7 @@
             <div><a asp-action="Create">Создать</a></div>
         </div>
         <div class="form-container_two">
-            <form method="post">
+            <form method="get" asp-action="Filter">
 
                 <input class="filter-input" name="SurnameFind" value="@surnameFind" placeholder="Фамилия" />
 
@@ -23,7 +23,7 @@
                 <input class="filter-input" name="LastnameFind" value="@lastnameFind" placeholder="Отчество" />
 
                 <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
-                <input class="submitButton-index" type="submit" value="Искать" />
+                <input class="submitButton-index" type="submit" value="Поиск" />
             </form>
         </div>
     </div>

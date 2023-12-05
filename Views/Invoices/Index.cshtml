@@ -20,7 +20,7 @@
             <div><a asp-action="Create">Создать</a></div>
         </div>
         <div class="form-container_two">
-            <form method="post">
+            <form method="get" asp-action="Filter">
                 <input class="filter-input" name="OrganizationNameFind" value="@organizationNameFind" placeholder="Название организации" />
 
                 <input class="filter-input" type="text" step="any" name="AmountFind" value="@(amountFind)" oninput="this.value = this.value.replace(/[^0-9,]/g, '')" placeholder="Сумма" />
@@ -32,7 +32,7 @@
                 <input class="filter-input" type="date" name="PermissionDateFind" value="@permissionDateFind?.ToString("yyyy-MM-dd")" placeholder="Дата для поиска задолников" />
 
                 <input class="filter-input" type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
-                <input class="submitButton-index" type="submit" value="Искать" />
+                <input class="submitButton-index" type="submit" value="Поиск" />
             </form>
         </div>
     </div>
@@ -117,7 +117,7 @@
                                 @(rooms.Single(e => e.RoomId == item.RoomId).Building.Name),<br /> № @(item.Room.RoomNumber)
                             </td>
                             <td class="element">
-                                @Html.DisplayFor(modelItem => item.RentalOrganization.Name)
+                                <a asp-controller="Organizations" asp-action="Details" asp-route-id="@item.RentalOrganizationId">@Html.DisplayFor(modelItem => item.RentalOrganization.Name) </a>
                             </td>
                             <td class="element">
                                 @Html.DisplayFor(modelItem => item.Amount)

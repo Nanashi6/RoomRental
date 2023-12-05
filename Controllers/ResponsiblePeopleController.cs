@@ -24,21 +24,17 @@ namespace RoomRental.Controllers
         }
 
         // GET: ResponsiblePersons
-        [SetSession("Person", "SurnameFind", "NameFind", "LastnameFind")]
-        //[Route("People/")]
         public async Task<IActionResult> Index(PersonFilterViewModel filterViewModel, int page = 1, PersonSortState sortOrder = PersonSortState.SurnameAsc)
         {
-            if (HttpContext.Request.Method == "GET")
-            {
-                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Person");
+            var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "People");
 
-                if (dict != null)
-                {
-                    filterViewModel.SurnameFind = dict["SurnameFind"];
-                    filterViewModel.NameFind = dict["NameFind"];
-                    filterViewModel.LastnameFind = dict["LastnameFind"];
-                }
+            if (dict != null)
+            {
+                filterViewModel.SurnameFind = dict["SurnameFind"];
+                filterViewModel.NameFind = dict["NameFind"];
+                filterViewModel.LastnameFind = dict["LastnameFind"];
             }
+
             var peopleQuery = await _cache.GetAll();
 
             //Фильтрация
@@ -86,6 +82,20 @@ namespace RoomRental.Controllers
             };
 
             return View(peopleViewModel);
+        }
+
+        // GET: People/Filter
+        [HttpGet]
+        [SetSession("People")]
+        public async Task<IActionResult> Filter(PersonFilterViewModel filterViewModel, PersonSortState sortOrder = PersonSortState.SurnameAsc)
+        {
+            var routeValues = new RouteValueDictionary
+            {
+                { "filterViewModel", filterViewModel },
+                { "sortOrder", sortOrder }
+            };
+
+            return RedirectToAction(nameof(Index), routeValues);
         }
 
         // GET: ResponsiblePersons/Details/5

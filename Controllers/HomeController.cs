@@ -13,6 +13,8 @@ namespace WebApplication1.Controllers
             _logger = logger;
         }
         //[Authorize(Roles = "admin, user")]
+
+        [ResponseCache(Location = ResponseCacheLocation.Any, Duration = 300)]
         public IActionResult Index()
         {
             return View();

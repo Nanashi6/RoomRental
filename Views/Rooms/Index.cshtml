@@ -13,13 +13,13 @@
             <div><a asp-action="Create">Создать</a></div>
         </div>
         <div class="form-container_two">
-            <form method="post">
+            <form method="get" asp-action="Filter">
                 <input class="filter-input" name="BuildingNameFind" value="@buildingNameFind" placeholder="Название здания" />
 
                 <input class="filter-input" type="text" step="any" name="AreaFind" value="@(areaFind)" placeholder="Площадь" oninput="this.value = this.value.replace(/[^0-9,]/g, '')" />
 
                 <input class="filter-input" type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
-                <input class="submitButton-index" type="submit" value="Искать" />
+                <input class="submitButton-index" type="submit" value="Поиск" />
             </form>
         </div>
     </div>

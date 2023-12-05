@@ -31,37 +31,39 @@ namespace RoomRental.Controllers
         }
 
         // GET: Rentals
-        [SetSession("Rental")]
         public async Task<IActionResult> Index(RentalFilterViewModel filterViewModel, int page = 1, RentalSortState sortOrder = RentalSortState.OrganizationNameAsc)
         {
-            if (HttpContext.Request.Method == "GET")
+            var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Rental");
+
+            if (dict != null)
             {
-                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Rental");
+                filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
 
-                if (dict != null)
-                {
-                    filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
-                    filterViewModel.BuildingIdFind = Int32.Parse(dict["BuildingIdFind"]);
+                if (dict.ContainsKey("BuildingIdFind") && Int32.TryParse(dict["BuildingIdFind"], out int id))
+                    filterViewModel.BuildingIdFind = id;
+                else
+                    filterViewModel.BuildingIdFind = null;
 
-                    DateTime data;
-                    if (dict.ContainsKey("CheckInDateStartFind") && DateTime.TryParse(dict["CheckInDateStartFind"], out data))
-                        filterViewModel.CheckInDateStartFind = data;
-                    else
-                        filterViewModel.CheckInDateStartFind = null;
-                    if (dict.ContainsKey("CheckInDateEndFind") && DateTime.TryParse(dict["CheckInDateEndFind"], out data))
-                        filterViewModel.CheckInDateEndFind = data;
-                    else
-                        filterViewModel.CheckInDateEndFind = null;
+                DateTime data;
+                if (dict.ContainsKey("CheckInDateStartFind") && DateTime.TryParse(dict["CheckInDateStartFind"], out data))
+                    filterViewModel.CheckInDateStartFind = data;
+                else
+                    filterViewModel.CheckInDateStartFind = null;
 
-                    if (dict.ContainsKey("CheckOutDateStartFind") && DateTime.TryParse(dict["CheckOutDateStartFind"], out data))
-                        filterViewModel.CheckOutDateStartFind = data;
-                    else
-                        filterViewModel.CheckOutDateStartFind = null;
-                    if (dict.ContainsKey("CheckOutDateEndFind") && DateTime.TryParse(dict["CheckOutDateEndFind"], out data))
-                        filterViewModel.CheckOutDateEndFind = data;
-                    else
-                        filterViewModel.CheckOutDateEndFind = null;
-                }
+                if (dict.ContainsKey("CheckInDateEndFind") && DateTime.TryParse(dict["CheckInDateEndFind"], out data))
+                    filterViewModel.CheckInDateEndFind = data;
+                else
+                    filterViewModel.CheckInDateEndFind = null;
+
+                if (dict.ContainsKey("CheckOutDateStartFind") && DateTime.TryParse(dict["CheckOutDateStartFind"], out data))
+                    filterViewModel.CheckOutDateStartFind = data;
+                else
+                    filterViewModel.CheckOutDateStartFind = null;
+
+                if (dict.ContainsKey("CheckOutDateEndFind") && DateTime.TryParse(dict["CheckOutDateEndFind"], out data))
+                    filterViewModel.CheckOutDateEndFind = data;
+                else
+                    filterViewModel.CheckOutDateEndFind = null;
             }
 
             var rentals = await _cache.GetAll();
@@ -132,6 +134,20 @@ namespace RoomRental.Controllers
             else
                 ViewData["BuildingId"] = new SelectList(buildings, "BuildingId", "Name");
             return View(rentalsViewModel);
+        }
+
+        // GET: Rentals/Filter
+        [HttpGet]
+        [SetSession("Rental")]
+        public async Task<IActionResult> Filter(RentalFilterViewModel filterViewModel, RentalSortState sortOrder = RentalSortState.OrganizationNameAsc)
+        {
+            var routeValues = new RouteValueDictionary
+            {
+                { "filterViewModel", filterViewModel },
+                { "sortOrder", sortOrder }
+            };
+
+            return RedirectToAction(nameof(Index), routeValues);
         }
 
         // GET: Rentals/Details/5

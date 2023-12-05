@@ -35,25 +35,21 @@ namespace RoomRental.Controllers
         }
 
         // GET: Buildings
-        [SetSession("Building")]
-        public async Task<IActionResult> Index(BuildingFilterViewModel filterViewModel, int page = 1, BuildingSortState sortOrder = BuildingSortState.NameAsc)
+        public async Task<IActionResult> Index(BuildingFilterViewModel filterViewModel = null, int page = 1, BuildingSortState sortOrder = BuildingSortState.NameAsc)
         {
-            if (HttpContext.Request.Method == "GET")
+            var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Building");
+
+            if (dict != null)
             {
-                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Building");
+                filterViewModel.AddressFind = dict["AddressFind"];
+                filterViewModel.BuildingNameFind = dict["BuildingNameFind"];
+                filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
 
-                if (dict != null)
-                {
-                    filterViewModel.AddressFind = dict["AddressFind"];
-                    filterViewModel.BuildingNameFind = dict["BuildingNameFind"];
-                    filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
-
-                    int floorsFind;
-                    if (dict.ContainsKey("FloorsFind") && int.TryParse(dict["FloorsFind"], out floorsFind))
-                        filterViewModel.FloorsFind = floorsFind;
-                    else
-                        filterViewModel.FloorsFind = null;
-                }
+                int floorsFind;
+                if (dict.ContainsKey("FloorsFind") && int.TryParse(dict["FloorsFind"], out floorsFind))
+                    filterViewModel.FloorsFind = floorsFind;
+                else
+                    filterViewModel.FloorsFind = null;
             }
 
             var buildings = await _cache.GetAll();
@@ -111,6 +107,20 @@ namespace RoomRental.Controllers
             };
 
             return View(buildingsViewModel);
+        }
+
+        // GET: Buildings/Filter
+        [HttpGet]
+        [SetSession("Building")]
+        public async Task<IActionResult> Filter(BuildingFilterViewModel filterViewModel, BuildingSortState sortOrder = BuildingSortState.NameAsc)
+        {
+            var routeValues = new RouteValueDictionary
+            {
+                { "filterViewModel", filterViewModel },
+                { "sortOrder", sortOrder }
+            };
+
+            return RedirectToAction(nameof(Index), routeValues);
         }
 
         // GET: Buildings/Details/5

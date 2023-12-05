@@ -22,7 +22,7 @@
             <div><a asp-action="Create">Создать</a></div>
         </div>
         <div class="form-container_two">
-            <form method="post">
+            <form method="get" asp-action="Filter">
                 <input class="filter-input" name="OrganizationNameFind" value="@organizationNameFind"  placeholder="Название организации"/>
 
                 <select class="filter-input" name="BuildingIdFind" asp-items="ViewBag.BuildingId"></select>
@@ -34,7 +34,7 @@
                 <input class="filter-input" type="date" name="CheckOutDateEndFind" value="@checkOutDateEndFind?.ToString("yyyy-MM-dd")" placeholder="Дата выезда" />
 
                 <input class="filter-input" type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
-                <input class="submitButton-index" type="submit" value="Искать" />
+                <input class="submitButton-index" type="submit" value="Поиск" />
             </form>
         </div>
     </div>
@@ -120,91 +120,3 @@
                    page-url-checkOutDateEndFind="@checkOutDateEndFind"></page-link>
     </div>
 </div>
-@* 
-<h1>Rentals</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-
-<form method="post">
-    <label>Название организации: </label>
-    <input name="OrganizationNameFind" value="@organizationNameFind" />
-
-    <label>Дата заезда: </label>
-    <input type="date" name="CheckInDateFind" value="@checkInDateFind?.ToString("yyyy-MM-dd")" />
-
-    <label>Дата выезда: </label>
-    <input type="date" name="CheckOutDateFind" value="@checkOutDateFind?.ToString("yyyy-MM-dd")" />
-
-    <input type="hidden" name="sortOrder" value="@Model.SortViewModel.Current" />
-    <input type="submit" value="Фильтр" />
-</form>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RoomId)
-            </th>
-            <th>
-                <a asp-action="Index"
-                   asp-route-sortOrder="@(Model.SortViewModel.OrganizationNameSort)"
-                   asp-route-organizationNameFind="@organizationNameFind"
-                   asp-route-checkInDateFind="@checkInDateFind"
-                   asp-route-checkOutDateFind="@checkOutDateFind">
-                    @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().RentalOrganization)
-                </a>
-            </th>
-            <th>
-                <a asp-action="Index"
-                   asp-route-sortOrder="@(Model.SortViewModel.CheckInDateSort)"
-                   asp-route-organizationNameFind="@organizationNameFind"
-                   asp-route-checkInDateFind="@checkInDateFind"
-                   asp-route-checkOutDateFind="@checkOutDateFind">
-                    @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().CheckInDate)
-                </a>
-            </th>
-            <th>
-                <a asp-action="Index"
-                   asp-route-sortOrder="@(Model.SortViewModel.CheckOutDateSort)"
-                   asp-route-organizationNameFind="@organizationNameFind"
-                   asp-route-checkInDateFind="@checkInDateFind"
-                   asp-route-checkOutDateFind="@checkOutDateFind">
-                    @Html.DisplayNameFor(model => model.Rentals.SingleOrDefault().CheckOutDate)
-                </a>
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Rentals) {
-        <tr>
-            <td>
-                    @Html.DisplayFor(modelItem => item.Room.Building.Name), №@Html.DisplayFor(modelItem => item.Room.RoomNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RentalOrganization.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CheckInDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CheckOutDate)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.RentalId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.RentalId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.RentalId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-
-<page-link page-model="Model.PageViewModel" page-action="Index"
-           page-url-sortOrder="@(Model.SortViewModel.Current)"
-           page-url-organizationNameFind="@organizationNameFind"
-           page-url-checkInDateFind="@checkInDateFind"
-           page-url-checkOutDateFind="@checkOutDateFind"></page-link> *@

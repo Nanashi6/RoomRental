@@ -5,6 +5,7 @@ using RoomRental.Attributes;
 using RoomRental.Models;
 using RoomRental.Services;
 using RoomRental.ViewModels;
+using RoomRental.ViewModels.FilterViewModels;
 using RoomRental.ViewModels.SortStates;
 using RoomRental.ViewModels.SortViewModels;
 
@@ -25,28 +26,29 @@ namespace RoomRental.Controllers
             _pageSize = int.Parse(appConfig["Parameters:PageSize"]);
         }
 
-        // GET/POST: Organizations
+        // GET: Organizations
         [HttpGet]
-        [HttpPost]
-        [SetSession("Organization")]
-        public async Task<IActionResult> Index(string organizationNameFind = "", int page = 1, OrganizationSortState sortOrder = OrganizationSortState.NameAsc)
+        public async Task<IActionResult> Index(OrganizationFilterViewModel filterViewModel, int page = 1, OrganizationSortState sortOrder = OrganizationSortState.NameAsc)
         {
-            if (HttpContext.Request.Method == "GET")
-            {
-                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Organization");
+            //Изъятие данных фильтрации из сессии
+            var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Organization");
 
-                if (dict != null)
-                {
-                    organizationNameFind = dict["organizationNameFind"];
-                }
+            if (dict != null)
+            {
+                filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
+                filterViewModel.AddressFind = dict["AddressFind"];
             }
 
             var organizationsQuery = await _cache.GetAll();
 
             //Фильтрация
-            if (!String.IsNullOrEmpty(organizationNameFind))
+            if (!String.IsNullOrEmpty(filterViewModel.OrganizationNameFind))
             {
-                organizationsQuery = organizationsQuery.Where(e => e.Name.Contains(organizationNameFind)).ToList();
+                organizationsQuery = organizationsQuery.Where(e => e.Name.Contains(filterViewModel.OrganizationNameFind)).ToList();
+            }
+            if (!String.IsNullOrEmpty(filterViewModel.AddressFind))
+            {
+                organizationsQuery = organizationsQuery.Where(e => e.PostalAddress.Contains(filterViewModel.AddressFind)).ToList();
             }
 
             //Сортировка
@@ -75,11 +77,25 @@ namespace RoomRental.Controllers
             {
                 Organizations = organizationsQuery,
                 PageViewModel = new PageViewModel(page, count, _pageSize),
-                OrganizationNameFind = organizationNameFind,
+                FilterViewModel = filterViewModel,
                 SortViewModel = new OrganizationSortViewModel(sortOrder)
             };
 
             return View(organizationsViewModel);
+        }
+
+        // GET: Organizations/Filter
+        [HttpGet]
+        [SetSession("Organization")]
+        public async Task<IActionResult> Filter(OrganizationFilterViewModel filterViewModel = null, OrganizationSortState sortOrder = OrganizationSortState.NameAsc)
+        {
+            var routeValues = new RouteValueDictionary
+            {
+                { "filterViewModel", filterViewModel },
+                { "sortOrder", sortOrder }
+            };
+
+            return RedirectToAction(nameof(Index), routeValues);
         }
 
         // GET: Organizations/Details/5

@@ -32,40 +32,36 @@ namespace RoomRental.Controllers
         }
 
         // GET: Invoices
-        [SetSession("Invoice")]
         public async Task<IActionResult> Index(InvoiceFilterViewModel filterViewModel, int page = 1, InvoiceSortState sortOrder = InvoiceSortState.OrganizationNameAsc)
         {
-            if (HttpContext.Request.Method == "GET")
+            var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Invoice");
+
+            if (dict != null)
             {
-                var dict = Infrastructure.SessionExtensions.Get(HttpContext.Session, "Invoice");
+                filterViewModel.ResponsiblePersonFind = dict["ResponsiblePersonFind"];
+                filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
 
-                if (dict != null)
-                {
-                    filterViewModel.ResponsiblePersonFind = dict["ResponsiblePersonFind"];
-                    filterViewModel.OrganizationNameFind = dict["OrganizationNameFind"];
+                DateTime date;
+                if (dict.ContainsKey("PaymentDateFind") && DateTime.TryParse(dict["PaymentDateFind"], out date))
+                    filterViewModel.PaymentDateFind = date;
+                else
+                    filterViewModel.PaymentDateFind = null;
 
-                    DateTime date;
-                    if (dict.ContainsKey("PaymentDateFind") && DateTime.TryParse(dict["PaymentDateFind"], out date))
-                        filterViewModel.PaymentDateFind = date;
-                    else
-                        filterViewModel.PaymentDateFind = null;
+                if (dict.ContainsKey("ConclusionDateFind") && DateTime.TryParse(dict["ConclusionDateFind"], out date))
+                    filterViewModel.ConclusionDateFind = date;
+                else
+                    filterViewModel.ConclusionDateFind = null;
 
-                    if (dict.ContainsKey("ConclusionDateFind") && DateTime.TryParse(dict["ConclusionDateFind"], out date))
-                        filterViewModel.ConclusionDateFind = date;
-                    else
-                        filterViewModel.ConclusionDateFind = null;
+                if (dict.ContainsKey("PermissionDateFind") && DateTime.TryParse(dict["PermissionDateFind"], out date))
+                    filterViewModel.PermissionDateFind = date;
+                else
+                    filterViewModel.PermissionDateFind = null;
 
-                    if (dict.ContainsKey("PermissionDateFind") && DateTime.TryParse(dict["PermissionDateFind"], out date))
-                        filterViewModel.PermissionDateFind = date;
-                    else
-                        filterViewModel.PermissionDateFind = null;
-
-                    Decimal amountFind;
-                    if (dict.ContainsKey("AmountFind") && Decimal.TryParse(dict["AmountFind"], out amountFind))
-                        filterViewModel.AmountFind = amountFind;
-                    else
-                        filterViewModel.AmountFind = null;
-                }
+                Decimal amountFind;
+                if (dict.ContainsKey("AmountFind") && Decimal.TryParse(dict["AmountFind"], out amountFind))
+                    filterViewModel.AmountFind = amountFind;
+                else
+                    filterViewModel.AmountFind = null;
             }
 
             var invoices = await _cache.GetAll();
@@ -133,6 +129,20 @@ namespace RoomRental.Controllers
             };
 
             return View(invoicesViewModel);
+        }
+
+        // GET: Invoices/Filter
+        [HttpGet]
+        [SetSession("Invoice")]
+        public async Task<IActionResult> Filter(InvoiceFilterViewModel filterViewModel, InvoiceSortState sortOrder = InvoiceSortState.OrganizationNameAsc)
+        {
+            var routeValues = new RouteValueDictionary
+            {
+                { "filterViewModel", filterViewModel },
+                { "sortOrder", sortOrder }
+            };
+
+            return RedirectToAction(nameof(Index), routeValues);
         }
 
         // GET: Invoices/Details/5
